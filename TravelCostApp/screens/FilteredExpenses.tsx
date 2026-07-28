@@ -8,9 +8,9 @@ import { GlobalStyles } from "../constants/styles";
 import PropTypes from "prop-types";
 import BackButton from "../components/UI/BackButton";
 import BlurPremium from "../components/Premium/BlurPremium";
-import FlatButton from "../components/UI/FlatButton";
+import ActionRowStack from "../components/UI/ActionRowStack";
+import { buildAddExpenseHereAction } from "../components/UI/AddExpensesHereButton";
 import { useNavigation } from "@react-navigation/native";
-import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { getEarliestDate } from "../util/date";
 import { ExpenseData } from "../util/expense";
 import {
@@ -34,6 +34,9 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
   const navigation = useNavigation();
   const earliestDate = getEarliestDate(
     expenses.map((exp: ExpenseData) => expenseDateToIsoString(exp.date))
+  );
+  const addExpenseAction = buildAddExpenseHereAction(earliestDate, (screen, params) =>
+    navigation.navigate(screen as never, params as never)
   );
   // ||new Date(dayString).toISOString();
 
@@ -67,11 +70,35 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
       />
       {/* <BlurPremium canBack /> */}
       {!withArgs && (
-        <View style={{ flexDirection: "row" }}>
-          <FlatButton onPress={() => navigation.pop()}>
-            {i18n.t("back")}
-          </FlatButton>
-          <AddExpenseHereButton dayISO={earliestDate} />
+        <View style={styles.footerActions}>
+          {addExpenseAction ? (
+            <ActionRowStack
+              showChevron={false}
+              actions={[
+                addExpenseAction,
+                {
+                  testID: "filtered-expenses-back",
+                  tier: "secondary",
+                  label: i18n.t("back"),
+                  icon: "arrow-back-outline",
+                  onPress: () => navigation.pop(),
+                },
+              ]}
+            />
+          ) : (
+            <ActionRowStack
+              showChevron={false}
+              actions={[
+                {
+                  testID: "filtered-expenses-back",
+                  tier: "secondary",
+                  label: i18n.t("back"),
+                  icon: "arrow-back-outline",
+                  onPress: () => navigation.pop(),
+                },
+              ]}
+            />
+          )}
         </View>
       )}
     </View>
@@ -106,6 +133,10 @@ const styles = StyleSheet.create({
   titleContainer: {
     marginVertical: "4%",
     flexDirection: "row",
+  },
+  footerActions: {
+    paddingHorizontal: "2%",
+    paddingBottom: "2%",
   },
   shadow: {
     borderTopWidth: 1,

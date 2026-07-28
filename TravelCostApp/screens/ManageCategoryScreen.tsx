@@ -22,7 +22,7 @@ import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import { fetchCategories, updateTrip } from "../util/http";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
-import GradientButton from "../components/UI/GradientButton";
+import ActionRow from "../components/UI/ActionRow";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { KeyboardAvoidingView } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
@@ -37,7 +37,6 @@ import IconButton from "../components/UI/IconButton";
 import { NetworkContext } from "../store/network-context";
 import InfoButton from "../components/UI/InfoButton";
 import Modal from "react-native-modal";
-import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
@@ -416,9 +415,12 @@ const ManageCategoryScreen = ({ navigation }) => {
       <View style={styles.infoModalContainer}>
         <Text style={styles.infoTitleText}>{infoTitleText}</Text>
         <Text style={styles.infoContentText}>{infoContentText}</Text>
-        <FlatButton onPress={setInfoIsVisible.bind(this, false)}>
-          {i18n.t("confirm")}
-        </FlatButton>
+        <ActionRow
+          tier="primary"
+          label={i18n.t("confirm")}
+          onPress={setInfoIsVisible.bind(this, false)}
+          showChevron={false}
+        />
       </View>
     </Modal>
   );
@@ -532,9 +534,7 @@ const ManageCategoryScreen = ({ navigation }) => {
               overflow: "visible",
             }}
           />
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
-          >
+          <View style={styles.footerActions}>
             <IconButton
               icon={"chevron-back-outline"}
               size={24}
@@ -544,9 +544,12 @@ const ManageCategoryScreen = ({ navigation }) => {
               }}
               color={GlobalStyles.colors.primaryGrayed}
             ></IconButton>
-            <GradientButton
-              colors={GlobalStyles.gradientAccentButton}
-              darkText
+            <ActionRow
+              testID="manage-category-reset"
+              tier="gradient"
+              accentColors={GlobalStyles.gradientAccentButton}
+              label={i18n.t("reset")}
+              icon="refresh-outline"
               onPress={() => {
                 alertYesNo(
                   i18n.t("reset"),
@@ -554,20 +557,19 @@ const ManageCategoryScreen = ({ navigation }) => {
                   handleResetCategoryList
                 );
               }}
-            >
-              {i18n.t("reset")}
-            </GradientButton>
-
+            />
             {touched && (
-              <GradientButton
+              <ActionRow
+                testID="manage-category-confirm"
+                tier="primary"
+                label={i18n.t("confirm")}
+                icon="checkmark-circle-outline"
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setTouched(false);
                   navigation.pop();
                 }}
-              >
-                {i18n.t("confirm")}
-              </GradientButton>
+              />
             )}
           </View>
         </KeyboardAvoidingView>
@@ -712,5 +714,9 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
+  },
+  footerActions: {
+    paddingHorizontal: dynamicScale(8, false, 0.5),
+    paddingBottom: dynamicScale(8, true),
   },
 });

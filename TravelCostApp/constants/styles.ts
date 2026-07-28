@@ -161,6 +161,12 @@ export const GlobalStyles = {
     transform: [{ scale: 0.975 }],
     opacity: 0.975,
   },
+  /** Action rows — same subtle scale as trip list (75% less than legacy 0.9). */
+  pressedActionRow: {
+    elevation: 0,
+    transform: [{ scale: 0.975 }],
+    opacity: 0.975,
+  },
   countryFlagStyle: {
     width: dynamicScale(30, false, 0.5),
     height: dynamicScale(25, false, 0.5),

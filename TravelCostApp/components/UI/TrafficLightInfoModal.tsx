@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
 import { i18n } from "../../i18n/i18n";
 import { GlobalStyles } from "../../constants/styles";
-import FlatButton from "./FlatButton";
+import ActionRow from "./ActionRow";
 import { dynamicScale } from "../../util/scalingUtil";
 import PropTypes from "prop-types";
 
@@ -25,7 +25,15 @@ const TrafficLightInfoModal = ({ isVisible, onClose }) => {
         <Text style={styles.infoContentText}>
           {i18n.t("trafficLightInfoText")}
         </Text>
-        <FlatButton onPress={onClose}>{i18n.t("confirm")}</FlatButton>
+        <ActionRow
+          tier="primary"
+          label={i18n.t("confirm")}
+          icon="checkmark-outline"
+          showChevron={false}
+          compact
+          onPress={onClose}
+          style={styles.confirmButton}
+        />
       </View>
     </Modal>
   );
@@ -65,5 +73,8 @@ const styles = StyleSheet.create({
     marginBottom: dynamicScale(24, true),
     textAlign: "center",
     lineHeight: dynamicScale(20, false, 0.5),
+  },
+  confirmButton: {
+    alignSelf: "stretch",
   },
 });

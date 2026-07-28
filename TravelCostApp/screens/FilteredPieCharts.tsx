@@ -11,10 +11,10 @@ import ExpenseCategories from "../components/ExpensesOutput/ExpenseStatistics/Ex
 import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers";
 import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCountries";
 import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies";
-import FlatButton from "../components/UI/FlatButton";
+import ActionRowStack from "../components/UI/ActionRowStack";
+import { buildAddExpenseHereAction } from "../components/UI/AddExpensesHereButton";
 import FilteredExpenses from "./FilteredExpenses";
 import BackButton from "../components/UI/BackButton";
-import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
@@ -109,6 +109,16 @@ const FilteredPieCharts = ({ navigation, route }) => {
       ),
     [expenses]
   );
+  const addExpenseAction = buildAddExpenseHereAction(earliestDate, (screen, params) =>
+    navigation.navigate(screen, params)
+  );
+  const backAction = {
+    testID: "filtered-pie-charts-back",
+    tier: "secondary" as const,
+    label: i18n.t("back"),
+    icon: "arrow-back-outline" as const,
+    onPress: () => navigation.pop(),
+  };
 
   return (
     <View style={styles.container}>
@@ -164,10 +174,14 @@ const FilteredPieCharts = ({ navigation, route }) => {
       <View style={styles.shadow}></View>
       {contents[toggleGraphEnum]}
       <View style={styles.footerContainer}>
-        <FlatButton onPress={() => navigation.pop()}>
-          {i18n.t("back")}
-        </FlatButton>
-        <AddExpenseHereButton dayISO={earliestDate}></AddExpenseHereButton>
+        <ActionRowStack
+          showChevron={false}
+          actions={
+            addExpenseAction
+              ? [addExpenseAction, backAction]
+              : [backAction]
+          }
+        />
       </View>
     </View>
   );
@@ -255,10 +269,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: "5%",
+    paddingBottom: dynamicScale(8, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

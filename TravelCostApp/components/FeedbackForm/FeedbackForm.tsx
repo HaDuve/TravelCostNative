@@ -14,8 +14,8 @@ import * as Haptics from "expo-haptics";
 import { i18n } from "../../i18n/i18n";
 
 import PropTypes from "prop-types";
-import GradientButton from "../UI/GradientButton";
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
+import ActionRowStack from "../UI/ActionRowStack";
 import { GlobalStyles } from "../../constants/styles";
 import { UserContext } from "../../store/user-context";
 import { storeFeedback, FeedbackData } from "../../util/http";
@@ -128,23 +128,25 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
             </Text>
           </View>
 
-          <View style={styles.modalButtons}>
-            <FlatButton onPress={handleClose} textStyle={{ fontSize: 16 }}>
-              {i18n.t("cancel")}
-            </FlatButton>
-            <GradientButton
-              style={styles.submitButton}
-              colors={GlobalStyles.gradientColorsButton}
-              onPress={handleSubmit}
-              darkText
-              buttonStyle={[
-                { padding: 8, paddingHorizontal: 12 },
-                (isSubmitting || !feedbackText.trim()) && styles.disabledButton,
-              ]}
-            >
-              {isSubmitting ? i18n.t("submitting") : i18n.t("submit")}
-            </GradientButton>
-          </View>
+          <ActionRowStack
+            showChevron={false}
+            actions={[
+              {
+                testID: "feedback-submit",
+                tier: "primary",
+                label: isSubmitting ? i18n.t("submitting") : i18n.t("submit"),
+                icon: "paper-plane-outline",
+                onPress: handleSubmit,
+                disabled: isSubmitting || !feedbackText.trim(),
+              },
+              {
+                testID: "feedback-cancel",
+                tier: "secondary",
+                label: i18n.t("cancel"),
+                onPress: handleClose,
+              },
+            ]}
+          />
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -208,18 +210,6 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray500,
     textAlign: "right",
     marginTop: dynamicScale(4),
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  submitButton: {
-    marginLeft: dynamicScale(16, false, 0.5),
-    flex: 1,
-  },
-  disabledButton: {
-    opacity: 0.5,
   },
 });
 

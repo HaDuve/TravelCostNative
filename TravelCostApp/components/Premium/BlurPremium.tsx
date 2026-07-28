@@ -1,7 +1,7 @@
 import { Alert, Platform, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { BlurView } from "expo-blur";
-import GradientButton from "../UI/GradientButton";
+import ActionRow from "../UI/ActionRow";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { GlobalStyles } from "../../constants/styles";
 
@@ -12,7 +12,6 @@ import { Card } from "react-native-paper";
 import { sleep } from "../../util/appState";
 import { NetworkContext } from "../../store/network-context";
 import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
 import { shouldShowOnboarding } from "../Rating/firstStartUtil";
 import { trackEvent } from "../../util/vexo-tracking";
@@ -90,10 +89,12 @@ const BlurPremium = ({ canBack = false }) => {
               // marginLeft: -55,
             }}
           >
-            <GradientButton
-              darkText
-              buttonStyle={{}}
-              colors={GlobalStyles.gradientColorsButton}
+            <ActionRow
+              tier="gradient"
+              label={i18n.t("paywallTitle")}
+              icon="diamond-outline"
+              showChevron={false}
+              compact
               onPress={() => {
                 if (!isConnected) {
                   Alert.alert(
@@ -105,16 +106,18 @@ const BlurPremium = ({ canBack = false }) => {
                 trackEvent(VexoEvents.PREMIUM_BLUR_CARD_PRESSED);
                 navigation.navigate("Paywall");
               }}
-            >
-              {i18n.t("paywallTitle")}
-            </GradientButton>
+            />
             {canBack && (
-              <FlatButton
+              <ActionRow
+                tier="secondary"
+                label={i18n.t("back")}
+                icon="chevron-back-outline"
                 onPress={() => navigation.goBack()}
-                textStyle={{ marginTop: 12, marginBottom: isAndroid ? 0 : -12 }}
-              >
-                Back
-              </FlatButton>
+                style={{
+                  marginTop: 12,
+                  marginBottom: isAndroid ? 0 : -12,
+                }}
+              />
             )}
           </Card>
         </Animated.View>

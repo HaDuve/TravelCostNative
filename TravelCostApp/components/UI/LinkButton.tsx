@@ -1,6 +1,6 @@
 import { Linking } from "react-native";
 import React from "react";
-import GradientButton from "./GradientButton";
+import ActionRow from "./ActionRow";
 import PropTypes from "prop-types";
 import safeLogError from "../../util/error";
 import { trackEvent } from "../../util/vexo-tracking";
@@ -21,9 +21,13 @@ const LinkingButton = ({ children, URL, style = {} }) => {
     });
   };
   return (
-    <GradientButton onPress={handleClick} style={style}>
-      {children}
-    </GradientButton>
+    <ActionRow
+      tier="secondary"
+      label={typeof children === "string" ? children : String(children)}
+      icon="open-outline"
+      onPress={handleClick}
+      style={style}
+    />
   );
 };
 

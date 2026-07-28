@@ -9,7 +9,7 @@ import {
 import * as Haptics from "expo-haptics";
 
 import React, { useState } from "react";
-import FlatButton from "../components/UI/FlatButton";
+import ActionRow from "../components/UI/ActionRow";
 import { GlobalStyles } from "../constants/styles";
 
 import { i18n } from "../i18n/i18n";
@@ -17,7 +17,6 @@ import { fetchCategories } from "../util/http";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import { Ionicons } from "@expo/vector-icons";
-import GradientButton from "../components/UI/GradientButton";
 import { useFocusEffect } from "@react-navigation/native";
 import { Alert } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
@@ -221,31 +220,31 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         ListFooterComponent={
           <View>
             <View style={styles.buttonContainer}>
-              <FlatButton
+              <ActionRow
+                testID="category-pick-continue"
+                tier="primary"
+                label={i18n.t("continue")}
+                icon="arrow-forward-outline"
+                onPress={() => {
+                  if (expenseId) {
+                    updateTempCategory("undefined");
+                    navigation.goBack();
+                  } else {
+                    navigation.navigate("ManageExpense", {
+                      pickedCat: "undefined",
+                    });
+                  }
+                }}
+              />
+              <ActionRow
+                testID="category-pick-back"
+                tier="secondary"
+                label={i18n.t("cancel")}
+                icon="arrow-back-outline"
                 onPress={() => {
                   navigation.goBack();
                 }}
-                textStyle={{}}
-              >
-                {i18n.t("cancel")}
-              </FlatButton>
-              {true && (
-                <GradientButton
-                  buttonStyle={styles.continueButtonStyle}
-                  onPress={() => {
-                    if (expenseId) {
-                      updateTempCategory("undefined");
-                      navigation.goBack();
-                    } else {
-                      navigation.navigate("ManageExpense", {
-                        pickedCat: "undefined",
-                      });
-                    }
-                  }}
-                >
-                  {i18n.t("continue")}
-                </GradientButton>
-              )}
+              />
             </View>
           </View>
         }
@@ -303,9 +302,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     paddingVertical: "4%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
+    paddingHorizontal: "2%",
   },
   buttonStyle: {
     backgroundColor: GlobalStyles.colors.gray500,
@@ -327,9 +324,5 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     fontWeight: "200",
     fontStyle: "italic",
-  },
-  continueButtonStyle: {
-    paddingVertical: "12%",
-    paddingHorizontal: "12%",
   },
 });

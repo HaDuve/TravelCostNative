@@ -11,7 +11,7 @@ import { i18n } from "../../i18n/i18n";
 import type { ExpenseData } from "../../util/expense";
 import { templatePickerModalContentWidth } from "../../util/modal-layout";
 import { dynamicScale } from "../../util/scalingUtil";
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
 import InfoButton from "../UI/InfoButton";
 
 export type ExpenseTemplatePickerModalProps = {
@@ -105,11 +105,14 @@ const ExpenseTemplatePickerModal = ({
           containerStyle={styles.infoButton}
           onPress={openHelp}
         />
-        <View testID="expense-template-picker-close">
-          <FlatButton onPress={onClose} textStyle={styles.closeButtonText}>
-            {i18n.t("cancel")}
-          </FlatButton>
-        </View>
+        <ActionRow
+          testID="expense-template-picker-close"
+          tier="secondary"
+          label={i18n.t("cancel")}
+          onPress={onClose}
+          showChevron={false}
+          style={styles.closeAction}
+        />
       </View>
       <ExpenseTemplateHelpModal isVisible={helpVisible} onClose={closeHelp} />
       <FlatList
@@ -160,8 +163,9 @@ const styles = StyleSheet.create({
   infoButton: {
     marginHorizontal: dynamicScale(6, false, 0.5),
   },
-  closeButtonText: {
-    fontSize: dynamicScale(16, false, 0.5),
+  closeAction: {
+    marginBottom: 0,
+    flex: 1,
   },
   sectionSubtitle: {
     fontWeight: "300",

@@ -1,72 +1,55 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
-import * as Haptics from "expo-haptics";
+import { type StyleProp, type ViewStyle } from "react-native";
+import PropTypes from "prop-types";
 
+import { actionRowLabelFromChildren } from "../../util/action-row-label";
+import ActionRow from "./ActionRow";
+
+/**
+ * @deprecated Use {@link ActionRow} directly instead.
+ * Kept as a compatibility shim for legacy call sites; do not add new usages.
+ */
 const Button = ({
   children,
   onPress,
   mode = "",
   style = {},
   buttonStyle = {},
+  hint,
+  icon,
+}: {
+  children: React.ReactNode;
+  onPress: () => void;
+  mode?: string;
+  style?: StyleProp<ViewStyle>;
+  buttonStyle?: StyleProp<ViewStyle>;
+  hint?: string;
+  icon?: React.ComponentProps<typeof ActionRow>["icon"];
 }) => {
-  const onPressHandler = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-    return;
-  };
+  const label = actionRowLabelFromChildren(children);
+  const tier = mode === "flat" ? "secondary" : "primary";
+
   return (
-    <View style={style}>
-      <Pressable
-        onPress={onPressHandler}
-        style={({ pressed }) => [
-          styles.button,
-          buttonStyle,
-          pressed && GlobalStyles.pressedWithShadow,
-        ]}
-      >
-        <View style={[mode === "flat" && styles.flat]}>
-          <Text
-            style={[
-              GlobalStyles.buttonTextPrimary,
-              mode === "flat" && styles.flatText,
-            ]}
-          >
-            {children}
-          </Text>
-        </View>
-      </Pressable>
-    </View>
+    <ActionRow
+      tier={tier}
+      label={label}
+      hint={hint}
+      icon={icon}
+      onPress={onPress}
+      showChevron={false}
+      style={[style, buttonStyle]}
+    />
   );
 };
 
 export default Button;
 
-const styles = StyleSheet.create({
-  button: {
-    padding: 16,
-    backgroundColor: GlobalStyles.colors.primary500,
-    borderRadius: 16,
-    elevation: 3,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowRadius: 3,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.4,
-    overflow: "visible",
-  },
-  flat: {
-    // TODO: find another way android
-    // backgroundColor: "transparent",
-  },
-  flatText: {
-    color: GlobalStyles.colors.primary200,
-  },
-  pressed: {
-    transform: [{ scale: 0.9 }],
-    opacity: 0.75,
-    backgroundColor: GlobalStyles.colors.primary100,
-    borderRadius: 16,
-    shadowColor: GlobalStyles.colors.backgroundColor,
-    shadowRadius: 0,
-  },
-});
+Button.propTypes = {
+  children: PropTypes.node.isRequired,
+  onPress: PropTypes.func.isRequired,
+  mode: PropTypes.string,
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  buttonStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  hint: PropTypes.string,
+  icon: PropTypes.string,
+};

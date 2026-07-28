@@ -14,8 +14,8 @@ import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
-import GradientButton from "../UI/GradientButton";
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
+import ActionRowStack from "../UI/ActionRowStack";
 import PropTypes from "prop-types";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
@@ -45,7 +45,6 @@ const GetLocalPriceButton = ({ navigation, style }) => {
       return;
     }
 
-    // Track get local price from profile
     trackEvent(VexoEvents.GET_LOCAL_PRICE_PROFILE_PRESSED, {
       product: productInput.trim(),
       currency: userCtx.lastCurrency || tripCtx.tripCurrency || "EUR",
@@ -67,26 +66,18 @@ const GetLocalPriceButton = ({ navigation, style }) => {
     setProductInput("");
   };
 
-  // Use different styles based on whether we're in header mode or standalone
-  const buttonStyle = style ? style : styles.settingsButton;
-
   return (
     <>
-      <GradientButton
-        style={buttonStyle}
-        buttonStyle={styles.gradientButtonStyle}
-        colors={GlobalStyles.gradientColorsButton}
+      <ActionRow
+        testID="profile-get-local-price"
+        tier="gradient"
+        label={i18n.t("getLocalPriceTitle")}
+        hint={i18n.t("getLocalPriceHint")}
+        imageIconSource={require("../../assets/chatgpt-logo.jpeg")}
         onPress={handleGetLocalPrice}
-        darkText
-      >
-        <View style={styles.buttonContent}>
-          <Image
-            source={require("../../assets/chatgpt-logo.jpeg")}
-            style={styles.buttonIcon}
-          />
-          <Text style={styles.buttonText}>{i18n.t("getLocalPriceTitle")}</Text>
-        </View>
-      </GradientButton>
+        showChevron={false}
+        style={style}
+      />
 
       <Modal
         visible={showLocalPriceModal}
@@ -122,23 +113,24 @@ const GetLocalPriceButton = ({ navigation, style }) => {
               onSubmitEditing={handleLocalPriceSubmit}
             />
 
-            <View style={styles.modalButtons}>
-              <FlatButton
-                onPress={handleModalClose}
-                textStyle={{ fontSize: 16 }}
-              >
-                {i18n.t("cancel")}
-              </FlatButton>
-              <GradientButton
-                style={styles.submitButton}
-                colors={GlobalStyles.gradientColorsButton}
-                onPress={handleLocalPriceSubmit}
-                darkText
-                buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
-              >
-                {i18n.t("getLocalPriceTitle")}
-              </GradientButton>
-            </View>
+            <ActionRowStack
+              showChevron={false}
+              actions={[
+                {
+                  testID: "get-local-price-submit",
+                  tier: "gradient",
+                  label: i18n.t("getLocalPriceTitle"),
+                  onPress: handleLocalPriceSubmit,
+                  disabled: !productInput.trim(),
+                },
+                {
+                  testID: "get-local-price-cancel",
+                  tier: "secondary",
+                  label: i18n.t("cancel"),
+                  onPress: handleModalClose,
+                },
+              ]}
+            />
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -152,38 +144,6 @@ GetLocalPriceButton.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  settingsButton: {
-    marginVertical: "2%",
-    marginHorizontal: "8%",
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    alignSelf: "center",
-  },
-  gradientButtonStyle: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 0, // Override GradientButton's default margin
-  },
-  buttonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: dynamicScale(2, true),
-    marginBottom: dynamicScale(-2, true),
-  },
-  buttonIcon: {
-    width: dynamicScale(18, false, 0.5),
-    height: dynamicScale(18, false, 0.5),
-    marginRight: dynamicScale(6, false, 0.5),
-  },
-  buttonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.textColor,
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

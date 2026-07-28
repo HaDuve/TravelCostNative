@@ -22,7 +22,7 @@ import { DEVELOPER_MODE } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
 import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
 import PropTypes from "prop-types";
-import GradientButton from "../components/UI/GradientButton";
+import ActionRow from "../components/UI/ActionRow";
 import SettingsSection from "../components/UI/SettingsSection";
 import Toast from "react-native-toast-message";
 import { useEffect } from "react";
@@ -190,11 +190,12 @@ const SettingsScreen = ({ navigation }) => {
       >
         {i18n.t("visitFoodForNomadsLabel")}
       </LinkingButton>
-      <GradientButton
+      <ActionRow
         style={styles.settingsButton}
-        buttonStyle={{}}
-        darkText
-        colors={GlobalStyles.gradientColorsButton}
+        tier="primary"
+        label={premiumButtonString}
+        icon="diamond-outline"
+        showChevron={false}
         onPress={() => {
           if (!isConnected) {
             Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
@@ -208,9 +209,7 @@ const SettingsScreen = ({ navigation }) => {
             navigation.navigate("Paywall");
           }
         }}
-      >
-        {premiumButtonString}
-      </GradientButton>
+      />
       <CurrencyExchangeInfo />
       {!isRestoringPurchases && (
         <TouchableOpacity onPress={() => restorePurchases()}>

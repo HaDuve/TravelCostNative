@@ -21,6 +21,12 @@ export type AppProviderOverrides = {
   settings?: Record<string, unknown>;
   orientation?: Record<string, unknown>;
   wrapNavigation?: boolean;
+  safeAreaInsets?: {
+    top: number;
+    left: number;
+    right: number;
+    bottom: number;
+  };
 };
 
 const defaultTrip = {
@@ -91,12 +97,18 @@ export function AppProviders({
     ...overrides.orientation,
   };
   const auth = { uid: "u1", ...overrides.auth };
+  const safeAreaInsets = overrides.safeAreaInsets ?? {
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  };
 
   const tree = (
     <SafeAreaProvider
       initialMetrics={{
         frame: { x: 0, y: 0, width: 390, height: 844 },
-        insets: { top: 0, left: 0, right: 0, bottom: 0 },
+        insets: safeAreaInsets,
       }}
     >
       <AuthContext.Provider value={auth as any}>

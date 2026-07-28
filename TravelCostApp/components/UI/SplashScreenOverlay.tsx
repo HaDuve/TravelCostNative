@@ -8,9 +8,8 @@ import Animated, {
   ZoomOutDown,
 } from "react-native-reanimated";
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
-import FlatButton from "./FlatButton";
 import { asyncStoreSafeClear } from "../../store/async-storage";
-import IconButton from "./IconButton";
+import ActionRow from "./ActionRow";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;
@@ -41,28 +40,17 @@ const SplashScreenOverlay = () => {
           >
             <ActivityIndicator size={"large"} color={loadingColor} />
           </Animated.View>
-          <Animated.View
-            entering={ZoomInDown.duration(1200).delay(3500)}
-            style={{ flexDirection: "row" }}
-          >
-            <IconButton
+          <Animated.View entering={ZoomInDown.duration(1200).delay(3500)}>
+            <ActionRow
+              tier="secondary"
+              label="Login / Signup"
+              icon="refresh-outline"
               onPress={async () => {
                 await asyncStoreSafeClear();
                 await reloadApp();
               }}
-              icon={"chevron-back-outline"}
-              size={24}
-              color={"black"}
-            ></IconButton>
-            <FlatButton
-              textStyle={{ color: "black" }}
-              onPress={async () => {
-                await asyncStoreSafeClear();
-                await reloadApp();
-              }}
-            >
-              Login / Signup
-            </FlatButton>
+              style={{ marginHorizontal: 24 }}
+            />
           </Animated.View>
         </ImageBackground>
       </Animated.View>

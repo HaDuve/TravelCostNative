@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
-import Button from "./Button";
+import ActionRow from "./ActionRow";
 import PropTypes from "prop-types";
 
 import { i18n } from "../../i18n/i18n";
@@ -11,7 +11,12 @@ const ErrorOverlay = ({ message, onConfirm }) => {
     <View style={styles.container}>
       <Text style={[styles.text, styles.title]}>{i18n.t("anErrorOccurred")}</Text>
       <Text style={styles.text}>{message}</Text>
-      <Button onPress={onConfirm}>{i18n.t("okay")}</Button>
+      <ActionRow
+        tier="primary"
+        label={i18n.t("okay")}
+        onPress={onConfirm}
+        showChevron={false}
+      />
     </View>
   );
 };

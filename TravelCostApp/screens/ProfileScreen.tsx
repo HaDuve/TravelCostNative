@@ -1,5 +1,12 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef, useState, useCallback, useMemo } from "react";
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   Alert,
   FlatList,
@@ -39,12 +46,12 @@ import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import { dynamicScale, constantScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
-import GradientButton from "../components/UI/GradientButton";
+import ActionRow from "../components/UI/ActionRow";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import IconButton from "../components/UI/IconButton";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTripListLeave } from "../components/ProfileOutput/use-trip-list-leave";
+import { ProfileToolbarTokens } from "../styles/profile-toolbar-tokens";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -108,7 +115,7 @@ async function storeToken() {
   }
 }
 
-const TOOLBAR_CONTENT_HEIGHT = dynamicScale(52, true);
+const TOOLBAR_CHROME_HEIGHT = ProfileToolbarTokens.chromeHeight;
 
 const ProfileScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
@@ -117,14 +124,12 @@ const ProfileScreen = ({ navigation }) => {
   const uid = authCtx.uid;
   const netCtx = useContext(NetworkContext);
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
-  const insets = useSafeAreaInsets();
 
   const [tripHistory, setTripHistory] = useState([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
   const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
 
-  const scrollTopInset =
-    Math.max(insets.top, dynamicScale(8, true)) + TOOLBAR_CONTENT_HEIGHT;
+  const scrollTopInset = TOOLBAR_CHROME_HEIGHT;
 
   const { canLeave, closeRow, onLeavePress, setRowRef } =
     useTripListLeave(tripHistory);
@@ -151,12 +156,11 @@ const ProfileScreen = ({ navigation }) => {
       });
 
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-      });
+      Notifications.addNotificationResponseReceivedListener((response) => {});
 
     return () => {
       Notifications.removeNotificationSubscription(
-        notificationListener.current
+        notificationListener.current,
       );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
@@ -233,21 +237,20 @@ const ProfileScreen = ({ navigation }) => {
     () => (
       <View testID="profile-scroll-header">
         <ProfileIdentity navigation={navigation} />
-        <View style={styles.headerButtonsContainer}>
-          <GetLocalPriceButton
-            navigation={navigation}
-            style={styles.headerButton}
-          />
-          <GradientButton
-            style={styles.headerButton}
-            buttonStyle={{}}
+        <View style={styles.profileActions}>
+          <GetLocalPriceButton navigation={navigation} />
+          <ActionRow
+            testID="profile-feedback"
+            tier="secondary"
+            label={i18n.t("supportFeedbackLabel")}
+            hint={i18n.t("supportFeedbackHint")}
+            icon="chatbubble-ellipses-outline"
+            showChevron={false}
             onPress={() => {
               trackEvent(VexoEvents.FEEDBACK_BUTTON_PRESSED);
               setIsFeedbackModalVisible(true);
             }}
-          >
-            {i18n.t("supportFeedbackLabel")}
-          </GradientButton>
+          />
         </View>
         <View style={styles.tripHubSection}>
           <Text style={styles.tripListTitle}>{i18n.t("myBudgets")}</Text>
@@ -261,7 +264,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       </View>
     ),
-    [navigation]
+    [navigation],
   );
 
   const renderTripItem = useCallback(
@@ -281,7 +284,7 @@ const ProfileScreen = ({ navigation }) => {
         />
       );
     },
-    [tripHistory, canLeave, onLeavePress, closeRow, setRowRef]
+    [tripHistory, canLeave, onLeavePress, closeRow, setRowRef],
   );
 
   const uniqTrips = uniqBy(tripHistory ?? []);
@@ -355,17 +358,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingBottom: dynamicScale(8, true),
   },
-  headerButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: dynamicScale(8, true),
+  profileActions: {
     marginBottom: dynamicScale(8, true),
-  },
-  headerButton: {
-    flex: 1,
-    marginHorizontal: dynamicScale(4, false, 0.5),
-    borderRadius: 16,
   },
   tripHubSection: {
     marginBottom: dynamicScale(8, true),

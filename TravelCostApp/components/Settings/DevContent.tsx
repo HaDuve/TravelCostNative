@@ -10,7 +10,7 @@ import { DateTime } from "luxon";
 
 import { i18n } from "../../i18n/i18n";
 
-import Button from "../UI/Button";
+import ActionRow from "../UI/ActionRow";
 import { AuthContext } from "../../store/auth-context";
 import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
@@ -96,8 +96,11 @@ const DevContent = ({ navigation }) => {
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
 
-      <Button
+      <ActionRow
         style={styles.settingsButton}
+        tier="primary"
+        label="showAdBanner"
+        showChevron={false}
         onPress={async () => {
           navigation.navigate("RecentExpenses");
           const onboardingFlags: OnboardingFlags = {
@@ -105,9 +108,7 @@ const DevContent = ({ navigation }) => {
           };
           await showBanner(navigation, onboardingFlags);
         }}
-      >
-        showAdBanner
-      </Button>
+      />
 
       <View style={{ padding: 12, flex: 1 }}>
         {currentVersion && <Text>Current Version: {currentVersion}</Text>}
@@ -139,8 +140,11 @@ const DevContent = ({ navigation }) => {
       />
       <Text>{errorMessage}</Text>
       {!isFetching && (
-        <Button
+        <ActionRow
           style={styles.settingsButton}
+          tier="primary"
+          label="Expo Token"
+          showChevron={false}
           onPress={async () => {
             setIsFetching(true);
             // testing the expo token routine
@@ -160,18 +164,17 @@ const DevContent = ({ navigation }) => {
             }
             setIsFetching(false);
           }}
-        >
-          Expo Token
-        </Button>
+        />
       )}
 
-      <Button
+      <ActionRow
         style={styles.settingsButton}
+        tier="primary"
+        label="trackPurchaseEvent"
+        showChevron={false}
         // onPress={async () => await trackPurchaseEvent()}
         onPress={async () => {}}
-      >
-        trackPurchaseEvent
-      </Button>
+      />
     </View>
   );
 };

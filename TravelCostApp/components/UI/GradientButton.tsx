@@ -7,6 +7,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
 import { dynamicScale } from "../../util/scalingUtil";
 
+/**
+ * @deprecated Use {@link ActionRow} with `tier="primary"` or `tier="gradient"` instead.
+ * Kept for shadow-regression tests only; do not add new usages.
+ */
 const GradientButton = ({
   children,
   onPress,

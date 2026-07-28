@@ -49,6 +49,7 @@ jest.mock("../../components/UI/DatePickerContainer", () => {
 jest.mock("../../components/UI/DatePickerModal", () => () => null);
 
 import FinderScreen from "../../screens/FinderScreen";
+import { ActionRowTokens } from "../../styles/action-row-tokens";
 import {
   FINDER_FILTER_CLEAR_SLOT_WIDTH,
   FINDER_FILTER_CONTENT_WIDTH,
@@ -171,6 +172,21 @@ describe("Finder screen", () => {
     ).width;
     expect(widthAfter).toBe(widthBefore);
     expect(widthAfter).toBe(FINDER_FILTER_CLEAR_SLOT_WIDTH);
+  });
+
+  it("uses a full-width ActionRow with standard border radius for results", async () => {
+    const screen = renderWithAppProviders(<FinderScreen />, {
+      wrapNavigation: false,
+      expenses: { expenses: [] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("finder-show-results")).toBeTruthy();
+    });
+
+    const rowStyle = flattenStyle(screen, "finder-show-results");
+    expect(rowStyle.borderRadius).toBe(ActionRowTokens.borderRadius);
+    expect(rowStyle.alignSelf).toBe("stretch");
   });
 
   it("keeps the date clear column width when the filter becomes active", async () => {

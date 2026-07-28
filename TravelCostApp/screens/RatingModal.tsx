@@ -14,8 +14,8 @@ import Modal from "react-native-modal";
 import { i18n } from "../i18n/i18n";
 
 import PropTypes from "prop-types";
-import FlatButton from "../components/UI/FlatButton";
-import GradientButton from "../components/UI/GradientButton";
+import ActionRow from "../components/UI/ActionRow";
+import ActionRowStack from "../components/UI/ActionRowStack";
 import { GlobalStyles } from "../constants/styles";
 import { secureStoreSetObject } from "../store/secure-storage";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
@@ -103,15 +103,30 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
         <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}>{i18n.t("rateModalSubTitle")}</Text>
         </View>
-        <View style={styles.buttonContainer}>
-          <FlatButton onPress={handleNeverAskAgain}>
-            {i18n.t("never")}
-          </FlatButton>
-          <FlatButton onPress={handleClose}>{i18n.t("later")}</FlatButton>
-          <GradientButton onPress={handleRate}>
-            {i18n.t("rateModalButton")}
-          </GradientButton>
-        </View>
+        <ActionRowStack
+          showChevron={false}
+          actions={[
+            {
+              testID: "rating-modal-rate",
+              tier: "primary",
+              label: i18n.t("rateModalButton"),
+              icon: "star-outline",
+              onPress: handleRate,
+            },
+            {
+              testID: "rating-modal-later",
+              tier: "secondary",
+              label: i18n.t("later"),
+              onPress: handleClose,
+            },
+            {
+              testID: "rating-modal-never",
+              tier: "secondary",
+              label: i18n.t("never"),
+              onPress: handleNeverAskAgain,
+            },
+          ]}
+        />
       </Pressable>
     </Modal>
   );
@@ -154,11 +169,6 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(16, false, 0.5),
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "100%",
   },
   reviewContainer: {
     alignItems: "center",

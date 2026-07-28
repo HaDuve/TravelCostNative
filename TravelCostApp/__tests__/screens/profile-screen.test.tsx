@@ -125,7 +125,7 @@ describe("Profile screen", () => {
 
     expect(screen.getByText("Alice")).toBeTruthy();
     expect(screen.getByText("My Budgets")).toBeTruthy();
-    expect(screen.getByTestId("profile-trip-container")).toBeTruthy();
+    expect(screen.getByTestId("profile-scroll")).toBeTruthy();
 
     await waitFor(() => {
       expect(trackEvent).not.toHaveBeenCalledWith(
@@ -369,7 +369,7 @@ describe("Profile screen", () => {
     });
   });
 
-  it("allocates remaining profile height to the trip history list", async () => {
+  it("scrolls profile content in a single FlatList", async () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
       <ProfileScreen navigation={navigation as any} />,
@@ -382,20 +382,32 @@ describe("Profile screen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("trip-list-wrapper")).toBeTruthy();
+      expect(screen.getByTestId("profile-scroll")).toBeTruthy();
     });
 
-    const tripContainer = screen.getByTestId("profile-trip-container");
-    const listWrapper = screen.getByTestId("trip-list-wrapper");
-    const containerFlat = StyleSheet.flatten(
-      tripContainer.props.style
-    ) as Record<string, unknown>;
-    const wrapperFlat = StyleSheet.flatten(
-      listWrapper.props.style
-    ) as Record<string, unknown>;
+    const flatLists = screen.UNSAFE_getAllByType(
+      require("react-native").FlatList
+    );
+    expect(flatLists).toHaveLength(1);
+    assertNoNestedVerticalFlatLists(screen.root);
+  });
 
-    expect(containerFlat.flex).toBe(1);
-    expect(wrapperFlat.flex).toBe(1);
+  it("keeps the floating profile toolbar outside the scroll list", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-floating-toolbar")).toBeTruthy();
+      expect(screen.getByTestId("profile-scroll")).toBeTruthy();
+    });
   });
 
   it("sizes trip history cards to content so Traveller chips are not clipped", async () => {
@@ -422,7 +434,7 @@ describe("Profile screen", () => {
     expect(flat.flex).not.toBe(1);
   });
 
-  it("keeps trip history cards in the visible layout region", async () => {
+  it("keeps trip history cards in the scrollable profile content", async () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
       <ProfileScreen navigation={navigation as any} />,
@@ -438,13 +450,7 @@ describe("Profile screen", () => {
       expect(screen.getByTestId("trip-history-card-t1")).toBeTruthy();
     });
 
-    const tripContainer = screen.getByTestId("profile-trip-container");
-    const flat = StyleSheet.flatten(tripContainer.props.style) as Record<
-      string,
-      unknown
-    >;
-    expect(typeof flat.marginBottom !== "number" || flat.marginBottom >= 0).toBe(
-      true
-    );
+    expect(screen.getByTestId("profile-scroll")).toBeTruthy();
+    expect(screen.getByTestId("profile-scroll-header")).toBeTruthy();
   });
 });

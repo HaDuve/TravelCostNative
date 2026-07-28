@@ -1,14 +1,17 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState, useCallback } from "react";
 import {
   Alert,
+  FlatList,
   Platform,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import ProfileForm from "../components/ManageProfile/ProfileForm";
-import TripList from "../components/ProfileOutput/TripList";
+import uniqBy from "lodash.uniqby";
+import ProfileIdentity from "../components/ManageProfile/ProfileIdentity";
+import ProfileToolbar from "../components/ManageProfile/ProfileToolbar";
+import TripListRow from "../components/ProfileOutput/TripListRow";
 import MyBudgetsHubActions from "../components/ProfileOutput/MyBudgetsHubActions";
 import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
@@ -19,6 +22,7 @@ import { UserContext } from "../store/user-context";
 import { i18n } from "../i18n/i18n";
 import React from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { storeExpoPushTokenInTrip } from "../util/http";
@@ -33,13 +37,14 @@ import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
-import { dynamicScale } from "../util/scalingUtil";
+import { dynamicScale, constantScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import GradientButton from "../components/UI/GradientButton";
-import safeLogError from "../util/error";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import IconButton from "../components/UI/IconButton";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTripListLeave } from "../components/ProfileOutput/use-trip-list-leave";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -103,6 +108,8 @@ async function storeToken() {
   }
 }
 
+const TOOLBAR_CONTENT_HEIGHT = dynamicScale(52, true);
+
 const ProfileScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
@@ -110,10 +117,17 @@ const ProfileScreen = ({ navigation }) => {
   const uid = authCtx.uid;
   const netCtx = useContext(NetworkContext);
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
+  const insets = useSafeAreaInsets();
 
   const [tripHistory, setTripHistory] = useState([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
   const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
+
+  const scrollTopInset =
+    Math.max(insets.top, dynamicScale(8, true)) + TOOLBAR_CONTENT_HEIGHT;
+
+  const { canLeave, closeRow, onLeavePress, setRowRef } =
+    useTripListLeave(tripHistory);
 
   // possible future use of notification display
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -215,57 +229,62 @@ const ProfileScreen = ({ navigation }) => {
     fetchHistory();
   }, [userCtx]);
 
-  const visibleContent = (
-    <>
-      <View style={styles.headerButtonsContainer}>
-        <GetLocalPriceButton
-          navigation={navigation}
-          style={styles.headerButton}
-        />
-        <GradientButton
-          style={styles.headerButton}
-          buttonStyle={{}}
-          onPress={() => {
-            trackEvent(VexoEvents.FEEDBACK_BUTTON_PRESSED);
-            setIsFeedbackModalVisible(true);
-          }}
-        >
-          {i18n.t("supportFeedbackLabel")}
-        </GradientButton>
-      </View>
-      <View style={styles.tripContainer} testID="profile-trip-container">
-        <Text style={styles.tripListTitle}>{i18n.t("myBudgets")}</Text>
-        <MyBudgetsHubActions
-          onJoin={() => navigation.navigate("Join")}
-          onAddAnother={() =>
-            navigation.navigate("ManageTrip", { mode: "addAnother" })
-          }
-        />
-        <Text style={styles.listSectionLabel}>{i18n.t("yourBudgets")}</Text>
-        <TripList trips={tripHistory}></TripList>
-      </View>
-      <View style={styles.horizontalButtonContainer}>
-        <View>
-          <IconButton
-            icon="list-outline"
-            buttonStyle={[styles.addButton, shadowRegressionStyles.addExpenseFab]}
-            size={dynamicScale(42, false, 0.5)}
-            color={GlobalStyles.colors.backgroundColor}
-            badge={null}
-            badgeText={null}
-            badgeStyle={null}
-            onPressIn={null}
-            onPressOut={null}
-            onLongPress={null}
-            category={null}
-            onPress={() => {
-              onSummaryHandler();
-            }}
+  const renderListHeader = useCallback(
+    () => (
+      <View testID="profile-scroll-header">
+        <ProfileIdentity navigation={navigation} />
+        <View style={styles.headerButtonsContainer}>
+          <GetLocalPriceButton
+            navigation={navigation}
+            style={styles.headerButton}
           />
+          <GradientButton
+            style={styles.headerButton}
+            buttonStyle={{}}
+            onPress={() => {
+              trackEvent(VexoEvents.FEEDBACK_BUTTON_PRESSED);
+              setIsFeedbackModalVisible(true);
+            }}
+          >
+            {i18n.t("supportFeedbackLabel")}
+          </GradientButton>
+        </View>
+        <View style={styles.tripHubSection}>
+          <Text style={styles.tripListTitle}>{i18n.t("myBudgets")}</Text>
+          <MyBudgetsHubActions
+            onJoin={() => navigation.navigate("Join")}
+            onAddAnother={() =>
+              navigation.navigate("ManageTrip", { mode: "addAnother" })
+            }
+          />
+          <Text style={styles.listSectionLabel}>{i18n.t("yourBudgets")}</Text>
         </View>
       </View>
-    </>
+    ),
+    [navigation]
   );
+
+  const renderTripItem = useCallback(
+    ({ item, index }) => {
+      if (!item) return null;
+      if (!(typeof item === "string" || item instanceof String)) return null;
+      const tripid = item as string;
+      return (
+        <TripListRow
+          tripid={tripid}
+          trips={tripHistory}
+          index={index}
+          canLeave={canLeave}
+          onLeavePress={onLeavePress}
+          onSwipeableOpen={closeRow}
+          setRowRef={setRowRef}
+        />
+      );
+    },
+    [tripHistory, canLeave, onLeavePress, closeRow, setRowRef]
+  );
+
+  const uniqTrips = uniqBy(tripHistory ?? []);
 
   if (isFetchingLogout)
     return (
@@ -274,13 +293,45 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.innerContainer}>
-        <ProfileForm
-          navigation={navigation}
-          setIsFetchingLogout={setIsFetchingLogout}
-        ></ProfileForm>
+      <ProfileToolbar
+        navigation={navigation}
+        setIsFetchingLogout={setIsFetchingLogout}
+      />
+      <FlatList
+        testID="profile-scroll"
+        data={uniqTrips}
+        keyExtractor={(item) => {
+          if (typeof item === "string" || item instanceof String)
+            return item as string;
+          return item.tripid + item.tripName;
+        }}
+        renderItem={renderTripItem}
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={<LoadingOverlay />}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: scrollTopInset },
+        ]}
+        ListFooterComponent={
+          <View style={{ height: constantScale(100), width: "100%" }} />
+        }
+      />
+      <View style={styles.fabContainer} pointerEvents="box-none">
+        <IconButton
+          icon="list-outline"
+          buttonStyle={[styles.addButton, shadowRegressionStyles.addExpenseFab]}
+          size={dynamicScale(42, false, 0.5)}
+          color={GlobalStyles.colors.backgroundColor}
+          badge={null}
+          badgeText={null}
+          badgeStyle={null}
+          onPressIn={null}
+          onPressOut={null}
+          onLongPress={null}
+          category={null}
+          onPress={onSummaryHandler}
+        />
       </View>
-      {visibleContent}
 
       <FeedbackForm
         isVisible={isFeedbackModalVisible}
@@ -298,16 +349,15 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
-  innerContainer: {
-    flex: 0,
-    minHeight: dynamicScale(100, true),
-    padding: dynamicScale(4),
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingBottom: dynamicScale(8, true),
   },
   headerButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingVertical: dynamicScale(8, true),
     marginBottom: dynamicScale(8, true),
   },
@@ -316,43 +366,9 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(4, false, 0.5),
     borderRadius: 16,
   },
-
-  tripContainer: {
-    flex: 1,
-    margin: dynamicScale(16),
+  tripHubSection: {
     marginBottom: dynamicScale(8, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  horizontalContainer: {
-    marginTop: dynamicScale(15, false, 0.3),
-    marginRight: dynamicScale(15),
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  horizontalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    // make it appear behind the triplist
-    // zIndex: -1,
-  },
-
-  newTripButtonContainer: {
-    flexDirection: "row",
-    padding: "10%",
-    paddingHorizontal: "12%",
-    marginBottom: "2%",
-    marginTop: "-4%",
-    marginRight: "-12%",
-    borderRadius: 99,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 8,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 2.5, height: 2.2 },
-    shadowOpacity: 0.55,
-    shadowRadius: 4,
-    //center
-    alignSelf: "center",
   },
   tripListTitle: {
     fontSize: dynamicScale(22, false, 0.5),
@@ -372,32 +388,20 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  deleteContainer: {
-    marginTop: dynamicScale(16, true),
-    paddingTop: dynamicScale(8, true),
-    borderTopWidth: 2,
-    borderTopColor: GlobalStyles.colors.primary200,
+  fabContainer: {
+    position: "absolute",
+    bottom: dynamicScale(16, true),
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    zIndex: 5,
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
     padding: dynamicScale(16, false, 0.5),
     paddingHorizontal: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(4, true),
     borderRadius: 99,
-  },
-  offlineWarningContainer: {
-    // center content
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    alignContent: "center",
-  },
-  offlineWarningText: {
-    fontSize: dynamicScale(14, false, 0.5),
-    paddingVertical: "2%",
-    paddingHorizontal: "2%",
-    color: GlobalStyles.colors.gray700,
-    fontWeight: "300",
   },
 });

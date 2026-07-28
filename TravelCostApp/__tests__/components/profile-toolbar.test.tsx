@@ -19,41 +19,16 @@ jest.mock("expo-haptics", () => ({
   ImpactFeedbackStyle: { Light: "Light" },
 }));
 
-import ProfileForm from "../../components/ManageProfile/ProfileForm";
+import ProfileToolbar from "../../components/ManageProfile/ProfileToolbar";
 import { i18n } from "../../i18n/i18n";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 
-describe("Profile", () => {
+describe("Profile toolbar", () => {
   let alertSpy: jest.SpyInstance;
 
   afterEach(() => {
     alertSpy?.mockRestore();
-  });
-
-  it("shows the signed-in User name", () => {
-    const navigation = { navigate: jest.fn() };
-    const screen = renderWithAppProviders(
-      <ProfileForm
-        navigation={navigation as any}
-        setIsFetchingLogout={jest.fn()}
-      />,
-      {
-        wrapNavigation: false,
-        auth: { uid: "u1", logout: jest.fn() },
-        trip: { setCurrentTrip: jest.fn(async () => {}) },
-        expenses: { setExpenses: jest.fn() },
-        user: {
-          userName: "Alice",
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
-      }
-    );
-
-    expect(screen.getByText("Alice")).toBeTruthy();
   });
 
   it("signs the User out when they confirm logout", async () => {
@@ -74,7 +49,7 @@ describe("Profile", () => {
 
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
-      <ProfileForm
+      <ProfileToolbar
         navigation={navigation as any}
         setIsFetchingLogout={setIsFetchingLogout}
       />,
@@ -113,7 +88,7 @@ describe("Profile", () => {
 
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
-      <ProfileForm
+      <ProfileToolbar
         navigation={navigation as any}
         setIsFetchingLogout={jest.fn()}
       />,

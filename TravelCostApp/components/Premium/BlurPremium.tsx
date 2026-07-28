@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { BlurView } from "expo-blur";
 import ActionRow from "../UI/ActionRow";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { GlobalStyles } from "../../constants/styles";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -80,21 +79,15 @@ const BlurPremium = ({ canBack = false }) => {
       {focused && (
         <Animated.View
           entering={SlideInDown.delay(600).springify().damping(11)}
+          style={styles.overlayCardWrap}
+          testID="blur-premium-card-wrap"
         >
-          <Card
-            elevation={1}
-            style={{
-              //   backgroundColor: GlobalStyles.colors.gray300,
-              padding: 30,
-              // marginLeft: -55,
-            }}
-          >
+          <Card elevation={1} style={styles.overlayCard}>
             <ActionRow
               tier="gradient"
               label={i18n.t("paywallTitle")}
               icon="diamond-outline"
               showChevron={false}
-              compact
               onPress={() => {
                 if (!isConnected) {
                   Alert.alert(
@@ -136,10 +129,11 @@ BlurPremium.propTypes = {
 
 const styles = StyleSheet.create({
   titleContainerBlur: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
+    paddingHorizontal: "5%",
 
     ...Platform.select({
       ios: {
@@ -153,5 +147,13 @@ const styles = StyleSheet.create({
         height: "105%",
       },
     }),
+  },
+  overlayCardWrap: {
+    width: "100%",
+    maxWidth: 420,
+  },
+  overlayCard: {
+    width: "100%",
+    padding: 30,
   },
 });

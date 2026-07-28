@@ -150,6 +150,21 @@ describe("shadow styles", () => {
     );
   });
 
+  it("action row card uses a lighter shadow than trip history cards", () => {
+    const actionRow = StyleSheet.flatten(
+      shadowRegressionStyles.actionRowCard
+    ) as Record<string, unknown>;
+    const tripCard = StyleSheet.flatten(
+      shadowRegressionStyles.tripHistoryCard
+    ) as Record<string, unknown>;
+
+    assertSolidBackgroundForShadow(actionRow);
+    expect(styleHasShadow(actionRow)).toBe(true);
+    expect(actionRow.shadowOpacity).toBeLessThan(
+      (tripCard.shadowOpacity as number) ?? 1
+    );
+  });
+
   it("trip traveller chip co-locates shadow and backgroundColor", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.tripTravellerChip)

@@ -32,11 +32,11 @@ describe("GradientButton", () => {
       <GradientButton onPress={jest.fn()} style={{ marginHorizontal: "8%" }}>
         Save trip
       </GradientButton>,
-      { wrapNavigation: false }
+      { wrapNavigation: false },
     );
 
     const outerStyle = flattenStyle(
-      screen.getByTestId("gradient-button-layout").props.style
+      screen.getByTestId("gradient-button-layout").props.style,
     );
     expect(isVisibleOpaqueBackground(outerStyle.backgroundColor)).toBe(false);
     expect(styleHasShadow(outerStyle)).toBe(false);
@@ -45,11 +45,11 @@ describe("GradientButton", () => {
   it("casts shadow from a rounded shell that matches the gradient pill", () => {
     const screen = renderWithAppProviders(
       <GradientButton onPress={jest.fn()}>Save trip</GradientButton>,
-      { wrapNavigation: false }
+      { wrapNavigation: false },
     );
 
     const shadowStyle = flattenStyle(
-      screen.getByTestId("gradient-button-shadow").props.style
+      screen.getByTestId("gradient-button-shadow").props.style,
     );
     assertSolidBackgroundForShadow(shadowStyle);
     expect(styleHasShadow(shadowStyle)).toBe(true);
@@ -64,11 +64,11 @@ describe("GradientButton", () => {
       <GradientButton onPress={jest.fn()} colors={colors}>
         Local price
       </GradientButton>,
-      { wrapNavigation: false }
+      { wrapNavigation: false },
     );
 
     const shadowStyle = flattenStyle(
-      screen.getByTestId("gradient-button-shadow").props.style
+      screen.getByTestId("gradient-button-shadow").props.style,
     );
     expect(shadowStyle.backgroundColor).toBe("#A1D8C1");
   });
@@ -76,14 +76,14 @@ describe("GradientButton", () => {
   it("fills the shadow shell with gradient only, without its own shadow or inset", () => {
     const screen = renderWithAppProviders(
       <GradientButton onPress={jest.fn()}>Save trip</GradientButton>,
-      { wrapNavigation: false }
+      { wrapNavigation: false },
     );
 
     const gradient = screen.UNSAFE_getByType(LinearGradient);
     const gradientStyle = flattenStyle(gradient.props.style);
     expect(styleHasShadow(gradientStyle)).toBe(false);
     expect(isVisibleOpaqueBackground(gradientStyle.backgroundColor)).toBe(
-      false
+      false,
     );
     expect(gradientStyle.marginHorizontal).toBeUndefined();
     expect(gradientStyle.borderRadius).toBe(16);

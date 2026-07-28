@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 
 import { i18n } from "../i18n/i18n";
 
-import GradientButton from "../components/UI/GradientButton";
+import ActionRow from "../components/UI/ActionRow";
 import { TripContext } from "../store/trip-context";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../store/user-context";
@@ -56,20 +56,19 @@ const FinancialScreen = () => {
 
       {/* <Ionicons name="wallet-outline" size={200} color="black" /> */}
 
-      <GradientButton
-        colors={GlobalStyles.gradientAccentButton}
-        darkText
-        onPress={async () => {
+      <ActionRow
+        style={styles.button}
+        tier="primary"
+        label={i18n.t("simplifySplitsLabel")}
+        icon="git-network-outline"
+        showChevron={false}
+        onPress={() => {
           trackEvent(VexoEvents.OPEN_SPLITS_SUMMARY_PRESSED, {
             tripId: tripCtx.tripid,
           });
           navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
-        buttonStyle={styles.button}
-        style={styles.button}
-      >
-        {i18n.t("simplifySplitsLabel")}
-      </GradientButton>
+      />
     </View>
   );
 };

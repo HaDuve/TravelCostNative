@@ -100,6 +100,7 @@ const en = {
   // Modal Titles
   editExp: "Edit Expense",
   addExp: "Add Expense",
+  addExpHereHint: "On this day: %{date}",
   whoPaid: "Who paid?",
   howShared: "How are the costs shared?",
   whoShared: "Who is the cost shared between?",
@@ -154,6 +155,7 @@ const en = {
   resetAppIntroductionLabel: "Reset App Introduction",
   visitFoodForNomadsLabel: "Visit Food For Nomads",
   supportFeedbackLabel: "Feedback?",
+  supportFeedbackHint: "Tell us what to improve",
 
   // Feedback Modal
   feedbackTitle: "Send Feedback",
@@ -310,6 +312,11 @@ const en = {
   gptSearchingWeb: "🔍 Searching current local prices and seasonal data...",
   gptAnalyzingData: "🧠 Analyzing market trends and pricing insights...",
   getLocalPriceTitle: "Local Price",
+  getLocalPriceHint: "Check prices with AI on the road",
+  getLocalPriceExpenseHint:
+    'Get local price for "%{product}" in %{country}',
+  getLocalPriceExpenseDealHint:
+    'Is %{price} %{currency} a good deal for "%{product}" in %{country}?',
   gettingLocalPrice: "Getting local price information...",
   day: "Day",
   week: "Week",
@@ -581,6 +588,7 @@ const en = {
   trips: "Budgets",
   trip: "Budget",
   summary: "Summary",
+  summaryHint: "Quick overview for one or more budgets",
   totalCosts: "Total Costs",
   averageCostPerDay: "Average Cost Per Day",
   averageCostPerMonth: "Average Cost Per Month",
@@ -710,6 +718,7 @@ const de = {
   // Modal Titles
   editExp: "Ausgabe bearbeiten",
   addExp: "Ausgabe hinzufügen",
+  addExpHereHint: "An diesem Tag: %{date}",
   whoPaid: "Wer hat bezahlt?",
   howShared: "Wie wurden die Kosten geteilt?",
   whoShared: "Zwischen wem wurden die Kosten geteilt?",
@@ -767,6 +776,7 @@ const de = {
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
   supportFeedbackLabel: "Feedback?",
+  supportFeedbackHint: "Sag uns, was wir verbessern können",
 
   // Feedback Modal
   feedbackTitle: "Feedback Senden",
@@ -936,6 +946,11 @@ const de = {
     "🔍 Aktuelle lokale Preise und saisonale Daten werden gesucht...",
   gptAnalyzingData: "🧠 Markttrends und Preisanalysen werden ausgewertet...",
   getLocalPriceTitle: "Lokaler Preis",
+  getLocalPriceHint: "Preise mit KI unterwegs prüfen",
+  getLocalPriceExpenseHint:
+    'Lokalen Preis für „%{product}“ in %{country} ermitteln',
+  getLocalPriceExpenseDealHint:
+    'Ist %{price} %{currency} ein gutes Angebot für „%{product}“ in %{country}?',
   gettingLocalPrice: "Lokale Preisinformationen werden abgerufen...",
   day: "Tag",
   week: "Woche",
@@ -1227,6 +1242,7 @@ const de = {
   trips: "Budgets",
   trip: "Budget",
   summary: "Zusammenfassung",
+  summaryHint: "Schneller Überblick für ein oder mehrere Budgets",
   totalCosts: "Gesamtkosten",
   averageCostPerDay: "Durchschnittskosten pro Tag",
   averageCostPerMonth: "Durchschnittskosten pro Monat",
@@ -1355,6 +1371,7 @@ const fr = {
   // Modal Titles
   editExp: "Modifier la dépense",
   addExp: "Ajouter une dépense",
+  addExpHereHint: "Ce jour-là : %{date}",
   whoPaid: "Qui a payé ?",
   howShared: "Comment les coûts sont-ils partagés ?",
   whoShared: "Avec qui les coûts sont-ils partagés ?",
@@ -1411,6 +1428,7 @@ const fr = {
   resetAppIntroductionLabel: "Réinitialiser l'introduction de l'application",
   visitFoodForNomadsLabel: "Visitez Food For Nomads",
   supportFeedbackLabel: "Commentaires?",
+  supportFeedbackHint: "Dites-nous quoi améliorer",
 
   // Feedback Modal
   feedbackTitle: "Envoyer des Commentaires",
@@ -1581,6 +1599,11 @@ const fr = {
   gptAnalyzingData:
     "🧠 Analyse des tendances du marché et des insights de prix...",
   getLocalPriceTitle: "Prix Local",
+  getLocalPriceHint: "Vérifiez les prix avec l'IA en voyage",
+  getLocalPriceExpenseHint:
+    'Obtenir le prix local pour « %{product} » en %{country}',
+  getLocalPriceExpenseDealHint:
+    'Est-ce que %{price} %{currency} est une bonne affaire pour « %{product} » en %{country} ?',
   gettingLocalPrice: "Obtention des informations sur les prix locaux...",
   day: "Jour",
   week: "Semaine",
@@ -1870,6 +1893,7 @@ const fr = {
   trips: "Budgets",
   trip: "Budget",
   summary: "Résumé",
+  summaryHint: "Aperçu rapide pour un ou plusieurs budgets",
   totalCosts: "Coûts totaux",
   averageCostPerDay: "Coût moyen par jour",
   averageCostPerMonth: "Coût moyen par mois",
@@ -1998,6 +2022,7 @@ const ru = {
   // Modal Titles
   editExp: "Изменить статью расходов",
   addExp: "Добавить статью расходов",
+  addExpHereHint: "В этот день: %{date}",
   whoPaid: "Кто заплатил?",
   howShared: "Как распределены расходы?",
   whoShared: "Кто участвует в распределении расходов?",
@@ -2053,6 +2078,7 @@ const ru = {
   resetAppIntroductionLabel: "Сбросить введение в приложение",
   visitFoodForNomadsLabel: "Посетить Food For Nomads",
   supportFeedbackLabel: "Отзыв?",
+  supportFeedbackHint: "Расскажите, что улучшить",
 
   // Feedback Modal
   feedbackTitle: "Отправить Отзыв",
@@ -2213,6 +2239,11 @@ const ru = {
   gptSearchingWeb: "🔍 Поиск актуальных местных цен и сезонных данных...",
   gptAnalyzingData: "🧠 Анализ рыночных трендов и ценовых инсайтов...",
   getLocalPriceTitle: "Местная Цена",
+  getLocalPriceHint: "Проверяйте цены с ИИ в пути",
+  getLocalPriceExpenseHint:
+    'Узнать местную цену для «%{product}» в %{country}',
+  getLocalPriceExpenseDealHint:
+    'Хорошая ли сделка — %{price} %{currency} за «%{product}» в %{country}?',
   gettingLocalPrice: "Получение информации о местных ценах...",
   day: "День",
   week: "Неделя",
@@ -2511,6 +2542,7 @@ const ru = {
   trips: "Бюджеты",
   trip: "Бюджет",
   summary: "Сводка",
+  summaryHint: "Быстрый обзор одного или нескольких бюджетов",
   totalCosts: "Общие расходы",
   averageCostPerDay: "Средние расходы в день",
   averageCostPerMonth: "Средние расходы в месяц",

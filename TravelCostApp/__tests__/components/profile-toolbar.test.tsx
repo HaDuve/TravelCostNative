@@ -20,15 +20,96 @@ jest.mock("expo-haptics", () => ({
 }));
 
 import ProfileToolbar from "../../components/ManageProfile/ProfileToolbar";
+import { GlobalStyles } from "../../constants/styles";
+import { ProfileToolbarTokens } from "../../styles/profile-toolbar-tokens";
 import { i18n } from "../../i18n/i18n";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { asyncStoreSafeClear } from "../../store/async-storage";
+import { StyleSheet } from "react-native";
+
+const profileToolbarProviders = {
+  wrapNavigation: false,
+  safeAreaInsets: { top: 44, left: 0, right: 0, bottom: 34 },
+  auth: { uid: "u1", logout: jest.fn() },
+  trip: { tripid: "t1", setCurrentTrip: jest.fn(async () => {}) },
+  expenses: { setExpenses: jest.fn() },
+  user: {
+    userName: "Alice",
+    freshlyCreated: false,
+    hasNewChanges: false,
+    setHasNewChanges: jest.fn(),
+    setUserName: jest.fn(async () => {}),
+    setTripHistory: jest.fn(),
+  },
+};
 
 describe("Profile toolbar", () => {
   let alertSpy: jest.SpyInstance;
 
   afterEach(() => {
     alertSpy?.mockRestore();
+  });
+
+  it("does not add top safe-area padding because SafeAreaWrapper already insets the app", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileToolbar
+        navigation={navigation as any}
+        setIsFetchingLogout={jest.fn()}
+      />,
+      profileToolbarProviders,
+    );
+
+    const shell = StyleSheet.flatten(
+      screen.getByTestId("profile-floating-toolbar").props.style,
+    ) as Record<string, unknown>;
+    expect(shell.paddingTop).not.toBe(44);
+  });
+
+  it("keeps the icon row no taller than icon size plus small padding", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileToolbar
+        navigation={navigation as any}
+        setIsFetchingLogout={jest.fn()}
+      />,
+      {
+        wrapNavigation: false,
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { tripid: "t1", setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    const buttons = screen.getByTestId("profile-toolbar-buttons");
+    const buttonRow = StyleSheet.flatten(buttons.props.style) as Record<
+      string,
+      unknown
+    >;
+    expect(buttonRow.minHeight).toBe(ProfileToolbarTokens.contentHeight);
+    expect(buttonRow.minHeight).toBeLessThanOrEqual(
+      ProfileToolbarTokens.iconSize + 2 * ProfileToolbarTokens.iconHitPadding
+    );
+
+    const shell = StyleSheet.flatten(
+      screen.getByTestId("profile-floating-toolbar").props.style
+    ) as Record<string, unknown>;
+    expect(shell.backgroundColor).toBeUndefined();
+
+    const chrome = StyleSheet.flatten(
+      screen.getByTestId("profile-toolbar-chrome").props.style
+    ) as Record<string, unknown>;
+    expect(chrome.backgroundColor).toBe(GlobalStyles.colors.backgroundColor);
+    expect(chrome.paddingBottom).toBe(ProfileToolbarTokens.paddingVertical);
+    expect(chrome.minHeight).toBe(ProfileToolbarTokens.chromeHeight);
   });
 
   it("signs the User out when they confirm logout", async () => {

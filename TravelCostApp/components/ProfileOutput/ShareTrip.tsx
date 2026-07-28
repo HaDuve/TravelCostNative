@@ -14,7 +14,7 @@ import PropTypes from "prop-types";
 import safeLogError from "../../util/error";
 import { loadKeys } from "../Premium/PremiumConstants";
 import { GlobalStyles } from "../../constants/styles";
-import GradientButton from "../UI/GradientButton";
+import ActionRow from "../UI/ActionRow";
 import IconButton from "../UI/IconButton";
 import { dynamicScale } from "../../util/scalingUtil";
 
@@ -77,12 +77,13 @@ const ShareTripButton = ({ route, navigation }) => {
           </Text>
 
           <View style={styles.buttonContainer}>
-            <GradientButton
+            <ActionRow
+              testID="share-trip-invite"
+              tier="primary"
+              label={i18n.t("inviteTraveller")}
+              icon="share-social-outline"
               onPress={() => onShare(shareId, navigation)}
-              style={styles.shareButton}
-            >
-              {i18n.t("inviteTraveller")}
-            </GradientButton>
+            />
           </View>
         </View>
       </ScrollView>

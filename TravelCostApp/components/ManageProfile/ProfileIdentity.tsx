@@ -5,8 +5,7 @@ import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
 import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
-import GradientButton from "../UI/GradientButton";
+import ActionRow from "../UI/ActionRow";
 import { i18n } from "../../i18n/i18n";
 import { dynamicScale } from "../../util/scalingUtil";
 import { trackEvent } from "../../util/vexo-tracking";
@@ -28,15 +27,22 @@ const ProfileIdentity = ({ navigation }: ProfileIdentityProps) => {
 
   const freshlyNavigationButtons = freshlyCreated && (
     <View style={styles.navButtonContainer}>
-      <FlatButton onPress={joinInviteHandler}>
-        {i18n.t("invitationText")}
-      </FlatButton>
-      <GradientButton
-        style={styles.navButton}
+      <ActionRow
+        testID="profile-identity-join"
+        tier="secondary"
+        label={i18n.t("invitationText")}
+        hint={i18n.t("joinBudgetHint")}
+        icon="people-outline"
+        onPress={joinInviteHandler}
+      />
+      <ActionRow
+        testID="profile-identity-create"
+        tier="primary"
+        label={i18n.t("createFirstTrip")}
+        hint={i18n.t("addAnotherBudgetHint")}
+        icon="add-circle-outline"
         onPress={() => navigation.navigate("ManageTrip")}
-      >
-        {i18n.t("createFirstTrip")}
-      </GradientButton>
+      />
     </View>
   );
 
@@ -121,14 +127,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
   },
   navButtonContainer: {
-    justifyContent: "flex-end",
-    padding: dynamicScale(4, true),
-    marginVertical: dynamicScale(8, true),
-    marginTop: dynamicScale(16, true),
-  },
-  navButton: {
-    minWidth: dynamicScale(120),
-    marginVertical: dynamicScale(8, true),
-    marginTop: dynamicScale(16, true),
+    paddingHorizontal: dynamicScale(15),
+    marginTop: dynamicScale(8, true),
   },
 });

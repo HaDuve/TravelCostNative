@@ -13,8 +13,7 @@ import { i18n } from "../../i18n/i18n";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
 import { TripContext } from "../../store/trip-context";
-import FlatButton from "../UI/FlatButton";
-import GradientButton from "../UI/GradientButton";
+import ActionRow from "../UI/ActionRow";
 import { useNavigation } from "@react-navigation/native";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
@@ -85,39 +84,39 @@ function ExpensesOutput({
             )}
             {!showLoading && emptyCtaLabel && onEmptyCtaPress && (
               <View testID="empty-expenses-cta" style={styles.emptyCta}>
-                <GradientButton
+                <ActionRow
+                  tier="primary"
+                  label={emptyCtaLabel}
+                  icon="add-circle-outline"
                   onPress={onEmptyCtaPress}
-                  buttonStyle={styles.emptyCtaInner}
-                >
-                  {emptyCtaLabel}
-                </GradientButton>
+                />
               </View>
             )}
             {showYesterday && (
-              <FlatButton
-                textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
+              <ActionRow
+                tier="secondary"
+                label={`${i18n.t("showXResults1")} ${i18n.t("yesterday")}`}
+                icon="calendar-outline"
                 onPress={() => {
                   (navigation as any).navigate("FilteredExpenses", {
                     expenses: toExpenseNavigationDtos(yesterdayExpenses),
                     dayString: i18n.t("yesterday"),
                   });
                 }}
-              >
-                {i18n.t("showXResults1") + " " + i18n.t("yesterday")}
-              </FlatButton>
+              />
             )}
             {showTomorrow && (
-              <FlatButton
-                textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
+              <ActionRow
+                tier="secondary"
+                label={`${i18n.t("showXResults1")} ${i18n.t("tomorrow")}`}
+                icon="calendar-outline"
                 onPress={() => {
                   (navigation as any).navigate("FilteredExpenses", {
                     expenses: toExpenseNavigationDtos(tomorrowExpenses),
                     dayString: i18n.t("tomorrow"),
                   });
                 }}
-              >
-                {i18n.t("showXResults1") + " " + i18n.t("tomorrow")}
-              </FlatButton>
+              />
             )}
           </View>
         </ScrollView>
@@ -198,11 +197,6 @@ const styles = StyleSheet.create({
     marginVertical: dynamicScale(32, false, 0.5),
   },
   emptyCta: {
-    alignSelf: "center",
     marginTop: dynamicScale(8, true),
-    minWidth: "70%",
-  },
-  emptyCtaInner: {
-    paddingVertical: dynamicScale(12, true),
   },
 });

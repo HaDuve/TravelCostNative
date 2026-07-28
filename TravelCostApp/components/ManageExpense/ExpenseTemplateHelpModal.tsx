@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text } from "react-native";
 import PropTypes from "prop-types";
 
 import AppModal from "../UI/AppModal";
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -30,9 +30,12 @@ const ExpenseTemplateHelpModal = ({
       <ScrollView style={styles.bodyScroll}>
         <Text style={styles.body}>{i18n.t("templateExpensesHelpText")}</Text>
       </ScrollView>
-      <FlatButton onPress={onClose} textStyle={styles.dismissButtonText}>
-        {i18n.t("confirm")}
-      </FlatButton>
+      <ActionRow
+        tier="primary"
+        label={i18n.t("confirm")}
+        onPress={onClose}
+        showChevron={false}
+      />
     </AppModal>
   );
 };

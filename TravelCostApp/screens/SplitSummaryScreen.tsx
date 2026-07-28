@@ -21,7 +21,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
-import FlatButton from "../components/UI/FlatButton";
+import ActionRowStack from "../components/UI/ActionRowStack";
 import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
@@ -32,7 +32,6 @@ import {
 } from "../util/split";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
-import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
 import {
   ExpenseData,
@@ -320,75 +319,72 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const ButtonContainerJSX = (
     <View style={isPortrait && styles.buttonContainer}>
-      {!showSimplify && (
-        <FlatButton
-          textStyle={styles.buttonText}
-          onPress={async () => {
-            if (showSimplify) {
-              trackEvent(VexoEvents.SPLIT_SUMMARY_BACK_PRESSED);
-              navigation.goBack();
-            } else {
-              getOpenSplits();
-              setShowSimplify(true);
-              setTitleText(titleTextOriginal);
-            }
-          }}
-        >
-          {i18n.t("back")}
-        </FlatButton>
-      )}
-      {showSimplify && !noSimpleSplits && (
-        <View style={styles.actionWithHelper}>
-          <GradientButton
-            buttonStyle={styles.button}
-            style={styles.button}
-            onPress={handleSimpflifySplits}
-          >
-            {i18n.t("simplifySplits")}
-          </GradientButton>
-          <Text style={styles.buttonHelperText}>
-            {i18n.t("balanceSimplificationHelper")}
-          </Text>
-        </View>
-      )}
-      {hasOpenSplits && !isTripSettled && (
-        <View style={styles.actionWithHelper}>
-          <GradientButton
-            style={styles.button}
-            colors={GlobalStyles.gradientColors}
-            darkText
-            buttonStyle={{
-              backgroundColor: GlobalStyles.colors.errorGrayed,
-            }}
-            onPress={async () => {
-              Alert.alert(
-                i18n.t("settleSplits"),
-                i18n.t("sureSettleSplitsFullMessage"),
-                [
-                  {
-                    text: i18n.t("cancel"),
-                    style: "cancel",
+      <ActionRowStack
+        showChevron={false}
+        actions={[
+          ...(showSimplify && !noSimpleSplits
+            ? [
+                {
+                  testID: "split-summary-simplify",
+                  tier: "primary" as const,
+                  label: i18n.t("simplifySplits"),
+                  hint: i18n.t("balanceSimplificationHelper"),
+                  icon: "git-merge-outline",
+                  onPress: handleSimpflifySplits,
+                },
+              ]
+            : []),
+          ...(hasOpenSplits && !isTripSettled
+            ? [
+                {
+                  testID: "split-summary-settle",
+                  tier: "primary" as const,
+                  label: i18n.t("settleSplits"),
+                  hint: i18n.t("settlementHelper"),
+                  icon: "checkmark-done-outline",
+                  onPress: async () => {
+                    Alert.alert(
+                      i18n.t("settleSplits"),
+                      i18n.t("sureSettleSplitsFullMessage"),
+                      [
+                        { text: i18n.t("cancel"), style: "cancel" },
+                        {
+                          text: i18n.t("confirmSettle"),
+                          onPress: async () => {
+                            trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
+                              splitsCount: splits?.length || 0,
+                            });
+                            await settleSplitsHandler();
+                          },
+                        },
+                      ]
+                    );
                   },
-                  {
-                    text: i18n.t("confirmSettle"),
-                    onPress: async () => {
-                      trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
-                        splitsCount: splits?.length || 0,
-                      });
-                      await settleSplitsHandler();
-                    },
+                },
+              ]
+            : []),
+          ...(!showSimplify
+            ? [
+                {
+                  testID: "split-summary-back",
+                  tier: "secondary" as const,
+                  label: i18n.t("back"),
+                  icon: "arrow-back-outline",
+                  onPress: async () => {
+                    if (showSimplify) {
+                      trackEvent(VexoEvents.SPLIT_SUMMARY_BACK_PRESSED);
+                      navigation.goBack();
+                    } else {
+                      getOpenSplits();
+                      setShowSimplify(true);
+                      setTitleText(titleTextOriginal);
+                    }
                   },
-                ]
-              );
-            }}
-          >
-            {i18n.t("settleSplits")}
-          </GradientButton>
-          <Text style={styles.buttonHelperText}>
-            {i18n.t("settlementHelper")}
-          </Text>
-        </View>
-      )}
+                },
+              ]
+            : []),
+        ]}
+      />
     </View>
   );
 

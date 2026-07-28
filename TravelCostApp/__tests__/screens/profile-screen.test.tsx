@@ -73,17 +73,18 @@ jest.mock("../../util/vexo-tracking", () => ({
 jest.mock("../../components/FeedbackForm/FeedbackForm", () => () => null);
 
 import ProfileScreen from "../../screens/ProfileScreen";
+import { ProfileToolbarTokens } from "../../styles/profile-toolbar-tokens";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 import { isDescendantOf } from "../../test-utils/react-tree";
-import { fireEvent, waitFor } from "@testing-library/react-native";
+import { fireEvent, waitFor, within } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 import { getTravellers } from "../../util/http";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
 function profileUserOverrides(
-  overrides: Record<string, unknown> = {}
+  overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
     userName: "Alice",
@@ -121,7 +122,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}) },
         expenses: { setExpenses: jest.fn() },
         user: profileUserOverrides({ freshlyCreated: true }),
-      }
+      },
     );
 
     expect(screen.getByText("Alice")).toBeTruthy();
@@ -130,10 +131,10 @@ describe("Profile screen", () => {
 
     await waitFor(() => {
       expect(trackEvent).not.toHaveBeenCalledWith(
-        VexoEvents.ONBOARDING_TOUR_STARTED
+        VexoEvents.ONBOARDING_TOUR_STARTED,
       );
       expect(trackEvent).not.toHaveBeenCalledWith(
-        VexoEvents.ONBOARDING_TOUR_SKIPPED
+        VexoEvents.ONBOARDING_TOUR_SKIPPED,
       );
       expect(navigation.navigate).not.toHaveBeenCalledWith("RecentExpenses");
       expect(navigation.navigate).not.toHaveBeenCalledWith("Overview");
@@ -149,7 +150,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}) },
         expenses: { setExpenses: jest.fn() },
         user: profileUserOverrides(),
-      }
+      },
     );
 
     expect(screen.getByText("Alice")).toBeTruthy();
@@ -168,7 +169,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}) },
         expenses: { setExpenses: jest.fn() },
         user: profileUserOverrides(),
-      }
+      },
     );
 
     fireEvent.press(screen.getByTestId("my-budgets-join"));
@@ -184,7 +185,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}) },
         expenses: { setExpenses: jest.fn() },
         user: profileUserOverrides(),
-      }
+      },
     );
 
     fireEvent.press(screen.getByTestId("my-budgets-add-another"));
@@ -218,7 +219,7 @@ describe("Profile screen", () => {
           ],
         },
         user: profileUserOverrides({ tripHistory: ["implicit-1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -240,7 +241,7 @@ describe("Profile screen", () => {
         },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -272,7 +273,7 @@ describe("Profile screen", () => {
           expenses: [],
         },
         user: profileUserOverrides({ tripHistory: ["implicit-1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -296,7 +297,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -315,7 +316,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -337,7 +338,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -355,7 +356,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -379,7 +380,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -387,10 +388,35 @@ describe("Profile screen", () => {
     });
 
     const flatLists = screen.UNSAFE_getAllByType(
-      require("react-native").FlatList
+      require("react-native").FlatList,
     );
     expect(flatLists).toHaveLength(1);
     assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("offsets scroll content by toolbar height only, not safe area twice", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        wrapNavigation: false,
+        safeAreaInsets: { top: 44, left: 0, right: 0, bottom: 34 },
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-scroll")).toBeTruthy();
+    });
+
+    const scrollList = screen.getByTestId("profile-scroll");
+    const contentStyle = StyleSheet.flatten(
+      scrollList.props.contentContainerStyle,
+    ) as Record<string, unknown>;
+    expect(contentStyle.paddingTop).toBe(ProfileToolbarTokens.chromeHeight);
   });
 
   it("keeps the floating profile toolbar outside the scroll list", async () => {
@@ -402,7 +428,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -424,7 +450,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -448,7 +474,7 @@ describe("Profile screen", () => {
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
         user: profileUserOverrides({ tripHistory: ["t1"] }),
-      }
+      },
     );
 
     await waitFor(() => {
@@ -457,5 +483,54 @@ describe("Profile screen", () => {
 
     expect(screen.getByTestId("profile-scroll")).toBeTruthy();
     expect(screen.getByTestId("profile-scroll-header")).toBeTruthy();
+  });
+
+  it("shows chevrons only on budget navigation rows, not modal actions", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: profileUserOverrides(),
+        network: { isConnected: true, strongConnection: true },
+      },
+    );
+
+    const chevron = "›";
+    expect(
+      within(screen.getByTestId("my-budgets-add-another")).getByText(chevron),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByTestId("my-budgets-join")).getByText(chevron),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByTestId("profile-get-local-price")).queryByText(
+        chevron,
+      ),
+    ).toBeNull();
+    expect(
+      within(screen.getByTestId("profile-feedback")).queryByText(chevron),
+    ).toBeNull();
+  });
+
+  it("shows profile action hints for Local Price and Feedback rows", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: profileUserOverrides(),
+        network: { isConnected: true, strongConnection: true },
+      },
+    );
+
+    expect(
+      screen.getByText("Check prices with AI on the road"),
+    ).toBeTruthy();
+    expect(screen.getByText("Tell us what to improve")).toBeTruthy();
   });
 });

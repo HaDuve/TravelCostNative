@@ -3,7 +3,6 @@ import { View, Alert, StyleSheet, Platform } from "react-native";
 import React from "react";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -17,6 +16,7 @@ import { fetchChangelog } from "../../util/http";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 import { getMMKVString, MMKV_KEYS } from "../../store/mmkv";
 import { dynamicScale } from "../../util/scalingUtil";
+import { ProfileToolbarTokens } from "../../styles/profile-toolbar-tokens";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -37,7 +37,6 @@ const ProfileToolbar = ({
   const isConnected = netCtx.strongConnection;
   const freshlyCreated = userCtx.freshlyCreated;
   const hasNewChanges = userCtx.hasNewChanges;
-  const insets = useSafeAreaInsets();
 
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
@@ -74,45 +73,46 @@ const ProfileToolbar = ({
   return (
     <View
       testID="profile-floating-toolbar"
-      style={[
-        styles.toolbar,
-        {
-          paddingTop: Math.max(insets.top, dynamicScale(8, true)),
-        },
-      ]}
+      pointerEvents="box-none"
+      style={styles.toolbarShell}
     >
-      <View style={styles.toolbarButtons}>
-        {!freshlyCreated && (
+      <View testID="profile-toolbar-chrome" style={styles.toolbarChrome}>
+        <View testID="profile-toolbar-buttons" style={styles.toolbarButtons}>
+          {!freshlyCreated && (
+            <IconButton
+              icon="newspaper-outline"
+              size={ProfileToolbarTokens.iconSize}
+              buttonStyle={styles.iconButton}
+              color={GlobalStyles.colors.textColor}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.navigate("Changelog");
+                userCtx.setHasNewChanges(false);
+              }}
+              badge={hasNewChanges}
+              badgeStyle={{ backgroundColor: GlobalStyles.colors.error500 }}
+            />
+          )}
+          {!freshlyCreated && (
+            <IconButton
+              icon="settings-outline"
+              size={ProfileToolbarTokens.iconSize}
+              buttonStyle={styles.iconButton}
+              color={GlobalStyles.colors.textColor}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.navigate("Settings");
+              }}
+            />
+          )}
           <IconButton
-            icon="newspaper-outline"
-            size={dynamicScale(36, false, 0.5)}
+            icon="exit-outline"
+            size={ProfileToolbarTokens.iconSize}
+            buttonStyle={styles.iconButton}
             color={GlobalStyles.colors.textColor}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              navigation.navigate("Changelog");
-              userCtx.setHasNewChanges(false);
-            }}
-            badge={hasNewChanges}
-            badgeStyle={{ backgroundColor: GlobalStyles.colors.error500 }}
+            onPress={logoutHandler}
           />
-        )}
-        {!freshlyCreated && (
-          <IconButton
-            icon="settings-outline"
-            size={dynamicScale(36, false, 0.5)}
-            color={GlobalStyles.colors.textColor}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              navigation.navigate("Settings");
-            }}
-          />
-        )}
-        <IconButton
-          icon="exit-outline"
-          size={dynamicScale(36, false, 0.5)}
-          color={GlobalStyles.colors.textColor}
-          onPress={logoutHandler}
-        />
+        </View>
       </View>
     </View>
   );
@@ -126,15 +126,18 @@ ProfileToolbar.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  toolbar: {
+  toolbarShell: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
+  },
+  toolbarChrome: {
+    minHeight: ProfileToolbarTokens.chromeHeight,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    paddingBottom: dynamicScale(8, true),
-    paddingHorizontal: dynamicScale(8, false, 0.5),
+    paddingBottom: ProfileToolbarTokens.paddingVertical,
+    paddingHorizontal: ProfileToolbarTokens.paddingHorizontal,
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -151,6 +154,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    gap: dynamicScale(4, false, 0.5),
+    minHeight: ProfileToolbarTokens.contentHeight,
+    gap: dynamicScale(2, false, 0.5),
+  },
+  iconButton: {
+    padding: ProfileToolbarTokens.iconHitPadding,
+    borderRadius: ProfileToolbarTokens.iconSize,
   },
 });

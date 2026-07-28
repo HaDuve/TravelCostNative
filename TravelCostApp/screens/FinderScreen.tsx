@@ -20,7 +20,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import FinderFilterRow from "../components/Finder/FinderFilterRow";
 import Autocomplete from "../components/UI/Autocomplete";
 import { finderFilterRowStyles } from "../styles/finder-filter-row-styles";
-import GradientButton from "../components/UI/GradientButton";
+import ActionRow from "../components/UI/ActionRow";
 import { GlobalStyles } from "../constants/styles";
 import {
   asyncStoreGetItem,
@@ -354,16 +354,21 @@ const FinderScreen = () => {
                   tripCtx.tripCurrency
                 )}{" "}
             </Text>
-            <GradientButton
-              onPress={() => findPressedHandler()}
+            <ActionRow
+              testID="finder-show-results"
               style={styles.findButton}
-            >
-              {foundResults
-                ? `${i18n.t("showXResults1")} ${numberOfResults} ${i18n.t(
-                    "showXResults2"
-                  )}`
-                : i18n.t("noResults")}
-            </GradientButton>
+              tier="primary"
+              icon="search-outline"
+              showChevron={false}
+              label={
+                foundResults
+                  ? `${i18n.t("showXResults1")} ${numberOfResults} ${i18n.t(
+                      "showXResults2"
+                    )}`
+                  : i18n.t("noResults")
+              }
+              onPress={findPressedHandler}
+            />
           </View>
         </ScrollView>
       </View>
@@ -429,8 +434,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   findButton: {
-    marginHorizontal: dynamicScale(65),
-    borderRadius: 99,
+    alignSelf: "stretch",
   },
   autocompleteInFilterRow: {
     alignSelf: "stretch",

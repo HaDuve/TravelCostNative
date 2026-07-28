@@ -1,6 +1,7 @@
 import { Platform, StyleSheet } from "react-native";
 
 import { GlobalStyles } from "../constants/styles";
+import { actionRowCardShell } from "./action-row-tokens";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 
 export const periodHeaderLabelFontSize = dynamicScale(28, false, 0.5);
@@ -113,6 +114,7 @@ export const shadowRegressionStyles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     ...GlobalStyles.wideStrongShadow,
   },
+  actionRowCard: actionRowCardShell,
   tripTravellerChip: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     ...GlobalStyles.strongShadow,

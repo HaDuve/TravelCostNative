@@ -18,7 +18,6 @@ import {
   FlatList,
   KeyboardAvoidingView,
   InputAccessoryView,
-  Image,
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useFocusEffect } from "@react-navigation/native";
@@ -30,7 +29,6 @@ import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
 import {
   DEFAULTCATEGORIES,
   getCatSymbol,
@@ -85,6 +83,7 @@ import { i18n } from "../../i18n/i18n";
 
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
+import { expenseFormLocalPriceHint } from "../../util/expense-form-local-price-hint";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   Easing,
@@ -95,7 +94,8 @@ import Animated, {
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
-import GradientButton from "../UI/GradientButton";
+import ActionRow from "../UI/ActionRow";
+import ActionRowStack from "../UI/ActionRowStack";
 import {
   DuplicateOption,
   ExpenseData,
@@ -1196,6 +1196,22 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     });
   };
 
+  const getLocalPriceRowHint = useMemo(
+    () =>
+      expenseFormLocalPriceHint({
+        product: inputs.description.value,
+        country: inputs.country.value,
+        price: amountValue,
+        currency: inputs.currency.value,
+      }),
+    [
+      inputs.description.value,
+      inputs.country.value,
+      inputs.currency.value,
+      amountValue,
+    ]
+  );
+
   const backButtonJsx = (
     <BackButton
       style={{
@@ -2038,40 +2054,37 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
             inputs.currency.value &&
             inputs.country.value && (
               <View style={styles.getLocalPriceContainer}>
-                <GradientButton
-                  style={styles.getLocalPriceButton}
-                  textStyle={{ fontSize: 16 }}
-                  buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
-                  colors={GlobalStyles.gradientColorsButton}
+                <ActionRow
+                  testID="expense-form-get-local-price"
+                  tier="gradient"
+                  label={i18n.t("getLocalPriceTitle")}
+                  hint={getLocalPriceRowHint}
+                  imageIconSource={require("../../assets/chatgpt-logo.jpeg")}
                   onPress={askChatGPTHandler}
-                  darkText
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={require("../../assets/chatgpt-logo.jpeg")}
-                      style={{
-                        width: dynamicScale(16, false, 0.5),
-                        height: dynamicScale(16, false, 0.5),
-                        marginRight: 8,
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: GlobalStyles.colors.textColor,
-                      }}
-                    >
-                      {i18n.t("getLocalPriceTitle")}
-                    </Text>
-                  </View>
-                </GradientButton>
+                  showChevron={false}
+                  style={styles.getLocalPriceButton}
+                />
               </View>
             )}
           <View style={styles.buttonContainer}>
-            <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
-            <GradientButton style={styles.button} onPress={debouncedSubmit}>
-              {submitButtonLabel}
-            </GradientButton>
+            <ActionRowStack
+              showChevron={false}
+              actions={[
+                {
+                  testID: "expense-form-submit",
+                  tier: "primary",
+                  label: submitButtonLabel,
+                  icon: "checkmark-circle-outline",
+                  onPress: debouncedSubmit,
+                },
+                {
+                  testID: "expense-form-cancel",
+                  tier: "secondary",
+                  label: i18n.t("cancel"),
+                  onPress: onCancel,
+                },
+              ]}
+            />
           </View>
         </Animated.View>
       </Animated.View>
@@ -2317,10 +2330,10 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "baseline",
+    flexDirection: "column",
+    alignItems: "stretch",
     paddingTop: dynamicScale(20, true),
+    marginHorizontal: "4%",
   },
   currencyContainer: {
     maxWidth: "100%",
@@ -2471,13 +2484,11 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   getLocalPriceContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
     paddingTop: dynamicScale(12, true),
     marginHorizontal: "4%",
   },
   getLocalPriceButton: {
+    alignSelf: "stretch",
     marginHorizontal: 0,
     marginVertical: 0,
   },

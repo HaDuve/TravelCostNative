@@ -1,4 +1,6 @@
 import * as React from "react";
+import { within } from "@testing-library/react-native";
+import { DateTime } from "luxon";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
@@ -93,6 +95,64 @@ describe("FilteredExpenses route params", () => {
         expenses: [],
       })
     );
+  });
+
+  it("stacks primary add-expense above secondary back in the footer", () => {
+    const expenses = [
+      makeExpense({
+        id: "earlier",
+        date: new Date("2026-03-05T00:00:00.000Z"),
+      }),
+    ];
+
+    const screen = renderWithAppProviders(
+      <FilteredExpenses
+        route={{
+          params: {
+            expenses: toExpenseNavigationDtos(expenses),
+            dayString: "Mar 2026",
+          },
+        }}
+      />
+    );
+
+    const stack = screen.getByTestId("action-row-stack");
+    const testIds = React.Children.toArray(stack.props.children).map(
+      (child: React.ReactElement) => child.props.testID
+    );
+
+    expect(testIds).toEqual(["add-expense-here", "filtered-expenses-back"]);
+  });
+
+  it("shows add-expense title and date hint on separate lines", () => {
+    const earliestDate = "2026-03-05T00:00:00.000Z";
+    const expenses = [
+      makeExpense({
+        id: "earlier",
+        date: new Date(earliestDate),
+      }),
+    ];
+
+    const screen = renderWithAppProviders(
+      <FilteredExpenses
+        route={{
+          params: {
+            expenses: toExpenseNavigationDtos(expenses),
+            dayString: "Mar 2026",
+          },
+        }}
+      />
+    );
+
+    const row = screen.getByTestId("add-expense-here");
+    expect(within(row).getByText(i18n.t("addExp"))).toBeTruthy();
+    expect(
+      within(row).getByText(
+        i18n.t("addExpHereHint", {
+          date: DateTime.fromISO(earliestDate).toLocaleString(),
+        })
+      )
+    ).toBeTruthy();
   });
 
   it("uses the earliest hydrated expense date for add-expense-here", () => {

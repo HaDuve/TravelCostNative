@@ -6,7 +6,7 @@ import { i18n } from "../../i18n/i18n";
 
 import Input from "./Input";
 import PropTypes from "prop-types";
-import GradientButton from "../UI/GradientButton";
+import ActionRow from "../UI/ActionRow";
 import {
   secureStoreGetItem,
   secureStoreSetItem,
@@ -194,19 +194,18 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
         />
 
         <View style={styles.buttons}>
-          <GradientButton
-            colors={
-              isConnected
-                ? GlobalStyles.gradientPrimaryButton
-                : [
-                    GlobalStyles.colors.primary500,
-                    GlobalStyles.colors.primaryGrayed,
-                  ]
-            }
+          <ActionRow
+            tier="primary"
+            label={isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
+            icon={isLogin ? "log-in-outline" : "person-add-outline"}
+            showChevron={false}
+            compact
             onPress={submitHandler}
-          >
-            {isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
-          </GradientButton>
+            style={[
+              styles.submitButton,
+              !isConnected && styles.submitButtonOffline,
+            ]}
+          />
         </View>
         <View style={styles.appleAuthContainer}>
           {/* {AppleAuthenticationJSX} */}
@@ -240,6 +239,12 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginTop: dynamicScale(12),
+  },
+  submitButton: {
+    width: "100%",
+  },
+  submitButtonOffline: {
+    opacity: 0.6,
   },
   iconContainer: {
     marginTop: dynamicScale(-30, true),

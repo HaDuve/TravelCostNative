@@ -11,7 +11,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import Markdown, { MarkdownProps } from "react-native-markdown-display";
 import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
-import FlatButton from "../components/UI/FlatButton";
+import ActionRow from "../components/UI/ActionRow";
 import { i18n } from "../i18n/i18n";
 
 import {
@@ -341,24 +341,13 @@ const GPTDealScreen = ({ route, navigation }) => {
           </ScrollView>
         </View>
         <View style={styles.buttonContainer}>
-          <FlatButton
+          <ActionRow
+            testID="gpt-deal-back"
+            tier="secondary"
+            label={i18n.t("back")}
+            icon="arrow-back-outline"
             onPress={() => navigation.pop()}
-            textStyle={{ fontSize: 16 }}
-          >
-            {i18n.t("back")}
-          </FlatButton>
-          {/* {!isFetching && (
-            <GradientButton
-              style={[
-                Platform.OS == "ios" && { paddingHorizontal: 20 },
-                { elevation: 0 },
-              ]}
-              onPress={handleRegenerate}
-              buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
-            >
-              Regenerate
-            </GradientButton>
-          )} */}
+          />
         </View>
         {/* <BlurPremium canBack /> */}
       </View>
@@ -430,10 +419,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 0.5,
-    flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    alignItems: "center",
+    paddingHorizontal: dynamicScale(4, false, 0.5),
   },
   chatContainer: {
     // padding: dynamicScale(4, false, 0.5),

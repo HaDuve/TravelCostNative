@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Pressable } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { waitFor } from "@testing-library/react-native";
 
 jest.mock("expo-haptics", () => ({
@@ -100,5 +102,59 @@ describe("TripSummaryScreen", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.tripSummaryTripItemSelected)
     );
+  });
+
+  it("stacks summary gradient CTA above charts and back secondary rows", async () => {
+    const navigation = { navigate: jest.fn(), pop: jest.fn(), goBack: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <TripSummaryScreen navigation={navigation as any} />,
+      {
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-summary-summary")).toBeTruthy();
+      expect(screen.getByTestId("trip-summary-charts")).toBeTruthy();
+      expect(screen.getByTestId("trip-summary-back")).toBeTruthy();
+    });
+
+    expect(screen.UNSAFE_queryAllByType(LinearGradient)).toHaveLength(1);
+
+    const pressableTestIds = screen
+      .UNSAFE_queryAllByType(Pressable)
+      .map((node) => node.props.testID)
+      .filter(Boolean) as string[];
+
+    expect(pressableTestIds.indexOf("trip-summary-summary")).toBeLessThan(
+      pressableTestIds.indexOf("trip-summary-charts")
+    );
+    expect(pressableTestIds.indexOf("trip-summary-charts")).toBeLessThan(
+      pressableTestIds.indexOf("trip-summary-back")
+    );
+  });
+
+  it("shows a hint on the gradient summary row", async () => {
+    const navigation = { navigate: jest.fn(), pop: jest.fn(), goBack: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <TripSummaryScreen navigation={navigation as any} />,
+      {
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(i18n.t("summaryHint"))).toBeTruthy();
+    });
   });
 });

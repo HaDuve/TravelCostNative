@@ -115,4 +115,24 @@ describe("FilteredPieCharts navigation arrows", () => {
 
     expectActiveTitle(screen, CATEGORIES);
   });
+
+  it("pops navigation when the footer back action row is pressed", () => {
+    const { screen, navigation } = renderScreen();
+
+    fireEvent.press(screen.getByTestId("filtered-pie-charts-back"));
+
+    expect(navigation.pop).toHaveBeenCalledTimes(1);
+  });
+
+  it("stacks full-width add-expense above back in the footer", () => {
+    const { screen } = renderScreen();
+
+    const stack = screen.getByTestId("action-row-stack");
+    const testIds = React.Children.toArray(stack.props.children).map(
+      (child: React.ReactElement) => child.props.testID
+    );
+
+    expect(testIds).toEqual(["add-expense-here", "filtered-pie-charts-back"]);
+    expect(screen.getByText(i18n.t("addExp"))).toBeTruthy();
+  });
 });

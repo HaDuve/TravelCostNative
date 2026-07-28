@@ -32,8 +32,8 @@ import Input from "../components/Auth/Input";
 import { i18n } from "../i18n/i18n";
 import { ExpensesContext } from "../store/expenses-context";
 import React from "react";
-import FlatButton from "../components/UI/FlatButton";
-import Button from "../components/UI/Button";
+import ActionRow from "../components/UI/ActionRow";
+import ActionRowStack from "../components/UI/ActionRowStack";
 import PropTypes from "prop-types";
 import { ActivityIndicator } from "react-native-paper";
 
@@ -46,7 +46,6 @@ import {
 } from "../store/secure-storage";
 import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
-import Animated, { FadeIn } from "react-native-reanimated";
 import {
   isConnectionFastEnough,
   isConnectionFastEnoughAsBool,
@@ -298,17 +297,16 @@ const JoinTrip = ({ navigation, route }) => {
             isInvalid={false}
           ></Input>
           {!isFetching && (
-            <Button
-              style={{ maxWidth: "100%", marginTop: "5%" }}
-              buttonStyle={{
-                backgroundColor: freshLink
-                  ? GlobalStyles.colors.primaryGrayed
-                  : GlobalStyles.colors.gray700,
-              }}
+            <ActionRow
+              testID="join-trip-update-link"
+              tier="secondary"
+              label={i18n.t("update")}
+              icon="refresh-outline"
               onPress={joinLinkHandler}
-            >
-              {i18n.t("update")}
-            </Button>
+              showChevron={false}
+              disabled={freshLink}
+              style={{ marginTop: "5%" }}
+            />
           )}
         </View>
       )}
@@ -334,20 +332,29 @@ const JoinTrip = ({ navigation, route }) => {
         {tripName}
       </Text>
       <View style={styles.buttonContainer}>
-        <FlatButton onPress={joinHandler.bind(this, false)}>
-          {i18n.t("cancel")}
-        </FlatButton>
-        {tripName?.length > 0 && !isFetching && (
-          <Animated.View entering={FadeIn}>
-            <Button
-              style={{ marginLeft: "10%" }}
-              buttonStyle={{ paddingHorizontal: "20%" }}
-              onPress={joinHandler.bind(this, true)}
-            >
-              {i18n.t("confirm2")}
-            </Button>
-          </Animated.View>
-        )}
+        <ActionRowStack
+          showChevron={false}
+          actions={[
+            ...(tripName?.length > 0 && !isFetching
+              ? [
+                  {
+                    testID: "join-trip-confirm",
+                    tier: "primary" as const,
+                    label: i18n.t("confirm2"),
+                    icon: "checkmark-circle-outline" as const,
+                    onPress: joinHandler.bind(this, true),
+                  },
+                ]
+              : []),
+            {
+              testID: "join-trip-cancel",
+              tier: "secondary" as const,
+              label: i18n.t("cancel"),
+              icon: "arrow-back-outline" as const,
+              onPress: joinHandler.bind(this, false),
+            },
+          ]}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -407,7 +414,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: "5%",
     marginTop: "5%",
-    flexDirection: "row",
+    width: "100%",
   },
   linkInputContainer: {
     flex: 1,

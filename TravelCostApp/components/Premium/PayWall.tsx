@@ -18,7 +18,7 @@ import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
 import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
 import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -63,15 +63,16 @@ const PaywallScreen = ({ navigation }) => {
   const header = () => (
     <View>
       {/* <BackButton></BackButton> */}
-      <FlatButton
-        textStyle={styles.backButtonTextStyle}
+      <ActionRow
+        tier="secondary"
+        label={i18n.t("back")}
+        icon="chevron-back-outline"
         onPress={() => {
           trackEvent(VexoEvents.PAYWALL_BACK_PRESSED);
           navigation.pop();
         }}
-      >
-        {i18n.t("back")}
-      </FlatButton>
+        style={styles.backButton}
+      />
       <View
         style={{
           alignItems: "center",
@@ -288,11 +289,8 @@ const styles = StyleSheet.create({
     // text size
     fontSize: constantScale(12, 0.5),
   },
-  backButtonTextStyle: {
-    color: GlobalStyles.colors.accent250,
-    fontSize: constantScale(16, 0.5),
-    fontWeight: "bold",
-    textAlign: "left",
+  backButton: {
+    alignSelf: "stretch",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

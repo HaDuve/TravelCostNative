@@ -29,7 +29,8 @@ import { KeyboardAvoidingView } from "react-native";
 import Input from "../ManageExpense/Input";
 import { TripContext, TripData } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
+import ActionRowStack from "../UI/ActionRowStack";
 import { ExpensesContext } from "../../store/expenses-context";
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -43,7 +44,6 @@ import * as Haptics from "expo-haptics";
 import DatePickerModal from "../UI/DatePickerModal";
 import IconButton from "../UI/IconButton";
 import DatePickerContainer from "../UI/DatePickerContainer";
-import GradientButton from "../UI/GradientButton";
 import PropTypes from "prop-types";
 import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
@@ -767,9 +767,12 @@ const TripForm = ({ navigation, route }) => {
       <View style={styles.infoModalContainer}>
         <Text style={styles.infoTitleText}>{infoTitleText}</Text>
         <Text style={styles.infoContentText}>{infoContentText}</Text>
-        <FlatButton onPress={setInfoIsVisible.bind(this, false)}>
-          {i18n.t("confirm")}
-        </FlatButton>
+        <ActionRow
+          tier="primary"
+          label={i18n.t("confirm")}
+          onPress={setInfoIsVisible.bind(this, false)}
+          showChevron={false}
+        />
       </View>
     </Modal>
   );
@@ -815,33 +818,34 @@ const TripForm = ({ navigation, route }) => {
             ios: -100,
           })}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginHorizontal: dynamicScale(8, false, 0.5),
-              marginBottom: dynamicScale(-8, false, 0.5),
-            }}
-          >
+          <View style={styles.headerRow}>
             <BackButton style={{ marginTop: dynamicScale(-8) }}></BackButton>
-            {!isEditing && (
-              <FlatButton
-                onPress={() => {
-                  navigation.navigate("Join");
-                }}
-              >
-                {i18n.t("joinTripLabel")}
-              </FlatButton>
-            )}
-            {isEditing && (
-              <FlatButton
-                onPress={() => {
-                  onShare(editedTripId, navigation);
-                }}
-              >
-                {i18n.t("shareTripLabel")}
-              </FlatButton>
-            )}
+            <View style={styles.headerAction}>
+              {!isEditing && (
+                <ActionRow
+                  testID="trip-form-join"
+                  tier="secondary"
+                  label={i18n.t("joinTripLabel")}
+                  icon="people-outline"
+                  onPress={() => {
+                    navigation.navigate("Join");
+                  }}
+                  style={styles.headerActionRow}
+                />
+              )}
+              {isEditing && (
+                <ActionRow
+                  testID="trip-form-share"
+                  tier="secondary"
+                  label={i18n.t("shareTripLabel")}
+                  icon="share-outline"
+                  onPress={() => {
+                    onShare(editedTripId, navigation);
+                  }}
+                  style={styles.headerActionRow}
+                />
+              )}
+            </View>
           </View>
           <View
             style={[
@@ -1074,62 +1078,73 @@ const TripForm = ({ navigation, route }) => {
           </View>
           {/* Add Currency Input field */}
           <View style={styles.buttonContainer}>
-            <FlatButton onPress={cancelHandler}>{i18n.t("cancel")}</FlatButton>
-            {!isEditing ? (
-              <GradientButton
-                buttonStyle={{}}
-                style={styles.button}
-                onPress={submitHandler.bind(this, true /* setActive */)}
-              >
-                {i18n.t("confirm2")}
-              </GradientButton>
-            ) : (
-              <FlatButton
-                onPress={submitHandler.bind(this, false /* setActive */)}
-              >
-                {i18n.t("saveChanges")}
-              </FlatButton>
-            )}
+            <ActionRowStack
+              showChevron={false}
+              actions={
+                !isEditing
+                  ? [
+                      {
+                        testID: "trip-form-confirm",
+                        tier: "primary",
+                        label: i18n.t("confirm2"),
+                        icon: "checkmark-circle-outline",
+                        onPress: submitHandler.bind(this, true),
+                      },
+                      {
+                        testID: "trip-form-cancel",
+                        tier: "secondary",
+                        label: i18n.t("cancel"),
+                        onPress: cancelHandler,
+                      },
+                    ]
+                  : [
+                      {
+                        testID: "trip-form-save",
+                        tier: "primary",
+                        label: i18n.t("saveChanges"),
+                        icon: "save-outline",
+                        onPress: submitHandler.bind(this, false),
+                      },
+                      {
+                        testID: "trip-form-cancel",
+                        tier: "secondary",
+                        label: i18n.t("cancel"),
+                        onPress: cancelHandler,
+                      },
+                    ]
+              }
+            />
           </View>
           {/* Horizontal container */}
           {isEditing && !isPromote && (
-            <GradientButton
-              buttonStyle={{}}
-              style={[
-                styles.button,
-                {
-                  marginVertical: dynamicScale(8, false, 0.5),
-                  marginHorizontal: dynamicScale(24, false, 0.5),
-                },
-              ]}
-              onPress={() => {
-                trackEvent(VexoEvents.SET_ACTIVE_TRIP_PRESSED, {
-                  tripId: editedTripId,
-                });
-                submitHandler(true /* setActive */);
-              }}
-            >
-              {i18n.t("setActive")}
-            </GradientButton>
+            <View style={styles.tripActionRows}>
+              <ActionRow
+                testID="trip-form-set-active"
+                tier="primary"
+                label={i18n.t("setActive")}
+                icon="star-outline"
+                showChevron={false}
+                onPress={() => {
+                  trackEvent(VexoEvents.SET_ACTIVE_TRIP_PRESSED, {
+                    tripId: editedTripId,
+                  });
+                  submitHandler(true /* setActive */);
+                }}
+              />
+            </View>
           )}
           {isEditing && !isPromote && (userCtx.tripHistory?.length ?? 0) > 1 && (
-            <GradientButton
-              buttonStyle={{
-                backgroundColor: GlobalStyles.colors.error300,
-                opacity: isConnected ? 1 : 0.5,
-              }}
-              style={[
-                styles.button,
-                {
-                  marginBottom: dynamicScale(8, false, 0.5),
-                  marginHorizontal: dynamicScale(24, false, 0.5),
-                },
-              ]}
-              onPress={leaveHandler}
-              colors={GlobalStyles.gradientErrorButton}
-            >
-              {i18n.t("leaveTrip")}
-            </GradientButton>
+            <View style={styles.tripActionRows}>
+              <ActionRow
+                testID="trip-form-leave"
+                tier="primary"
+                label={i18n.t("leaveTrip")}
+                icon="exit-outline"
+                onPress={leaveHandler}
+                showChevron={false}
+                style={{ opacity: isConnected ? 1 : 0.5 }}
+              />
+            </View>
           )}
         </KeyboardAvoidingView>
       </Animated.View>
@@ -1152,6 +1167,23 @@ TripForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: dynamicScale(8, false, 0.5),
+    marginBottom: dynamicScale(-8, false, 0.5),
+  },
+  headerAction: {
+    flex: 1,
+    marginLeft: dynamicScale(4, false, 0.5),
+  },
+  headerActionRow: {
+    marginBottom: 0,
+  },
+  tripActionRows: {
+    marginHorizontal: dynamicScale(24, false, 0.5),
+    marginVertical: dynamicScale(4, false, 0.5),
+  },
   form: {
     // flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -1248,10 +1280,8 @@ const styles = StyleSheet.create({
     margin: dynamicScale(8, false, 0.5),
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-
+    flexDirection: "column",
+    alignItems: "stretch",
     marginTop: "4%",
     marginBottom: "2%",
     marginHorizontal: "4%",

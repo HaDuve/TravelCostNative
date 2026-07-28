@@ -9,6 +9,8 @@ describe("My Budgets hub i18n (issue #356)", () => {
       expect(locale.joinBudgetHint).toBeTruthy();
       expect(locale.addAnotherBudget).toBeTruthy();
       expect(locale.addAnotherBudgetHint).toBeTruthy();
+      expect(locale.getLocalPriceHint).toBeTruthy();
+      expect(locale.supportFeedbackHint).toBeTruthy();
       expect(locale.yourBudget).toBeTruthy();
       expect(locale.myBudgetAutoName).toBeTruthy();
       expect(locale.activeTripLabel).toBeTruthy();
@@ -25,5 +27,13 @@ describe("My Budgets hub i18n (issue #356)", () => {
     expect(en.yourBudget).toBe("Your budget");
     expect(en.myBudgetAutoName).toBe("My Budget");
     expect(en.activeTripLabel).toBe("Active");
+  });
+
+  it("German profile action hints stay readable for secondary rows", () => {
+    expect(de.joinBudgetHint).toBe("Einladungscode oder Link eingeben");
+    expect(de.getLocalPriceHint).toBe("Preise mit KI unterwegs prüfen");
+    expect(de.supportFeedbackHint).toBe(
+      "Sag uns, was wir verbessern können",
+    );
   });
 });

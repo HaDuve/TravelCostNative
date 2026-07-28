@@ -15,7 +15,7 @@ import { i18n } from "../../i18n/i18n";
 
 import { useNavigation } from "@react-navigation/native";
 
-import FlatButton from "../UI/FlatButton";
+import ActionRow from "../UI/ActionRow";
 import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
@@ -102,9 +102,14 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
             <Text style={styles.secondaryText}>
               {isLogin ? i18n.t("noAccountText") : i18n.t("alreadyAccountText")}
             </Text>
-            <FlatButton onPress={switchAuthModeHandler}>
-              {isLogin ? i18n.t("createNewUser") : i18n.t("loginInstead")}
-            </FlatButton>
+            <ActionRow
+              tier="secondary"
+              label={isLogin ? i18n.t("createNewUser") : i18n.t("loginInstead")}
+              icon="swap-horizontal-outline"
+              showChevron={false}
+              compact
+              onPress={switchAuthModeHandler}
+            />
           </View>
         </View>
       </ScrollView>

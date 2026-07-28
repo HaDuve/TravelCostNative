@@ -17,7 +17,8 @@ import { Checkbox } from "react-native-paper";
 import { daysBetween, isToday } from "../util/date";
 import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
-import FlatButton from "../components/UI/FlatButton";
+import ActionRow from "../components/UI/ActionRow";
+import ActionRowStack from "../components/UI/ActionRowStack";
 
 import { i18n } from "../i18n/i18n";
 
@@ -44,7 +45,6 @@ import { getTripData } from "../util/trip";
 import * as Progress from "react-native-progress";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
-import GradientButton from "../components/UI/GradientButton";
 import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
 import { Platform } from "react-native";
 import { safelyParseJSON } from "../util/jsonParse";
@@ -588,7 +588,12 @@ const TripSummaryScreen = ({ navigation }) => {
         )}
       </Pressable>
       <View style={styles.buttonContainer}>
-        <GradientButton
+        <ActionRow
+          testID="trip-summary-summary"
+          tier="gradient"
+          label={i18n.t("summary")}
+          hint={i18n.t("summaryHint")}
+          icon="document-text-outline"
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setShowSummary(!showSummary);
@@ -596,27 +601,17 @@ const TripSummaryScreen = ({ navigation }) => {
               summarizeHandler();
             }
           }}
-          buttonStyle={styles.fullWidthButtonStyle}
-          colors={GlobalStyles.gradientColorsButton}
-          darkText
-        >
-          {i18n.t("summary")}
-        </GradientButton>
-        <View style={styles.halfWidthButtonContainer}>
-          <View style={styles.halfWidthButton}>
-            <FlatButton
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                navigation.pop();
-              }}
-              textStyle={{}}
-            >
-              {i18n.t("back")}
-            </FlatButton>
-          </View>
-          <View style={styles.halfWidthButton}>
-            <FlatButton
-              onPress={() => {
+          showChevron={false}
+        />
+        <ActionRowStack
+          showChevron={false}
+          actions={[
+            {
+              testID: "trip-summary-charts",
+              tier: "secondary",
+              label: i18n.t("charts"),
+              icon: "pie-chart-outline",
+              onPress: () => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate("FilteredPieCharts", {
                   expenses: toExpenseNavigationDtos(allExpensesList),
@@ -624,21 +619,20 @@ const TripSummaryScreen = ({ navigation }) => {
                     "expensesTab"
                   )}`,
                 });
-              }}
-              textStyle={{}}
-            >
-              {i18n.t("charts")}
-            </FlatButton>
-          </View>
-        </View>
-        {/* {tripSummary && (
-          <GradientButton
-            style={styles.gradientButtonStyle}
-            onPress={exportHandler}
-          >
-            Export to PDF
-          </GradientButton>
-        )} */}
+              },
+            },
+            {
+              testID: "trip-summary-back",
+              tier: "secondary",
+              label: i18n.t("back"),
+              icon: "arrow-back-outline",
+              onPress: () => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.pop();
+              },
+            },
+          ]}
+        />
       </View>
     </ScrollView>
   );
@@ -729,19 +723,6 @@ const styles = StyleSheet.create({
     margin: dynamicScale(20, false, 0.5),
     paddingHorizontal: dynamicScale(16, false, 0.5),
   },
-  fullWidthButtonStyle: {
-    width: "100%",
-    marginBottom: dynamicScale(24, false, 0.5),
-  },
-  halfWidthButtonContainer: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-  },
-  halfWidthButton: {
-    flex: 1,
-  },
   summaryTextBig: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "600",
@@ -794,29 +775,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     opacity: 0.8,
-  },
-  gradientButtonStyle: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 0, // Override GradientButton's default margin
-  },
-  buttonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: dynamicScale(2, true),
-    marginBottom: dynamicScale(-2, true),
-  },
-  buttonIcon: {
-    width: dynamicScale(18, false, 0.5),
-    height: dynamicScale(18, false, 0.5),
-    marginRight: dynamicScale(6, false, 0.5),
-  },
-  buttonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.textColor,
   },
   tripItemText: {
     fontSize: dynamicScale(14, false, 0.5),

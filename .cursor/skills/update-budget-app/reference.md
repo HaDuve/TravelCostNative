@@ -113,6 +113,17 @@ git diff "$LAST_CL"..HEAD -- . ':!changelog.txt' ':!pnpm-lock.yaml'
 
 Writing style: [changelog-style.md](changelog-style.md).
 
+### Git commit and push
+
+After updating `changelog.txt` (Step 2d), commit and push from the **repo root** before publishing — except when `update:*:bump` bumps the changelog **after** publish; then commit after the bump.
+
+| Bump type | Files |
+|-----------|-------|
+| OTA / edit in place | `TravelCostApp/changelog.txt` |
+| Store (`version:bump`) | `TravelCostApp/changelog.txt`, `app.config.js`, `app.json` |
+
+Commit message: `Changelog {version}: {first bullet}` → `git push`. Skip only if the user explicitly opts out for the session.
+
 ## Change → flow quick lookup
 
 | Changed paths | Flow |

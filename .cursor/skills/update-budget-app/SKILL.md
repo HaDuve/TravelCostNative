@@ -1,6 +1,6 @@
 ---
 name: update-budget-app
-description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — and updates changelog.txt from git changes in the project's existing style. Bare invocation (no tier) defaults to production OTA. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
+description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — updates changelog.txt from git changes in the project's existing style, and commits/pushes changelog (and app version files for store bumps) before publishing. Bare invocation (no tier) defaults to production OTA. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
 ---
 
 # Update Budget App
@@ -124,6 +124,35 @@ pnpm run version:bump -- --notes "Headline feature" "Second feature"
 
 Show the user the **old → new** changelog block before running publish/build commands unless they asked to run immediately.
 
+### 2e — Commit and push changelog
+
+**Always** commit and push version/changelog files before publishing (OTA or store). That keeps git, EAS update metadata, and the in-app Changelog screen aligned.
+
+Run git from the **repo root** (`TravelCostApp/..`), not from `TravelCostApp/`.
+
+**Files to stage:**
+
+| Bump type | Stage |
+|-----------|-------|
+| OTA (`version:bump:eas` or edit in place) | `TravelCostApp/changelog.txt` |
+| Store (`version:bump`) | `TravelCostApp/changelog.txt`, `TravelCostApp/app.config.js`, `TravelCostApp/app.json` |
+
+```bash
+cd ..   # repo root, if currently in TravelCostApp/
+git add TravelCostApp/changelog.txt   # + app.config.js app.json for store bumps
+git commit -m "$(cat <<'EOF'
+Changelog 1.3.005k: Improved currency amounts in Overview, My Budgets, and trip history
+EOF
+)"
+git push
+```
+
+**Commit message:** `Changelog {version}: {first bullet}` — use the version line and first bullet from `__Newest Changes__` (truncate long bullets if needed).
+
+**When `update:{tier}:bump` bumps changelog after publish** (bugfixes-only shortcut): commit and push **after** that bump, not before.
+
+**Skip only if** the user explicitly says not to commit/push in this session.
+
 ## Step 3 — Pick target audience
 
 | Audience | Channel / branch | Typical use |
@@ -160,14 +189,16 @@ build → submit (optional: submit+update)
 ```bash
 eas whoami
 pnpm run version:bump:eas -- --notes "Feature headline" "Bugfixes and performance improvements"
+# Step 2e: commit + push changelog.txt (repo root)
 pnpm run update:production -- --dry-run          # optional preview
 pnpm run update:production                       # reads changelog automatically
 ```
 
-Bugfixes-only OTA:
+Bugfixes-only OTA (`update:production:bump` bumps changelog **after** publish):
 
 ```bash
 pnpm run update:production:bump -- "Bugfixes and performance improvements"
+# Step 2e: commit + push changelog.txt (repo root)
 ```
 
 Other tiers: `update:alpha`, `update:staging`, `update:dev`.
@@ -178,9 +209,11 @@ Other tiers: `update:alpha`, `update:staging`, `update:dev`.
 
 ```bash
 pnpm run build:production:all
+# Step 2e: commit + push changelog.txt, app.config.js, app.json (repo root)
 pnpm run submit:production:ios
 pnpm run submit:production:android
 pnpm run update:production:bump -- "optional post-store OTA"
+# Step 2e again if post-store bump changed changelog.txt
 ```
 
 ### Flow C — Submit + OTA
@@ -207,10 +240,11 @@ pnpm run update:dev -- "message"
 ## Step 5 — Pre-flight checklist
 
 ```
-- [ ] Working directory is TravelCostApp/
+- [ ] Working directory is TravelCostApp/ for pnpm/EAS; repo root for git
 - [ ] `eas whoami` succeeds
 - [ ] changelog.txt reflects git diff since last changelog commit
 - [ ] Changelog base version matches app.config.js
+- [ ] Changelog (and app version files for store bumps) committed and pushed
 - [ ] Target tier confirmed (default: production OTA when user named none)
 - [ ] Flow matches change classification (OTA vs native)
 - [ ] For native store submit/build: user confirmed production if not already explicit
@@ -227,8 +261,9 @@ eas build:list --limit 3
 
 1. **Flow chosen** and why
 2. **Changelog** — version line and bullets (old → new)
-3. **Commands run** (or next steps)
-4. **Who receives it** — channel/branch, store review if applicable
+3. **Git** — commit message and push result (or why skipped)
+4. **Commands run** (or next steps)
+5. **Who receives it** — channel/branch, store review if applicable
 
 ## Do not use
 
@@ -240,6 +275,7 @@ eas build:list --limit 3
 | `version:bump` for OTA-only patches | `version:bump:eas` or edit in place |
 | `version:bump:eas` when app version must change | `version:bump` + native build |
 | Publishing without checking changelog vs git diff | Step 2 first |
+| Leaving changelog.txt uncommitted after a release | Step 2e commit + push before publish (after for `:bump` post-publish) |
 
 ## Additional resources
 

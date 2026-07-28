@@ -22,6 +22,8 @@ import { getMMKVString, MMKV_KEYS } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
 import { OrientationContext } from "../../store/orientation-context";
 import { dynamicScale } from "../../util/scalingUtil";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const authCtx = useContext(AuthContext);

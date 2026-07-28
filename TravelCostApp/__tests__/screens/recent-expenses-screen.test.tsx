@@ -321,6 +321,49 @@ describe("RecentExpenses screen", () => {
     expect(navigation.navigate).toHaveBeenCalledWith("CategoryPick");
   });
 
+  it("does not show the empty-state while the initial trip fetch is still running", async () => {
+    jest.useFakeTimers();
+    let resolveFetch!: () => void;
+    const fetchPromise = new Promise<void>((resolve) => {
+      resolveFetch = resolve;
+    });
+    (fetchAndSetExpenses as jest.Mock).mockImplementation(async () => {
+      await fetchPromise;
+    });
+
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: expensesContextForList([]),
+        user: {
+          periodName: "month",
+          freshlyCreated: false,
+        },
+        trip: implicitDefaultTrip,
+        network: { isConnected: true, strongConnection: true },
+      }
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.queryByTestId("empty-expenses-cta")).toBeNull();
+    expect(
+      screen.queryByText(/No expenses in this time period yet/)
+    ).toBeNull();
+
+    await act(async () => {
+      resolveFetch();
+      await Promise.resolve();
+    });
+
+    await flushExpensesLoadTimeout();
+
+    expect(screen.getByTestId("empty-expenses-cta")).toBeTruthy();
+  });
+
   it("does not show the empty-state CTA when the trip ledger already has expenses", async () => {
     jest.useFakeTimers();
     const historyExpense = makeExpense({

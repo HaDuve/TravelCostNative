@@ -63,6 +63,36 @@ describe("pickFittingCurrencyPairDisplay", () => {
     expect(result.spentText).toMatch(/10\.000/);
     expect(result.budgetText).toMatch(/20\.000/);
   });
+
+  it("shows ∞ for total budget on a budget-free trip", () => {
+    const result = pickFittingCurrencyPairDisplay(
+      10_000,
+      0,
+      "EUR",
+      "de",
+      200,
+      150,
+      { noBudget: true }
+    );
+
+    expect(result.spentText).toMatch(/10\.000/);
+    expect(result.budgetText).toBe("∞");
+  });
+
+  it("uses compact trip total spent with ∞ when the pair overflows", () => {
+    const result = pickFittingCurrencyPairDisplay(
+      10_000,
+      0,
+      "EUR",
+      "de",
+      150,
+      200,
+      { noBudget: true }
+    );
+
+    expect(result.spentText).toBe("10k€");
+    expect(result.budgetText).toBe("∞");
+  });
 });
 
 describe("FittingCurrencyAmountPair", () => {
@@ -85,5 +115,54 @@ describe("FittingCurrencyAmountPair", () => {
 
     expect(screen.getByText("10k€")).toBeTruthy();
     expect(screen.getByText("20k€")).toBeTruthy();
+  });
+
+  it("shows full spent/budget when the row is wide enough", () => {
+    render(
+      <FittingCurrencyAmountPair
+        spent={10_000}
+        budget={20_000}
+        currency="EUR"
+        locale="de"
+        textStyle={{ fontSize: 12, fontWeight: "bold" }}
+        testID="fitting-currency-pair"
+      />
+    );
+
+    fireEvent(screen.getByTestId("fitting-currency-pair"), "layout", {
+      nativeEvent: { layout: { width: 200, height: 20, x: 0, y: 0 } },
+    });
+    firePairProbeTextLayout(150);
+
+    expect(screen.queryByText("10k€")).toBeNull();
+    expect(screen.queryByText("20k€")).toBeNull();
+    expect(
+      screen.getAllByText(/10\.000/, { includeHiddenElements: true }).length
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/20\.000/, { includeHiddenElements: true }).length
+    ).toBeGreaterThan(0);
+  });
+
+  it("shows ∞ for total budget when the trip has no total budget", () => {
+    render(
+      <FittingCurrencyAmountPair
+        spent={10_000}
+        budget={0}
+        currency="EUR"
+        locale="de"
+        noBudget
+        textStyle={{ fontSize: 12, fontWeight: "bold" }}
+        testID="fitting-currency-pair"
+      />
+    );
+
+    fireEvent(screen.getByTestId("fitting-currency-pair"), "layout", {
+      nativeEvent: { layout: { width: 200, height: 20, x: 0, y: 0 } },
+    });
+    firePairProbeTextLayout(150);
+
+    expect(screen.getByText("∞")).toBeTruthy();
+    expect(screen.queryByText("10k€")).toBeNull();
   });
 });

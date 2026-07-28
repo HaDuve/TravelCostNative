@@ -104,17 +104,20 @@ type FittingCurrencyPairDisplay = {
   budgetText: string;
 };
 
-/** Chooses compact for both spent and budget when the full pair overflows the row. */
-export function pickFittingCurrencyPairDisplay(
+type SpentBudgetPairLabels = {
+  spentFull: string;
+  spentCompact: string;
+  budgetFull: string;
+  budgetCompact: string;
+};
+
+function formatSpentBudgetPairLabels(
   spent: number,
   budget: number,
   currency: string,
   locale: string,
-  rowWidth: number | null,
-  fullCombinedWidth: number | null,
-  options?: { noBudget?: boolean }
-): FittingCurrencyPairDisplay {
-  const { noBudget = false } = options ?? {};
+  noBudget = false
+): SpentBudgetPairLabels {
   const spentFull = formatExpenseWithCurrency(
     spent,
     currency,
@@ -133,15 +136,45 @@ export function pickFittingCurrencyPairDisplay(
     ? "∞"
     : formatCompactExpenseWithCurrency(budget, currency, locale);
 
+  return { spentFull, spentCompact, budgetFull, budgetCompact };
+}
+
+/** Chooses compact for both spent and budget when the full pair overflows the row. */
+export function pickFittingCurrencyPairLabels(
+  labels: SpentBudgetPairLabels,
+  rowWidth: number | null,
+  fullCombinedWidth: number | null
+): FittingCurrencyPairDisplay {
   const useCompact =
     rowWidth != null &&
     fullCombinedWidth != null &&
     fullCombinedWidth > rowWidth;
 
   return {
-    spentText: useCompact ? spentCompact : spentFull,
-    budgetText: useCompact ? budgetCompact : budgetFull,
+    spentText: useCompact ? labels.spentCompact : labels.spentFull,
+    budgetText: useCompact ? labels.budgetCompact : labels.budgetFull,
   };
+}
+
+/** Chooses compact for both spent and budget when the full pair overflows the row. */
+export function pickFittingCurrencyPairDisplay(
+  spent: number,
+  budget: number,
+  currency: string,
+  locale: string,
+  rowWidth: number | null,
+  fullCombinedWidth: number | null,
+  options?: { noBudget?: boolean }
+): FittingCurrencyPairDisplay {
+  const { noBudget = false } = options ?? {};
+  const labels = formatSpentBudgetPairLabels(
+    spent,
+    budget,
+    currency,
+    locale,
+    noBudget
+  );
+  return pickFittingCurrencyPairLabels(labels, rowWidth, fullCombinedWidth);
 }
 
 export function useFittingCurrencyPairText(
@@ -158,27 +191,27 @@ export function useFittingCurrencyPairText(
 
   const resolvedLocale = resolveFittingLocale(locale);
 
-  const fullProbeText = useMemo(() => {
-    const spentFull = formatExpenseWithCurrency(
-      spent,
-      currency,
-      undefined,
-      resolvedLocale
-    );
-    const budgetFull = noBudget
-      ? "∞"
-      : formatExpenseWithCurrency(budget, currency, undefined, resolvedLocale);
-    return `${spentFull}/${budgetFull}`;
-  }, [spent, budget, currency, resolvedLocale, noBudget]);
+  const labels = useMemo(
+    () =>
+      formatSpentBudgetPairLabels(
+        spent,
+        budget,
+        currency,
+        resolvedLocale,
+        noBudget
+      ),
+    [spent, budget, currency, resolvedLocale, noBudget]
+  );
 
-  const { spentText, budgetText } = pickFittingCurrencyPairDisplay(
-    spent,
-    budget,
-    currency,
-    resolvedLocale,
+  const fullProbeText = useMemo(
+    () => `${labels.spentFull}/${labels.budgetFull}`,
+    [labels]
+  );
+
+  const { spentText, budgetText } = pickFittingCurrencyPairLabels(
+    labels,
     rowWidth,
-    fullCombinedWidth,
-    { noBudget }
+    fullCombinedWidth
   );
 
   function onRowLayout(event: LayoutChangeEvent) {

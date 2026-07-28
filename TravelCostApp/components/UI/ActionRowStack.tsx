@@ -26,9 +26,9 @@ type ActionRowStackProps = {
 function ActionRowStack({ actions, showChevron = false }: ActionRowStackProps) {
   return (
     <View testID="action-row-stack" style={styles.stack}>
-      {actions.map((action) => (
+      {actions.map((action, index) => (
         <ActionRow
-          key={action.testID ?? action.label}
+          key={action.testID ?? `${action.label}-${index}`}
           testID={action.testID}
           label={action.label}
           hint={action.hint}

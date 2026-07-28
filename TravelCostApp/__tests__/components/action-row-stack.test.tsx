@@ -86,6 +86,28 @@ describe("ActionRowStack", () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
+  it("renders duplicate labels when testIDs are omitted", () => {
+    const firstPress = jest.fn();
+    const secondPress = jest.fn();
+    const screen = renderWithAppProviders(
+      <ActionRowStack
+        actions={[
+          { label: "Cancel", onPress: firstPress },
+          { label: "Cancel", onPress: secondPress },
+        ]}
+      />,
+      { wrapNavigation: false }
+    );
+
+    const pressables = screen.UNSAFE_getAllByType(Pressable);
+    expect(pressables).toHaveLength(2);
+
+    fireEvent.press(pressables[0]);
+    fireEvent.press(pressables[1]);
+    expect(firstPress).toHaveBeenCalledTimes(1);
+    expect(secondPress).toHaveBeenCalledTimes(1);
+  });
+
   it("clears per-row bottom margin so stack gap controls spacing", () => {
     const screen = renderWithAppProviders(
       <ActionRowStack

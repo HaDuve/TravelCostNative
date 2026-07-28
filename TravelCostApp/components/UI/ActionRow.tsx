@@ -61,6 +61,9 @@ function ActionRow({
       testID={testID}
       onPress={onPressHandler}
       disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={hint}
       style={({ pressed }) => [
         styles.row,
         hint ? styles.rowWithHint : null,

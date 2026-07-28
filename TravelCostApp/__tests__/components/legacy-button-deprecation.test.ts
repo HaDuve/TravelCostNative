@@ -12,12 +12,17 @@ const LEGACY_IMPORT_PATTERNS: Array<{ name: string; pattern: RegExp }> = [
     name: "FlatButton",
     pattern: /from\s+["'][^"']*\/FlatButton["']/,
   },
+  {
+    name: "Button",
+    pattern: /from\s+["'][^"']*(?:\/UI\/Button|\.\/Button)["']/,
+  },
 ];
 
 const ALLOWED_LEGACY_IMPORT_SUFFIXES = [
   "__tests__/",
   "components/UI/GradientButton.tsx",
   "components/UI/FlatButton.tsx",
+  "components/UI/Button.tsx",
 ];
 
 function walkSourceFiles(dir: string, acc: string[] = []): string[] {
@@ -40,7 +45,7 @@ function isAllowedLegacyImport(relPath: string): boolean {
 }
 
 describe("legacy button deprecation", () => {
-  it("keeps GradientButton and FlatButton out of production imports", () => {
+  it("keeps deprecated button components out of production imports", () => {
     const offenders: string[] = [];
 
     for (const file of walkSourceFiles(appRoot)) {
@@ -62,6 +67,7 @@ describe("legacy button deprecation", () => {
   it.each([
     "components/UI/GradientButton.tsx",
     "components/UI/FlatButton.tsx",
+    "components/UI/Button.tsx",
   ])("marks %s @deprecated with ActionRow migration note", (relPath) => {
     const src = readFileSync(join(appRoot, relPath), "utf8");
     expect(src).toMatch(/@deprecated[\s\S]*ActionRow/);

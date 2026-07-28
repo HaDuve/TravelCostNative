@@ -194,15 +194,6 @@ const styles = StyleSheet.create({
     minHeight: dynamicScale(50, true),
     ...GlobalStyles.strongShadow,
   },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  submitButton: {
-    marginLeft: dynamicScale(16, false, 0.5),
-    flex: 1,
-  },
 });
 
 export default GetLocalPriceButton;

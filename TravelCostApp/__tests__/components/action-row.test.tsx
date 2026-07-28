@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Pressable, StyleSheet } from "react-native";
+import { fireEvent } from "@testing-library/react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Haptics from "expo-haptics";
 
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(async () => {}),
@@ -24,6 +26,10 @@ function getPressedPressableStyle(
 }
 
 describe("ActionRow", () => {
+  beforeEach(() => {
+    jest.mocked(Haptics.impactAsync).mockClear();
+  });
+
   it("renders a gradient accent strip for primary tier", () => {
     const screen = renderWithAppProviders(
       <ActionRow
@@ -110,5 +116,74 @@ describe("ActionRow", () => {
     expect(cardStyle.backgroundColor).not.toBe(
       GlobalStyles.colors.backgroundColor
     );
+  });
+
+  it("exposes button accessibility with label and optional hint", () => {
+    const screen = renderWithAppProviders(
+      <ActionRow
+        testID="action-row-a11y"
+        label="Join budget"
+        hint="Enter an invite code"
+        onPress={jest.fn()}
+      />,
+      { wrapNavigation: false }
+    );
+
+    const pressable = screen.getByTestId("action-row-a11y");
+    expect(pressable.props.accessibilityRole).toBe("button");
+    expect(pressable.props.accessibilityLabel).toBe("Join budget");
+    expect(pressable.props.accessibilityHint).toBe("Enter an invite code");
+  });
+
+  it("omits accessibilityHint when no hint is provided", () => {
+    const screen = renderWithAppProviders(
+      <ActionRow
+        testID="action-row-a11y-no-hint"
+        label="Feedback"
+        onPress={jest.fn()}
+      />,
+      { wrapNavigation: false }
+    );
+
+    expect(
+      screen.getByTestId("action-row-a11y-no-hint").props.accessibilityHint
+    ).toBeUndefined();
+  });
+
+  it("invokes onPress with light haptic feedback", () => {
+    const onPress = jest.fn();
+    const screen = renderWithAppProviders(
+      <ActionRow
+        testID="action-row-press"
+        label="Save"
+        onPress={onPress}
+      />,
+      { wrapNavigation: false }
+    );
+
+    fireEvent.press(screen.getByTestId("action-row-press"));
+
+    expect(Haptics.impactAsync).toHaveBeenCalledWith(
+      Haptics.ImpactFeedbackStyle.Light
+    );
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not invoke onPress or haptics when disabled", () => {
+    const onPress = jest.fn();
+    const screen = renderWithAppProviders(
+      <ActionRow
+        testID="action-row-disabled"
+        label="Save"
+        onPress={onPress}
+        disabled
+      />,
+      { wrapNavigation: false }
+    );
+
+    fireEvent.press(screen.getByTestId("action-row-disabled"));
+
+    expect(Haptics.impactAsync).not.toHaveBeenCalled();
+    expect(onPress).not.toHaveBeenCalled();
   });
 });

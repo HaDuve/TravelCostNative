@@ -105,4 +105,32 @@ describe("BlurPremium", () => {
     expect(screen.getByText(i18n.t("paywallTitle"))).toBeTruthy();
     expect(screen.getByText(i18n.t("back"))).toBeTruthy();
   });
+
+  it("shows a feature hint under the premium prompt when featureHintKey is set", async () => {
+    const checkPremium = jest.fn(async () => false);
+
+    const screen = renderWithAppProviders(
+      <BlurPremium featureHintKey="paywallHintCustomCategories" />,
+      {
+        user: {
+          checkPremium,
+          isPremium: false,
+          freshlyCreated: false,
+        },
+        network: {
+          isConnected: true,
+          strongConnection: true,
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(checkPremium).toHaveBeenCalled();
+    });
+
+    expect(screen.getByText(i18n.t("paywallTitle"))).toBeTruthy();
+    expect(
+      screen.getByText("Create your own categories")
+    ).toBeTruthy();
+  });
 });

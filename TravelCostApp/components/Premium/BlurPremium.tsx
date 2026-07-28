@@ -17,7 +17,7 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import { blurPremiumLayoutStyles as styles } from "../../styles/blur-premium-layout";
 
-const BlurPremium = ({ canBack = false }) => {
+const BlurPremium = ({ canBack = false, featureHintKey }) => {
   const netCtx = useContext(NetworkContext);
   const userCtx = useContext(UserContext);
   const [isPremium, setIsPremium] = useState(false);
@@ -86,6 +86,7 @@ const BlurPremium = ({ canBack = false }) => {
             <ActionRow
               tier="gradient"
               label={i18n.t("paywallTitle")}
+              hint={featureHintKey ? i18n.t(featureHintKey) : undefined}
               icon="diamond-outline"
               showChevron={false}
               onPress={() => {
@@ -125,4 +126,5 @@ export default BlurPremium;
 
 BlurPremium.propTypes = {
   canBack: PropTypes.bool,
+  featureHintKey: PropTypes.string,
 };

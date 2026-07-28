@@ -574,7 +574,7 @@ const ManageCategoryScreen = ({ navigation }) => {
           </View>
         </KeyboardAvoidingView>
       </BackgroundGradient>
-      <BlurPremium canBack />
+      <BlurPremium canBack featureHintKey="paywallHintCustomCategories" />
     </>
   );
 };

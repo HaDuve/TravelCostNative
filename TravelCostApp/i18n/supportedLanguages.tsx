@@ -291,6 +291,12 @@ const en = {
     "At the end of the 1-week trial period, your iTunes account will be charged $2. The subscription will automatically renew unless canceled within 24 hours before the end of the current period. You can cancel anytime through your iTunes account. Any unused portion of a free trial will be forfeited upon subscription purchase. For more information, please refer to our terms and conditions and privacy policy.",
   paywallToS: "Terms of Service",
   paywallPP: "Privacy Policy",
+  paywallHintCustomCategories: "Create your own categories",
+  paywallHintExpenseSearch: "Search and filter expenses",
+  paywallHintAdvancedCharts: "Advanced spending charts",
+  paywallHintGptDeal: "Ask AI if you got a good deal",
+  paywallHintDebtSettlements: "Simplify debt settlements",
+  paywallHintUnlimitedExpenses: "Add unlimited budgets and expenses",
 
   //auth form
   nameInvalidInfoText: "Please enter a name!",
@@ -924,6 +930,12 @@ const de = {
     "Datenschutzrichtlinien.",
   paywallToS: "Nutzungsbedingungen",
   paywallPP: "Datenschutzbestimmungen",
+  paywallHintCustomCategories: "Eigene Kategorien erstellen",
+  paywallHintExpenseSearch: "Ausgaben suchen und filtern",
+  paywallHintAdvancedCharts: "Erweiterte Ausgabendiagramme",
+  paywallHintGptDeal: "KI fragen, ob du einen guten Deal hast",
+  paywallHintDebtSettlements: "Schuldenbegleichungen vereinfachen",
+  paywallHintUnlimitedExpenses: "Unbegrenzt Budgets und Ausgaben hinzufügen",
 
   // auth form
   nameInvalidInfoText: "Bitte gib einen Namen ein!",
@@ -1576,6 +1588,12 @@ const fr = {
     "À la fin de la période d'essai d'une semaine, votre compte iTunes sera facturé 2 $. L'abonnement se renouvellera automatiquement sauf s'il est annulé dans les 24 heures précédant la fin de la période en cours. Vous pouvez annuler à tout moment via votre compte iTunes. Toute partie inutilisée de l'essai gratuit sera perdue lors de l'achat de l'abonnement. Pour plus d'informations, veuillez consulter nos conditions générales et notre politique de confidentialité.",
   paywallToS: "Conditions d'utilisation",
   paywallPP: "Politique de confidentialité",
+  paywallHintCustomCategories: "Créez vos propres catégories",
+  paywallHintExpenseSearch: "Recherchez et filtrez les dépenses",
+  paywallHintAdvancedCharts: "Graphiques de dépenses avancés",
+  paywallHintGptDeal: "Demandez à l'IA si vous avez fait une bonne affaire",
+  paywallHintDebtSettlements: "Simplifiez le règlement des dettes",
+  paywallHintUnlimitedExpenses: "Ajoutez des budgets et dépenses illimités",
 
   // auth form
   nameInvalidInfoText: "Veuillez entrer un nom !",
@@ -2220,6 +2238,12 @@ const ru = {
     "По истечении 1-недельного пробного периода ваш аккаунт iTunes будет списан на $2. Подписка автоматически продлится, если не будет отменена в течение 24 часов перед окончанием текущего периода. Вы можете отменить подписку в любое время через свой аккаунт iTunes. Любая неиспользованная часть бесплатного пробного периода будет аннулирована при покупке подписки. Дополнительную информацию можно найти в наших условиях использования и политике конфиденциальности.",
   paywallToS: "Условия использования",
   paywallPP: "Политика конфиденциальности",
+  paywallHintCustomCategories: "Создавайте собственные категории",
+  paywallHintExpenseSearch: "Ищите и фильтруйте расходы",
+  paywallHintAdvancedCharts: "Расширенные графики расходов",
+  paywallHintGptDeal: "Спросите ИИ, выгодная ли была сделка",
+  paywallHintDebtSettlements: "Упрощайте расчёты по долгам",
+  paywallHintUnlimitedExpenses: "Добавляйте неограниченно бюджетов и расходов",
   // auth form
   nameInvalidInfoText: "Пожалуйста, введите имя!",
   emailInvalidInfoText:

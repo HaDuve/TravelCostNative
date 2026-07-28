@@ -269,6 +269,8 @@ function RecentExpenses({ navigation }) {
   }, [navigation, settings.skipCategoryScreen]);
 
   const tripLedgerEmpty = tripExpenseCount === 0;
+  // Only gate on the first session fetch; later isFetching (pull-to-refresh) must keep empty visible.
+  const awaitingTripFetch = tripLedgerEmpty && !loadedOnce;
 
   useEffect(() => {
     const asyncLoading = async () => {
@@ -355,6 +357,7 @@ function RecentExpenses({ navigation }) {
       fallbackText={i18n.t("fallbackTextExpenses")}
       emptyCtaLabel={tripLedgerEmpty ? i18n.t("addExp") : undefined}
       onEmptyCtaPress={tripLedgerEmpty ? handleEmptyCtaPress : undefined}
+      awaitingTripFetch={awaitingTripFetch}
       refreshing={refreshing}
       refreshControl={
         <RefreshControl

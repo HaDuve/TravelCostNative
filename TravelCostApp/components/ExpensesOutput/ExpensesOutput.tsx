@@ -29,6 +29,7 @@ function ExpensesOutput({
   isFiltered,
   emptyCtaLabel,
   onEmptyCtaPress,
+  awaitingTripFetch,
 }) {
   const { tripName, tripid } = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
@@ -56,6 +57,8 @@ function ExpensesOutput({
     if (tripReady && expenses.length > 1) setShowLoading(false);
   }, [tripReady, expenses.length]);
 
+  const deferEmptyState = showLoading || awaitingTripFetch;
+
   const memoizedContent = useMemo(() => {
     if (expenses?.length > 0) {
       if (fallback) setFallback(false);
@@ -78,11 +81,11 @@ function ExpensesOutput({
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.fallbackInnerContainer}>
-            {showLoading && <LoadingOverlay></LoadingOverlay>}
-            {!showLoading && (
+            {deferEmptyState && <LoadingOverlay></LoadingOverlay>}
+            {!deferEmptyState && (
               <Text style={styles.infoText}>{fallbackText}</Text>
             )}
-            {!showLoading && emptyCtaLabel && onEmptyCtaPress && (
+            {!deferEmptyState && emptyCtaLabel && onEmptyCtaPress && (
               <View testID="empty-expenses-cta" style={styles.emptyCta}>
                 <ActionRow
                   tier="primary"
@@ -123,6 +126,7 @@ function ExpensesOutput({
       </Animated.View>
     );
   }, [
+    awaitingTripFetch,
     emptyCtaLabel,
     expenses,
     fallback,
@@ -160,6 +164,7 @@ ExpensesOutput.propTypes = {
   isFiltered: PropTypes.bool,
   emptyCtaLabel: PropTypes.string,
   onEmptyCtaPress: PropTypes.func,
+  awaitingTripFetch: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

@@ -1,4 +1,4 @@
-import { Alert, Platform, StyleSheet } from "react-native";
+import { Alert, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { BlurView } from "expo-blur";
 import ActionRow from "../UI/ActionRow";
@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import { shouldShowOnboarding } from "../Rating/firstStartUtil";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import { blurPremiumLayoutStyles as styles } from "../../styles/blur-premium-layout";
 
 const BlurPremium = ({ canBack = false }) => {
   const netCtx = useContext(NetworkContext);
@@ -80,7 +81,6 @@ const BlurPremium = ({ canBack = false }) => {
         <Animated.View
           entering={SlideInDown.delay(600).springify().damping(11)}
           style={styles.overlayCardWrap}
-          testID="blur-premium-card-wrap"
         >
           <Card elevation={1} style={styles.overlayCard}>
             <ActionRow
@@ -126,34 +126,3 @@ export default BlurPremium;
 BlurPremium.propTypes = {
   canBack: PropTypes.bool,
 };
-
-const styles = StyleSheet.create({
-  titleContainerBlur: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    paddingHorizontal: "5%",
-
-    ...Platform.select({
-      ios: {
-        paddingBottom: "2%",
-        width: "100%",
-        height: "100%",
-      },
-      android: {
-        paddingBottom: "0%",
-        width: "100%",
-        height: "105%",
-      },
-    }),
-  },
-  overlayCardWrap: {
-    width: "100%",
-    maxWidth: 420,
-  },
-  overlayCard: {
-    width: "100%",
-    padding: 30,
-  },
-});

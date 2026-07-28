@@ -1,7 +1,6 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import { waitFor } from "@testing-library/react-native";
-import { Card } from "react-native-paper";
 
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(async () => {}),
@@ -18,7 +17,7 @@ jest.mock("expo-blur", () => {
     }: {
       children: React.ReactNode;
       style?: object;
-    }) => React.createElement(View, { testID: "blur-premium-overlay", style }, children),
+    }) => React.createElement(View, { style }, children),
   };
 });
 
@@ -50,11 +49,41 @@ jest.mock("../../util/appState", () => ({
 }));
 
 import BlurPremium from "../../components/Premium/BlurPremium";
+import { blurPremiumLayoutStyles } from "../../styles/blur-premium-layout";
+import { dynamicScale } from "../../util/scalingUtil";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { i18n } from "../../i18n/i18n";
 
+describe("blur premium layout styles", () => {
+  it("uses column flex and horizontal inset on the overlay", () => {
+    const flat = StyleSheet.flatten(
+      blurPremiumLayoutStyles.titleContainerBlur
+    ) as Record<string, unknown>;
+
+    expect(flat.flexDirection).toBe("column");
+    expect(flat.paddingHorizontal).toBe("5%");
+  });
+
+  it("gives the card wrapper full width with a scaled max width", () => {
+    const flat = StyleSheet.flatten(
+      blurPremiumLayoutStyles.overlayCardWrap
+    ) as Record<string, unknown>;
+
+    expect(flat.width).toBe("100%");
+    expect(flat.maxWidth).toBe(dynamicScale(420, false, 0.5));
+  });
+
+  it("stretches the card to the wrapper width", () => {
+    const flat = StyleSheet.flatten(
+      blurPremiumLayoutStyles.overlayCard
+    ) as Record<string, unknown>;
+
+    expect(flat.width).toBe("100%");
+  });
+});
+
 describe("BlurPremium", () => {
-  it("gives the paywall prompt card enough horizontal space for readable labels", async () => {
+  it("renders the paywall prompt for non-premium users", async () => {
     const checkPremium = jest.fn(async () => false);
 
     const screen = renderWithAppProviders(<BlurPremium canBack />, {
@@ -74,26 +103,6 @@ describe("BlurPremium", () => {
     });
 
     expect(screen.getByText(i18n.t("paywallTitle"))).toBeTruthy();
-
-    const overlay = screen.getByTestId("blur-premium-overlay");
-    const overlayStyle = StyleSheet.flatten(
-      overlay.props.style
-    ) as Record<string, unknown>;
-    expect(overlayStyle.flexDirection).not.toBe("row");
-    expect(overlayStyle.paddingHorizontal).toBeDefined();
-
-    const cardWrap = screen.getByTestId("blur-premium-card-wrap");
-    const cardWrapStyle = StyleSheet.flatten(
-      cardWrap.props.style
-    ) as Record<string, unknown>;
-    expect(cardWrapStyle.width).toBe("100%");
-    expect(cardWrapStyle.maxWidth).toBeGreaterThanOrEqual(300);
-
-    const card = screen.UNSAFE_getByType(Card);
-    const cardStyle = StyleSheet.flatten(card.props.style) as Record<
-      string,
-      unknown
-    >;
-    expect(cardStyle.width).toBe("100%");
+    expect(screen.getByText(i18n.t("back"))).toBeTruthy();
   });
 });

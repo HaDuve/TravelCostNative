@@ -156,6 +156,11 @@ export const GlobalStyles = {
     transform: [{ scale: 0.9 }],
     opacity: 0.9,
   },
+  pressedTripListItem: {
+    elevation: 0,
+    transform: [{ scale: 0.975 }],
+    opacity: 0.975,
+  },
   countryFlagStyle: {
     width: dynamicScale(30, false, 0.5),
     height: dynamicScale(25, false, 0.5),

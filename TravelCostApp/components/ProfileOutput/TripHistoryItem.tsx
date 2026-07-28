@@ -399,7 +399,7 @@ function TripHistoryItem({ tripid, trips }) {
     return (
       <Pressable
         onPress={tripPressHandler}
-        style={({ pressed }) => pressed && GlobalStyles.pressed}
+        style={({ pressed }) => pressed && GlobalStyles.pressedTripListItem}
       >
         <View
           testID={`trip-history-card-${tripid}`}
@@ -483,7 +483,7 @@ function TripHistoryItem({ tripid, trips }) {
   return (
     <Pressable
       onPress={tripPressHandler}
-      style={({ pressed }) => pressed && GlobalStyles.pressed}
+      style={({ pressed }) => pressed && GlobalStyles.pressedTripListItem}
     >
       <View
         testID={`trip-history-card-${tripid}`}

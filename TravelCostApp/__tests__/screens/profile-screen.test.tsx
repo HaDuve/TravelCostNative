@@ -75,6 +75,7 @@ jest.mock("../../components/FeedbackForm/FeedbackForm", () => () => null);
 import ProfileScreen from "../../screens/ProfileScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
+import { isDescendantOf } from "../../test-utils/react-tree";
 import { fireEvent, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 import { getTravellers } from "../../util/http";
@@ -408,6 +409,10 @@ describe("Profile screen", () => {
       expect(screen.getByTestId("profile-floating-toolbar")).toBeTruthy();
       expect(screen.getByTestId("profile-scroll")).toBeTruthy();
     });
+
+    const scrollList = screen.getByTestId("profile-scroll");
+    const toolbar = screen.getByTestId("profile-floating-toolbar");
+    expect(isDescendantOf(toolbar, scrollList)).toBe(false);
   });
 
   it("sizes trip history cards to content so Traveller chips are not clipped", async () => {

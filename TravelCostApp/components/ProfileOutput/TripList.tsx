@@ -3,6 +3,7 @@ import { FlatList, View } from "react-native";
 import PropTypes from "prop-types";
 import uniqBy from "lodash.uniqby";
 
+// Test-only scroll shell: production profile uses ProfileScreen's root FlatList + TripListRow.
 import TripListRow from "./TripListRow";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import { TripData } from "../../store/trip-context";

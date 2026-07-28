@@ -98,9 +98,9 @@ This document contains a comprehensive list of all user-facing buttons, switches
 
 ### Profile Management
 
-52. **Edit Profile Button** - Edit user profile (`components/ManageProfile/ProfileForm.tsx`)
-53. **Save Profile Button** - Save profile changes (`components/ManageProfile/ProfileForm.tsx`)
-54. **Logout Button** - Log out of account (`components/ManageProfile/ProfileForm.tsx`)
+52. **Edit Profile Button** - Edit user profile (`components/ManageProfile/ProfileIdentity.tsx`)
+53. **Save Profile Button** - Save profile changes (`components/ManageProfile/ProfileIdentity.tsx`)
+54. **Logout Button** - Log out of account (`components/ManageProfile/ProfileToolbar.tsx`)
 55. **Delete Account Button** - Delete user account (`screens/SettingsScreen.tsx`)
 
 ### Trip History

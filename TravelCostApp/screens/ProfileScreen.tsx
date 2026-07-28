@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef, useState, useCallback } from "react";
+import { useContext, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import {
   Alert,
   FlatList,
@@ -285,6 +285,7 @@ const ProfileScreen = ({ navigation }) => {
   );
 
   const uniqTrips = uniqBy(tripHistory ?? []);
+  const tripListEmpty = useMemo(() => <LoadingOverlay />, []);
 
   if (isFetchingLogout)
     return (
@@ -307,7 +308,7 @@ const ProfileScreen = ({ navigation }) => {
         }}
         renderItem={renderTripItem}
         ListHeaderComponent={renderListHeader}
-        ListEmptyComponent={<LoadingOverlay />}
+        ListEmptyComponent={tripListEmpty}
         contentContainerStyle={[
           styles.scrollContent,
           { paddingTop: scrollTopInset },

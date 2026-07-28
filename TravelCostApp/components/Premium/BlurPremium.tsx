@@ -1,9 +1,8 @@
-import { Alert, Platform, StyleSheet } from "react-native";
+import { Alert, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { BlurView } from "expo-blur";
 import ActionRow from "../UI/ActionRow";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { GlobalStyles } from "../../constants/styles";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -16,6 +15,7 @@ import PropTypes from "prop-types";
 import { shouldShowOnboarding } from "../Rating/firstStartUtil";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import { blurPremiumLayoutStyles as styles } from "../../styles/blur-premium-layout";
 
 const BlurPremium = ({ canBack = false }) => {
   const netCtx = useContext(NetworkContext);
@@ -80,21 +80,14 @@ const BlurPremium = ({ canBack = false }) => {
       {focused && (
         <Animated.View
           entering={SlideInDown.delay(600).springify().damping(11)}
+          style={styles.overlayCardWrap}
         >
-          <Card
-            elevation={1}
-            style={{
-              //   backgroundColor: GlobalStyles.colors.gray300,
-              padding: 30,
-              // marginLeft: -55,
-            }}
-          >
+          <Card elevation={1} style={styles.overlayCard}>
             <ActionRow
               tier="gradient"
               label={i18n.t("paywallTitle")}
               icon="diamond-outline"
               showChevron={false}
-              compact
               onPress={() => {
                 if (!isConnected) {
                   Alert.alert(
@@ -133,25 +126,3 @@ export default BlurPremium;
 BlurPremium.propTypes = {
   canBack: PropTypes.bool,
 };
-
-const styles = StyleSheet.create({
-  titleContainerBlur: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-
-    ...Platform.select({
-      ios: {
-        paddingBottom: "2%",
-        width: "100%",
-        height: "100%",
-      },
-      android: {
-        paddingBottom: "0%",
-        width: "100%",
-        height: "105%",
-      },
-    }),
-  },
-});

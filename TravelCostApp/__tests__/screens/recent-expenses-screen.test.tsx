@@ -95,10 +95,11 @@ jest.mock("react-native-toast-message/lib/src/Toast", () => ({
 }));
 
 import { act, fireEvent, waitFor } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { RefreshControl, StyleSheet } from "react-native";
 import RecentExpenses from "../../screens/RecentExpenses";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { fetchAndSetExpenses } from "../../components/ExpensesOutput/RecentExpensesUtil";
+import { refreshWithToast } from "../../util/refreshWithToast";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
@@ -362,6 +363,61 @@ describe("RecentExpenses screen", () => {
     await flushExpensesLoadTimeout();
 
     expect(screen.getByTestId("empty-expenses-cta")).toBeTruthy();
+  });
+
+  it("keeps the empty-state CTA visible during pull-to-refresh after an empty fetch this session", async () => {
+    jest.useFakeTimers();
+    let resolveRefresh!: () => void;
+    const refreshPromise = new Promise<void>((resolve) => {
+      resolveRefresh = resolve;
+    });
+    (refreshWithToast as jest.Mock).mockImplementation(
+      async ({
+        setIsFetching,
+      }: {
+        setIsFetching: (value: boolean) => void;
+      }) => {
+        setIsFetching(true);
+        await refreshPromise;
+        setIsFetching(false);
+      }
+    );
+
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: expensesContextForList([]),
+        user: {
+          periodName: "month",
+          freshlyCreated: false,
+        },
+        trip: implicitDefaultTrip,
+        network: { isConnected: true, strongConnection: true },
+      }
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    await flushExpensesLoadTimeout();
+    expect(screen.getByTestId("empty-expenses-cta")).toBeTruthy();
+
+    const refreshControl = screen.UNSAFE_getByType(RefreshControl);
+    await act(async () => {
+      refreshControl.props.onRefresh();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId("empty-expenses-cta")).toBeTruthy();
+    expect(
+      screen.getByText(/No expenses in this time period yet/)
+    ).toBeTruthy();
+
+    await act(async () => {
+      resolveRefresh();
+      await Promise.resolve();
+    });
   });
 
   it("does not show the empty-state CTA when the trip ledger already has expenses", async () => {

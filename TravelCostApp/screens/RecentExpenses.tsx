@@ -269,7 +269,8 @@ function RecentExpenses({ navigation }) {
   }, [navigation, settings.skipCategoryScreen]);
 
   const tripLedgerEmpty = tripExpenseCount === 0;
-  const awaitingTripFetch = tripLedgerEmpty && (!loadedOnce || isFetching);
+  // Only gate on the first session fetch; later isFetching (pull-to-refresh) must keep empty visible.
+  const awaitingTripFetch = tripLedgerEmpty && !loadedOnce;
 
   useEffect(() => {
     const asyncLoading = async () => {

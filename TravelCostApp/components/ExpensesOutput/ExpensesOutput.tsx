@@ -127,7 +127,6 @@ function ExpensesOutput({
     );
   }, [
     awaitingTripFetch,
-    deferEmptyState,
     emptyCtaLabel,
     expenses,
     fallback,

@@ -396,9 +396,34 @@ const en = {
   settingsShowTravellerIcon: "Show Nomad Icons",
   settingsTrafficLightBudgetColors: "Traffic Light Budget Colors",
   settingsAskAiForGoodPrices: "Ask AI for good prices",
+  settingsInfoButtonA11y: "More information about %{setting}",
   trafficLightInfoTitle: "Traffic Light Budget Colors",
   trafficLightInfoText:
     "Budget colors now use a traffic light system:\n\n🟢 Green: Under budget\n🟠 Orange: Over budget, but average spending is under budget\n🔴 Red: Over budget AND average spending is over budget\n\nThe average is calculated from the current period plus the previous period (e.g., this week + last week for daily view).",
+  hideSpecialExpensesInfoTitle: "Hide special expenses",
+  hideSpecialExpensesInfoText:
+    "When turned on, expenses marked as special no longer appear in charts and spending summaries. They still count toward splits and balances between nomads.",
+  disableNumberAnimationsInfoTitle: "Disable number animations",
+  disableNumberAnimationsInfoText:
+    "When turned on, budget totals and other numbers update instantly instead of counting up or down.",
+  skipCategoryScreenInfoTitle: "Skip category picker",
+  skipCategoryScreenInfoText:
+    "When turned on, adding an expense skips the category picker and opens the form right away using your most recent category.",
+  alwaysShowAdvancedInfoTitle: "Always show more options",
+  alwaysShowAdvancedInfoText:
+    "When turned on, the full expense form is shown every time you add an expense — currency, dates, splits, and more. When off, you start with a quick form and can expand for extra options.",
+  showFlagsInfoTitle: "Show flag icons",
+  showFlagsInfoText:
+    "When turned on, a small country flag appears next to each expense in the list.",
+  showInternetSpeedInfoTitle: "Show internet speed",
+  showInternetSpeedInfoText:
+    "When turned on, your current connection speed is shown in the header on the overview and expense list screens.",
+  askAiForGoodPricesInfoTitle: "Ask AI for good prices",
+  askAiForGoodPricesInfoText:
+    "When turned on, you can ask AI whether a price is reasonable for your current location from your profile and on the expense form.",
+  showWhoPaidInfoTitle: "Show nomad icons",
+  showWhoPaidInfoText:
+    "When turned on, a small icon shows which nomad paid for each expense. Only applies when your budget has more than one nomad.",
   overBudgetButAverage: "Over budget, but your average daily spending is",
   underDailyBudget: "under your daily budget of",
   trafficLightUnderBudget: "Under budget",
@@ -1042,9 +1067,34 @@ const de = {
   settingsShowTravellerIcon: "Nomaden-Icons anzeigen",
   settingsTrafficLightBudgetColors: "Ampel-Budget-Farben",
   settingsAskAiForGoodPrices: "KI nach guten Preisen fragen",
+  settingsInfoButtonA11y: "Mehr Informationen zu %{setting}",
   trafficLightInfoTitle: "Ampel-Budget-Farben",
   trafficLightInfoText:
     "Budget-Farben verwenden jetzt ein Ampelsystem:\n\n🟢 Grün: Unter Budget\n🟠 Orange: Über Budget, aber Durchschnittsausgaben sind unter Budget\n🔴 Rot: Über Budget UND Durchschnittsausgaben sind über Budget\n\nDer Durchschnitt wird aus der aktuellen Periode plus der vorherigen Periode berechnet (z.B. diese Woche + letzte Woche für Tagesansicht).",
+  hideSpecialExpensesInfoTitle: "Besondere Ausgaben ausblenden",
+  hideSpecialExpensesInfoText:
+    "Wenn aktiviert, erscheinen als besonders markierte Ausgaben nicht mehr in Diagrammen und Ausgabenübersichten. Sie zählen weiterhin für Aufteilungen und Salden zwischen Nomaden.",
+  disableNumberAnimationsInfoTitle: "Zahlenanimationen deaktivieren",
+  disableNumberAnimationsInfoText:
+    "Wenn aktiviert, aktualisieren sich Budgetsummen und andere Zahlen sofort, anstatt hoch- oder runterzuzählen.",
+  skipCategoryScreenInfoTitle: "Kategorieauswahl überspringen",
+  skipCategoryScreenInfoText:
+    "Wenn aktiviert, wird beim Hinzufügen einer Ausgabe die Kategorieauswahl übersprungen und das Formular direkt mit deiner zuletzt verwendeten Kategorie geöffnet.",
+  alwaysShowAdvancedInfoTitle: "Immer Optionen anzeigen",
+  alwaysShowAdvancedInfoText:
+    "Wenn aktiviert, wird bei jeder neuen Ausgabe das vollständige Formular angezeigt — Währung, Datum, Aufteilungen und mehr. Wenn deaktiviert, startest du mit einem Schnellformular und kannst es bei Bedarf erweitern.",
+  showFlagsInfoTitle: "Länderflaggen anzeigen",
+  showFlagsInfoText:
+    "Wenn aktiviert, erscheint neben jeder Ausgabe in der Liste eine kleine Länderflagge.",
+  showInternetSpeedInfoTitle: "Internetgeschwindigkeit anzeigen",
+  showInternetSpeedInfoText:
+    "Wenn aktiviert, wird deine aktuelle Verbindungsgeschwindigkeit in der Kopfzeile auf der Übersichts- und Ausgabenlistenseite angezeigt.",
+  askAiForGoodPricesInfoTitle: "KI nach guten Preisen fragen",
+  askAiForGoodPricesInfoText:
+    "Wenn aktiviert, kannst du über dein Profil und im Ausgabenformular die KI fragen, ob ein Preis für deinen aktuellen Standort angemessen ist.",
+  showWhoPaidInfoTitle: "Nomaden-Icons anzeigen",
+  showWhoPaidInfoText:
+    "Wenn aktiviert, zeigt ein kleines Icon an, welcher Nomade für jede Ausgabe bezahlt hat. Gilt nur, wenn dein Budget mehr als einen Nomaden hat.",
   overBudgetButAverage:
     "Über Budget, aber Ihre durchschnittlichen Tagesausgaben sind",
   underDailyBudget: "unter Ihrem Tagesbudget von",
@@ -1702,9 +1752,34 @@ const fr = {
   settingsShowTravellerIcon: "Afficher les icônes de nomades",
   settingsTrafficLightBudgetColors: "Couleurs de budget feux de circulation",
   settingsAskAiForGoodPrices: "Demander à l'IA de bons prix",
+  settingsInfoButtonA11y: "Plus d'informations sur %{setting}",
   trafficLightInfoTitle: "Couleurs de budget feux de circulation",
   trafficLightInfoText:
     "Les couleurs du budget utilisent maintenant un système de feux de circulation:\n\n🟢 Vert: Sous le budget\n🟠 Orange: Au-dessus du budget, mais les dépenses moyennes sont sous le budget\n🔴 Rouge: Au-dessus du budget ET les dépenses moyennes sont au-dessus du budget\n\nLa moyenne est calculée à partir de la période actuelle plus la période précédente (par exemple, cette semaine + la semaine dernière pour la vue quotidienne).",
+  hideSpecialExpensesInfoTitle: "Masquer les dépenses spéciales",
+  hideSpecialExpensesInfoText:
+    "Lorsque activé, les dépenses marquées comme spéciales n'apparaissent plus dans les graphiques et les résumés de dépenses. Elles comptent toujours pour les répartitions et les soldes entre nomades.",
+  disableNumberAnimationsInfoTitle: "Désactiver les animations de nombres",
+  disableNumberAnimationsInfoText:
+    "Lorsque activé, les totaux du budget et les autres chiffres se mettent à jour instantanément au lieu de compter de haut en bas.",
+  skipCategoryScreenInfoTitle: "Passer la sélection de catégorie",
+  skipCategoryScreenInfoText:
+    "Lorsque activé, l'ajout d'une dépense ignore le sélecteur de catégorie et ouvre directement le formulaire avec votre catégorie la plus récente.",
+  alwaysShowAdvancedInfoTitle: "Toujours afficher plus d'options",
+  alwaysShowAdvancedInfoText:
+    "Lorsque activé, le formulaire complet s'affiche à chaque ajout de dépense — devise, dates, répartitions, etc. Lorsque désactivé, vous commencez avec un formulaire rapide que vous pouvez développer si besoin.",
+  showFlagsInfoTitle: "Afficher les icônes de drapeau",
+  showFlagsInfoText:
+    "Lorsque activé, un petit drapeau du pays apparaît à côté de chaque dépense dans la liste.",
+  showInternetSpeedInfoTitle: "Afficher la vitesse d'Internet",
+  showInternetSpeedInfoText:
+    "Lorsque activé, votre vitesse de connexion actuelle s'affiche dans l'en-tête des écrans de vue d'ensemble et de liste des dépenses.",
+  askAiForGoodPricesInfoTitle: "Demander à l'IA de bons prix",
+  askAiForGoodPricesInfoText:
+    "Lorsque activé, vous pouvez demander à l'IA si un prix est raisonnable pour votre emplacement actuel depuis votre profil et dans le formulaire de dépense.",
+  showWhoPaidInfoTitle: "Afficher les icônes de nomades",
+  showWhoPaidInfoText:
+    "Lorsque activé, une petite icône indique quel nomade a payé chaque dépense. S'applique uniquement lorsque votre budget compte plus d'un nomade.",
   overBudgetButAverage:
     "Au-dessus du budget, mais vos dépenses quotidiennes moyennes sont",
   underDailyBudget: "sous votre budget quotidien de",
@@ -2351,9 +2426,34 @@ const ru = {
   settingsShowTravellerIcon: "Показывать иконки номадов",
   settingsTrafficLightBudgetColors: "Цвета бюджета светофора",
   settingsAskAiForGoodPrices: "Спросить ИИ о хороших ценах",
+  settingsInfoButtonA11y: "Подробнее о %{setting}",
   trafficLightInfoTitle: "Цвета бюджета светофора",
   trafficLightInfoText:
     "Цвета бюджета теперь используют систему светофора:\n\n🟢 Зеленый: В пределах бюджета\n🟠 Оранжевый: Превышен бюджет, но средние расходы в пределах бюджета\n🔴 Красный: Превышен бюджет И средние расходы превышают бюджет\n\nСреднее значение рассчитывается из текущего периода плюс предыдущий период (например, эта неделя + прошлая неделя для дневного просмотра).",
+  hideSpecialExpensesInfoTitle: "Скрыть специальные расходы",
+  hideSpecialExpensesInfoText:
+    "Когда включено, расходы, отмеченные как специальные, больше не отображаются на диаграммах и в сводках расходов. Они по-прежнему учитываются при разделении и балансах между номадами.",
+  disableNumberAnimationsInfoTitle: "Отключить анимацию чисел",
+  disableNumberAnimationsInfoText:
+    "Когда включено, итоги бюджета и другие числа обновляются мгновенно, без анимации счёта.",
+  skipCategoryScreenInfoTitle: "Пропустить выбор категории",
+  skipCategoryScreenInfoText:
+    "Когда включено, при добавлении расхода пропускается выбор категории и сразу открывается форма с вашей последней категорией.",
+  alwaysShowAdvancedInfoTitle: "Всегда показывать дополнительные опции",
+  alwaysShowAdvancedInfoText:
+    "Когда включено, при каждом добавлении расхода показывается полная форма — валюта, даты, разделение и др. Когда выключено, вы начинаете с быстрой формы и можете развернуть дополнительные опции.",
+  showFlagsInfoTitle: "Показывать значки флагов",
+  showFlagsInfoText:
+    "Когда включено, рядом с каждым расходом в списке отображается маленький флаг страны.",
+  showInternetSpeedInfoTitle: "Показывать скорость интернета",
+  showInternetSpeedInfoText:
+    "Когда включено, текущая скорость соединения отображается в заголовке на экранах обзора и списка расходов.",
+  askAiForGoodPricesInfoTitle: "Спросить ИИ о хороших ценах",
+  askAiForGoodPricesInfoText:
+    "Когда включено, вы можете спросить ИИ, разумна ли цена для вашего текущего местоположения, с экрана профиля и в форме расхода.",
+  showWhoPaidInfoTitle: "Показывать иконки номадов",
+  showWhoPaidInfoText:
+    "Когда включено, маленькая иконка показывает, какой номад оплатил каждый расход. Применяется только если в бюджете больше одного номада.",
   overBudgetButAverage:
     "Превышен бюджет, но ваши средние дневные расходы составляют",
   underDailyBudget: "ниже вашего дневного бюджета",

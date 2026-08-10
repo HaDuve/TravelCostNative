@@ -7,7 +7,7 @@ import ActionRow from "./ActionRow";
 import { dynamicScale } from "../../util/scalingUtil";
 import PropTypes from "prop-types";
 
-const TrafficLightInfoModal = ({ isVisible, onClose }) => {
+const SettingsInfoModal = ({ isVisible, title, text, onClose }) => {
   return (
     <Modal
       isVisible={isVisible}
@@ -19,30 +19,32 @@ const TrafficLightInfoModal = ({ isVisible, onClose }) => {
       onBackButtonPress={onClose}
     >
       <View style={styles.infoModalContainer}>
-        <Text style={styles.infoTitleText}>
-          {i18n.t("trafficLightInfoTitle")}
-        </Text>
-        <Text style={styles.infoContentText}>
-          {i18n.t("trafficLightInfoText")}
-        </Text>
-        <ActionRow
-          tier="primary"
-          label={i18n.t("confirm")}
-          icon="checkmark-outline"
-          showChevron={false}
-          compact
-          onPress={onClose}
-          style={styles.confirmButton}
-        />
+        {isVisible && (
+          <>
+            <Text style={styles.infoTitleText}>{title}</Text>
+            <Text style={styles.infoContentText}>{text}</Text>
+            <ActionRow
+              tier="primary"
+              label={i18n.t("confirm")}
+              icon="checkmark-outline"
+              showChevron={false}
+              compact
+              onPress={onClose}
+              style={styles.confirmButton}
+            />
+          </>
+        )}
       </View>
     </Modal>
   );
 };
 
-export default TrafficLightInfoModal;
+export default SettingsInfoModal;
 
-TrafficLightInfoModal.propTypes = {
+SettingsInfoModal.propTypes = {
   isVisible: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 

@@ -1193,6 +1193,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       currency: inputs.currency.value,
       country: inputs.country.value,
       product: inputs.description.value,
+      inclusiveDayCount: daysBeween || 1,
+      duplOrSplit,
+      alreadyDividedAmountByDays,
     });
   };
 
@@ -1203,12 +1206,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         country: inputs.country.value,
         price: amountValue,
         currency: inputs.currency.value,
+        inclusiveDayCount: daysBeween || 1,
+        duplOrSplit,
+        alreadyDividedAmountByDays,
       }),
     [
       inputs.description.value,
       inputs.country.value,
       inputs.currency.value,
       amountValue,
+      daysBeween,
+      duplOrSplit,
+      alreadyDividedAmountByDays,
     ]
   );
 

@@ -323,6 +323,8 @@ const en = {
     'Get local price for "%{product}" in %{country}',
   getLocalPriceExpenseDealHint:
     'Is %{price} %{currency} a good deal for "%{product}" in %{country}?',
+  getLocalPriceExpenseDealHintRanged:
+    'Is %{price} %{currency} over %{days} days (sum %{sum} %{currency}) a good deal for "%{product}" in %{country}?',
   gettingLocalPrice: "Getting local price information...",
   day: "Day",
   week: "Week",
@@ -963,6 +965,8 @@ const de = {
     'Lokalen Preis für „%{product}“ in %{country} ermitteln',
   getLocalPriceExpenseDealHint:
     'Ist %{price} %{currency} ein gutes Angebot für „%{product}“ in %{country}?',
+  getLocalPriceExpenseDealHintRanged:
+    'Ist %{price} %{currency} über %{days} Tage (Summe %{sum} %{currency}) ein gutes Angebot für „%{product}“ in %{country}?',
   gettingLocalPrice: "Lokale Preisinformationen werden abgerufen...",
   day: "Tag",
   week: "Woche",
@@ -1622,6 +1626,8 @@ const fr = {
     'Obtenir le prix local pour « %{product} » en %{country}',
   getLocalPriceExpenseDealHint:
     'Est-ce que %{price} %{currency} est une bonne affaire pour « %{product} » en %{country} ?',
+  getLocalPriceExpenseDealHintRanged:
+    'Est-ce que %{price} %{currency} sur %{days} jours (somme %{sum} %{currency}) est une bonne affaire pour « %{product} » en %{country} ?',
   gettingLocalPrice: "Obtention des informations sur les prix locaux...",
   day: "Jour",
   week: "Semaine",
@@ -2268,6 +2274,8 @@ const ru = {
     'Узнать местную цену для «%{product}» в %{country}',
   getLocalPriceExpenseDealHint:
     'Хорошая ли сделка — %{price} %{currency} за «%{product}» в %{country}?',
+  getLocalPriceExpenseDealHintRanged:
+    'Хорошая ли сделка — %{price} %{currency} за %{days} дн. (сумма %{sum} %{currency}) для «%{product}» в %{country}?',
   gettingLocalPrice: "Получение информации о местных ценах...",
   day: "День",
   week: "Неделя",

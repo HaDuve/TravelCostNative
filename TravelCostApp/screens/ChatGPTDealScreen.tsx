@@ -20,6 +20,7 @@ import {
   GPT_getGoodDeal,
   GPT_getPrice,
 } from "../util/chatGPTrequest";
+import { expenseFormLocalPriceHint } from "../util/expense-form-local-price-hint";
 import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
@@ -30,7 +31,15 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const GPTDealScreen = ({ route, navigation }) => {
-  const { price, currency, country, product } = route.params;
+  const {
+    price,
+    currency,
+    country,
+    product,
+    inclusiveDayCount = 1,
+    duplOrSplit = 0,
+    alreadyDividedAmountByDays = false,
+  } = route.params;
 
   const markdownStyles: MarkdownProps["style"] = {
     body: {
@@ -166,6 +175,9 @@ const GPTDealScreen = ({ route, navigation }) => {
           price: price,
           currency: currency,
           country: country,
+          inclusiveDayCount,
+          duplOrSplit,
+          alreadyDividedAmountByDays,
         };
 
         const response = await getChatGPT_Response(goodDeal, setLoadingPhase);
@@ -203,7 +215,16 @@ const GPTDealScreen = ({ route, navigation }) => {
       return;
     }
     getGPT_Response();
-  }, [country, currency, price, product, answer]);
+  }, [
+    country,
+    currency,
+    price,
+    product,
+    answer,
+    inclusiveDayCount,
+    duplOrSplit,
+    alreadyDividedAmountByDays,
+  ]);
 
   const startStreaming = (content) => {
     // Split content into chapters/sections by double newlines
@@ -243,6 +264,9 @@ const GPTDealScreen = ({ route, navigation }) => {
         price: price,
         currency: currency,
         country: country,
+        inclusiveDayCount,
+        duplOrSplit,
+        alreadyDividedAmountByDays,
       };
 
       const response = await getChatGPT_Response(goodDeal, setLoadingPhase);
@@ -291,9 +315,15 @@ const GPTDealScreen = ({ route, navigation }) => {
             <View style={styles.userBubbleContainer}>
               <View style={[styles.userBubble, GlobalStyles.shadowGlowPrimary]}>
                 <Text style={styles.userBubbleText}>
-                  {price && price !== "" && !isNaN(Number(price))
-                    ? `Is ${price} ${currency} a good deal for "${product.trim()}" in ${country}?`
-                    : `Get local price for "${product.trim()}" in ${country}`}
+                  {expenseFormLocalPriceHint({
+                    product,
+                    country,
+                    price,
+                    currency,
+                    inclusiveDayCount,
+                    duplOrSplit,
+                    alreadyDividedAmountByDays,
+                  })}
                 </Text>
               </View>
             </View>

@@ -8,6 +8,7 @@ const languageName = languageObj?.name;
 import axios from "axios";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 import safeLogError from "./error";
+import { localPriceDealAmountPhrase } from "./expense-form-local-price-hint";
 
 // Function to get current date in a readable format
 function getCurrentDateString(): string {
@@ -139,6 +140,9 @@ export interface GPT_getGoodDeal extends GPT_RequestBody {
   price: string;
   currency: string;
   country: string;
+  inclusiveDayCount?: number;
+  duplOrSplit?: number;
+  alreadyDividedAmountByDays?: boolean;
 }
 export interface GPT_getPrice extends GPT_RequestBody {
   requestType: GPT_RequestType.getPrice;
@@ -169,7 +173,10 @@ async function chatGPTcontentGoodDealPost(
   price: string,
   currency: string,
   country: string,
-  onLoadingPhaseChange?: (phase: string) => void
+  onLoadingPhaseChange?: (phase: string) => void,
+  inclusiveDayCount = 1,
+  duplOrSplit = 0,
+  alreadyDividedAmountByDays = false
 ): Promise<string> {
   const currentDate = getCurrentDateString();
   const { seasonalInfo, pricingInfo } = await performComprehensiveWebSearch(
@@ -179,7 +186,15 @@ async function chatGPTcontentGoodDealPost(
     onLoadingPhaseChange
   );
 
-  return `Analyze this local price: Is ${price} ${currency} a good deal for the product "${product}" in ${country}?
+  const amountPhrase = localPriceDealAmountPhrase({
+    price,
+    currency,
+    inclusiveDayCount,
+    duplOrSplit,
+    alreadyDividedAmountByDays,
+  });
+
+  return `Analyze this local price: Is ${amountPhrase} a good deal for the product "${product}" in ${country}?
 
 **Current Seasonal Context:** ${seasonalInfo}
 
@@ -197,11 +212,11 @@ IF "${product}" is not recognized as a typical product or service:
 - Provide a brief, witty response commenting humorously on the unusual item.
 
 IF "${product}" is recognized:
-**Price Analysis:** Based on the current market data above, compare ${price} ${currency} to current local market prices for "${product}" in ${country}.
+**Price Analysis:** Based on the current market data above, compare ${amountPhrase} to current local market prices for "${product}" in ${country}.
 \n\n
 
 **Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product.
-\n Explain whether this influences the value of ${price} ${currency}.
+\n Explain whether this influences the value of ${amountPhrase}.
 \n\n
 
 **Actionable Advice:** Recommend next steps or purchasing tips based on the comprehensive analysis (e.g., good deal, worth waiting for discounts, overpriced). Consider both current market prices and seasonal timing in your recommendations.
@@ -263,7 +278,10 @@ async function getGPT_Content(
         (requestBody as GPT_getGoodDeal).price,
         (requestBody as GPT_getGoodDeal).currency,
         (requestBody as GPT_getGoodDeal).country,
-        onLoadingPhaseChange
+        onLoadingPhaseChange,
+        (requestBody as GPT_getGoodDeal).inclusiveDayCount,
+        (requestBody as GPT_getGoodDeal).duplOrSplit,
+        (requestBody as GPT_getGoodDeal).alreadyDividedAmountByDays
       );
     case GPT_RequestType.getKeywords:
       return chatGPTcontentKeywords(

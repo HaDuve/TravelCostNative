@@ -12,7 +12,46 @@ import { safelyParseJSON } from "../../util/jsonParse";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import InfoButton from "./InfoButton";
-import TrafficLightInfoModal from "./TrafficLightInfoModal";
+import SettingsInfoModal from "./SettingsInfoModal";
+
+const SETTINGS_INFO_CONTENT = {
+  trafficLightBudgetColors: {
+    titleKey: "trafficLightInfoTitle",
+    textKey: "trafficLightInfoText",
+  },
+  hideSpecialExpenses: {
+    titleKey: "hideSpecialExpensesInfoTitle",
+    textKey: "hideSpecialExpensesInfoText",
+  },
+  disableNumberAnimations: {
+    titleKey: "disableNumberAnimationsInfoTitle",
+    textKey: "disableNumberAnimationsInfoText",
+  },
+  skipCategoryScreen: {
+    titleKey: "skipCategoryScreenInfoTitle",
+    textKey: "skipCategoryScreenInfoText",
+  },
+  alwaysShowAdvanced: {
+    titleKey: "alwaysShowAdvancedInfoTitle",
+    textKey: "alwaysShowAdvancedInfoText",
+  },
+  showFlags: {
+    titleKey: "showFlagsInfoTitle",
+    textKey: "showFlagsInfoText",
+  },
+  showInternetSpeed: {
+    titleKey: "showInternetSpeedInfoTitle",
+    textKey: "showInternetSpeedInfoText",
+  },
+  askAiForGoodPrices: {
+    titleKey: "askAiForGoodPricesInfoTitle",
+    textKey: "askAiForGoodPricesInfoText",
+  },
+  showWhoPaid: {
+    titleKey: "showWhoPaidInfoTitle",
+    textKey: "showWhoPaidInfoText",
+  },
+};
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -39,7 +78,17 @@ const SettingsSection = ({ multiTraveller }) => {
   const [askAiForGoodPrices, setAskAiForGoodPrices] = useState(
     settings.askAiForGoodPrices
   );
-  const [showTrafficLightInfo, setShowTrafficLightInfo] = useState(false);
+  const [activeInfoKey, setActiveInfoKey] = useState(null);
+
+  const infoButtonFor = (settingKey) => (
+    <InfoButton
+      containerStyle={styles.infoButton}
+      testID={`settings-info-${settingKey}`}
+      onPress={() => setActiveInfoKey(settingKey)}
+    />
+  );
+
+  const activeInfo = activeInfoKey ? SETTINGS_INFO_CONTENT[activeInfoKey] : null;
 
   const toggleShowFlags = () => {
     const newValue = !showFlags;
@@ -152,16 +201,13 @@ const SettingsSection = ({ multiTraveller }) => {
         state={trafficLightBudgetColors}
         toggleState={toggleTrafficLightBudgetColors}
         labelStyle={{}}
-        infoButton={
-          <InfoButton
-            containerStyle={styles.infoButton}
-            onPress={() => setShowTrafficLightInfo(true)}
-          />
-        }
+        infoButton={infoButtonFor("trafficLightBudgetColors")}
       />
-      <TrafficLightInfoModal
-        isVisible={showTrafficLightInfo}
-        onClose={() => setShowTrafficLightInfo(false)}
+      <SettingsInfoModal
+        isVisible={activeInfoKey !== null}
+        title={activeInfo ? i18n.t(activeInfo.titleKey) : ""}
+        text={activeInfo ? i18n.t(activeInfo.textKey) : ""}
+        onClose={() => setActiveInfoKey(null)}
       />
       <SettingsSwitch
         label={i18n.t("hideSpecialExpenses")}
@@ -169,6 +215,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={hideSpecialExpenses}
         toggleState={toggleHideSpecialExpenses}
         labelStyle={{}}
+        infoButton={infoButtonFor("hideSpecialExpenses")}
       />
       <SettingsSwitch
         label={i18n.t("settingsDisableNumberAnimations")}
@@ -176,6 +223,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={disableNumberAnimations}
         toggleState={toggleDisableNumberAnimations}
         labelStyle={{}}
+        infoButton={infoButtonFor("disableNumberAnimations")}
       />
       <SettingsSwitch
         label={i18n.t("settingsSkipCat")}
@@ -183,6 +231,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={skipCategoryPickScreen}
         toggleState={toggleSkipCategoryPickScreen}
         labelStyle={{}}
+        infoButton={infoButtonFor("skipCategoryScreen")}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowAdvanced")}
@@ -190,6 +239,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={alwaysShowAdvanced}
         toggleState={toggleAlwaysShowAdvanced}
         labelStyle={{}}
+        infoButton={infoButtonFor("alwaysShowAdvanced")}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowFlags")}
@@ -197,6 +247,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={showFlags}
         toggleState={toggleShowFlags}
         labelStyle={{}}
+        infoButton={infoButtonFor("showFlags")}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowInternetSpeed")}
@@ -204,6 +255,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={showInternetSpeed}
         toggleState={toggleShowInternetSpeed}
         labelStyle={{}}
+        infoButton={infoButtonFor("showInternetSpeed")}
       />
       <SettingsSwitch
         label={i18n.t("settingsAskAiForGoodPrices")}
@@ -211,6 +263,7 @@ const SettingsSection = ({ multiTraveller }) => {
         state={askAiForGoodPrices}
         toggleState={toggleAskAiForGoodPrices}
         labelStyle={{}}
+        infoButton={infoButtonFor("askAiForGoodPrices")}
       />
       {multiTraveller && (
         <SettingsSwitch
@@ -219,6 +272,7 @@ const SettingsSection = ({ multiTraveller }) => {
           state={showWhoPaid}
           toggleState={toggleShowWhoPaid}
           labelStyle={{}}
+          infoButton={infoButtonFor("showWhoPaid")}
         />
       )}
     </View>

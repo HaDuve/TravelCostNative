@@ -485,6 +485,22 @@ describe("Profile screen", () => {
     expect(screen.getByTestId("profile-scroll-header")).toBeTruthy();
   });
 
+  it("hides Local Price when Ask AI for good prices is off", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: profileUserOverrides(),
+        network: { isConnected: true, strongConnection: true },
+      },
+    );
+
+    expect(screen.queryByTestId("profile-get-local-price")).toBeNull();
+  });
+
   it("shows chevrons only on budget navigation rows, not modal actions", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(

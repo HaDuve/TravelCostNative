@@ -53,7 +53,8 @@ export const SettingsProvider = ({
       const settingsString = await secureStoreGetItem("settings");
       if (settingsString) {
         const loadedSettings: Settings = safelyParseJSON(settingsString);
-        loadedSettings && setSettings(loadedSettings);
+        loadedSettings &&
+          setSettings({ ...defaultSettings, ...loadedSettings });
       } else setSettings(defaultSettings);
     };
     loadSettingsAsync();

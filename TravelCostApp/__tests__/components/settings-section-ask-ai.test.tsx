@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fireEvent } from "@testing-library/react-native";
+import { fireEvent, within } from "@testing-library/react-native";
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -7,6 +7,21 @@ jest.mock("../../util/vexo-tracking", () => ({
 
 import SettingsSection from "../../components/UI/SettingsSection";
 import { renderWithAppProviders } from "../fixtures/app-providers";
+
+function switchForLabel(
+  screen: ReturnType<typeof renderWithAppProviders>,
+  label: string,
+) {
+  let node: { parent?: unknown } | null = screen.getByText(label);
+  while (node) {
+    try {
+      return within(node as object).getByRole("switch");
+    } catch {
+      node = (node.parent as { parent?: unknown } | null) ?? null;
+    }
+  }
+  throw new Error(`No switch found for label: ${label}`);
+}
 
 describe("SettingsSection ask AI setting", () => {
   it("shows Ask AI for good prices switch when the setting is off", () => {
@@ -22,6 +37,9 @@ describe("SettingsSection ask AI setting", () => {
     );
 
     expect(screen.getByText("Ask AI for good prices")).toBeTruthy();
+    expect(switchForLabel(screen, "Ask AI for good prices").props.value).toBe(
+      false,
+    );
   });
 
   it("persists Ask AI for good prices when toggled on", () => {

@@ -495,6 +495,7 @@ describe("Profile screen", () => {
         expenses: { setExpenses: jest.fn() },
         user: profileUserOverrides(),
         network: { isConnected: true, strongConnection: true },
+        settings: { settings: { askAiForGoodPrices: true } },
       },
     );
 
@@ -525,6 +526,7 @@ describe("Profile screen", () => {
         expenses: { setExpenses: jest.fn() },
         user: profileUserOverrides(),
         network: { isConnected: true, strongConnection: true },
+        settings: { settings: { askAiForGoodPrices: true } },
       },
     );
 

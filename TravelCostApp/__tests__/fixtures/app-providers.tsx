@@ -66,6 +66,7 @@ const defaultSettings = {
     showInternetSpeed: false,
     disableNumberAnimations: true,
     trafficLightBudgetColors: false,
+    askAiForGoodPrices: false,
   },
 };
 
@@ -79,11 +80,13 @@ export function AppProviders({
   const trip = { ...defaultTrip, ...overrides.trip };
   const user = { ...defaultUser, ...overrides.user };
   const expenses = { ...defaultExpenses, ...overrides.expenses };
-  const settings = {
+  const settingsContextValue = {
     settings: {
       ...defaultSettings.settings,
       ...(overrides.settings?.settings as object | undefined),
     },
+    saveSettings:
+      overrides.settings?.saveSettings ?? jest.fn(async () => {}),
   };
   const network = {
     isConnected: false,
@@ -116,7 +119,7 @@ export function AppProviders({
           <ExpensesContext.Provider value={expenses as any}>
             <UserContext.Provider value={user as any}>
               <NetworkContext.Provider value={network as any}>
-                <SettingsContext.Provider value={settings as any}>
+                <SettingsContext.Provider value={settingsContextValue as any}>
                   <OrientationContext.Provider value={orientation as any}>
                     {children}
                   </OrientationContext.Provider>

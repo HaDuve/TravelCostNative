@@ -395,6 +395,7 @@ const en = {
   settingsDisableNumberAnimations: "Disable Number Animations",
   settingsShowTravellerIcon: "Show Nomad Icons",
   settingsTrafficLightBudgetColors: "Traffic Light Budget Colors",
+  settingsAskAiForGoodPrices: "Ask AI for good prices",
   trafficLightInfoTitle: "Traffic Light Budget Colors",
   trafficLightInfoText:
     "Budget colors now use a traffic light system:\n\n🟢 Green: Under budget\n🟠 Orange: Over budget, but average spending is under budget\n🔴 Red: Over budget AND average spending is over budget\n\nThe average is calculated from the current period plus the previous period (e.g., this week + last week for daily view).",
@@ -1040,6 +1041,7 @@ const de = {
   settingsDisableNumberAnimations: "Zahlenanimationen deaktivieren",
   settingsShowTravellerIcon: "Nomaden-Icons anzeigen",
   settingsTrafficLightBudgetColors: "Ampel-Budget-Farben",
+  settingsAskAiForGoodPrices: "KI nach guten Preisen fragen",
   trafficLightInfoTitle: "Ampel-Budget-Farben",
   trafficLightInfoText:
     "Budget-Farben verwenden jetzt ein Ampelsystem:\n\n🟢 Grün: Unter Budget\n🟠 Orange: Über Budget, aber Durchschnittsausgaben sind unter Budget\n🔴 Rot: Über Budget UND Durchschnittsausgaben sind über Budget\n\nDer Durchschnitt wird aus der aktuellen Periode plus der vorherigen Periode berechnet (z.B. diese Woche + letzte Woche für Tagesansicht).",
@@ -1699,6 +1701,7 @@ const fr = {
   settingsDisableNumberAnimations: "Désactiver les animations de nombres",
   settingsShowTravellerIcon: "Afficher les icônes de nomades",
   settingsTrafficLightBudgetColors: "Couleurs de budget feux de circulation",
+  settingsAskAiForGoodPrices: "Demander à l'IA de bons prix",
   trafficLightInfoTitle: "Couleurs de budget feux de circulation",
   trafficLightInfoText:
     "Les couleurs du budget utilisent maintenant un système de feux de circulation:\n\n🟢 Vert: Sous le budget\n🟠 Orange: Au-dessus du budget, mais les dépenses moyennes sont sous le budget\n🔴 Rouge: Au-dessus du budget ET les dépenses moyennes sont au-dessus du budget\n\nLa moyenne est calculée à partir de la période actuelle plus la période précédente (par exemple, cette semaine + la semaine dernière pour la vue quotidienne).",
@@ -2347,6 +2350,7 @@ const ru = {
   settingsDisableNumberAnimations: "Отключить анимацию чисел",
   settingsShowTravellerIcon: "Показывать иконки номадов",
   settingsTrafficLightBudgetColors: "Цвета бюджета светофора",
+  settingsAskAiForGoodPrices: "Спросить ИИ о хороших ценах",
   trafficLightInfoTitle: "Цвета бюджета светофора",
   trafficLightInfoText:
     "Цвета бюджета теперь используют систему светофора:\n\n🟢 Зеленый: В пределах бюджета\n🟠 Оранжевый: Превышен бюджет, но средние расходы в пределах бюджета\n🔴 Красный: Превышен бюджет И средние расходы превышают бюджет\n\nСреднее значение рассчитывается из текущего периода плюс предыдущий период (например, эта неделя + прошлая неделя для дневного просмотра).",

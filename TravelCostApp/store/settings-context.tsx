@@ -14,6 +14,7 @@ export interface Settings {
   hideSpecialExpenses: boolean;
   disableNumberAnimations: boolean;
   trafficLightBudgetColors: boolean;
+  askAiForGoodPrices: boolean;
 }
 
 export type SettingsContextType = {
@@ -30,6 +31,7 @@ const defaultSettings: Settings = {
   hideSpecialExpenses: false,
   disableNumberAnimations: false,
   trafficLightBudgetColors: true,
+  askAiForGoodPrices: false,
 };
 
 export const SettingsContext = createContext<SettingsContextType>({

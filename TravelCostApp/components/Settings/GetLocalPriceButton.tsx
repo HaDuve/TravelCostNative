@@ -12,6 +12,7 @@ import {
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
+import { SettingsContext } from "../../store/settings-context";
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 import ActionRow from "../UI/ActionRow";
@@ -26,6 +27,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const { settings } = useContext(SettingsContext);
   const isConnected = netCtx.isConnected;
 
   const [showLocalPriceModal, setShowLocalPriceModal] = useState(false);
@@ -65,6 +67,10 @@ const GetLocalPriceButton = ({ navigation, style }) => {
     setShowLocalPriceModal(false);
     setProductInput("");
   };
+
+  if (!settings.askAiForGoodPrices) {
+    return null;
+  }
 
   return (
     <>

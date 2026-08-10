@@ -28,9 +28,16 @@ export function resolveLocalPriceDealPerDayAndSum(input: {
 }): { perDay: number; sum: number } | null {
   if (input.inclusiveDayCount <= 1) return null;
 
+  const mode = Number(input.duplOrSplit ?? DuplicateOption.null);
+  if (
+    mode !== DuplicateOption.duplicate &&
+    mode !== DuplicateOption.split
+  ) {
+    return null;
+  }
+
   const isUndividedSplit =
-    Number(input.duplOrSplit) === DuplicateOption.split &&
-    !input.alreadyDividedAmountByDays;
+    mode === DuplicateOption.split && !input.alreadyDividedAmountByDays;
 
   if (isUndividedSplit) {
     return {

@@ -2275,7 +2275,7 @@ const ru = {
   getLocalPriceExpenseDealHint:
     'Хорошая ли сделка — %{price} %{currency} за «%{product}» в %{country}?',
   getLocalPriceExpenseDealHintRanged:
-    'Хорошая ли сделка — %{price} %{currency} за %{days} дн. (сумма %{sum} %{currency}) за «%{product}» в %{country}?',
+    'Хорошая ли сделка — %{price} %{currency} за %{days} дн. (сумма %{sum} %{currency}) для «%{product}» в %{country}?',
   gettingLocalPrice: "Получение информации о местных ценах...",
   day: "День",
   week: "Неделя",

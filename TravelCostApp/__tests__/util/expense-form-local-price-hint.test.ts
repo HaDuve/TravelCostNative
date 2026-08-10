@@ -88,6 +88,20 @@ describe("expenseFormLocalPriceHint", () => {
       })
     ).toBe('Is 80 EUR a good deal for "hotel" in Spain?');
   });
+
+  it("omits day span when ranged mode is not chosen yet", () => {
+    expect(
+      expenseFormLocalPriceHint({
+        product: "hotel",
+        country: "Spain",
+        price: "240",
+        currency: "EUR",
+        inclusiveDayCount: 3,
+        duplOrSplit: DuplicateOption.null,
+        alreadyDividedAmountByDays: false,
+      })
+    ).toBe('Is 240 EUR a good deal for "hotel" in Spain?');
+  });
 });
 
 describe("localPriceDealAmountPhrase", () => {
@@ -101,5 +115,17 @@ describe("localPriceDealAmountPhrase", () => {
         alreadyDividedAmountByDays: false,
       })
     ).toBe("80 EUR over 3 days (sum 240 EUR)");
+  });
+
+  it("uses plain amount when ranged mode is not chosen yet", () => {
+    expect(
+      localPriceDealAmountPhrase({
+        price: "240",
+        currency: "EUR",
+        inclusiveDayCount: 3,
+        duplOrSplit: DuplicateOption.null,
+        alreadyDividedAmountByDays: false,
+      })
+    ).toBe("240 EUR");
   });
 });

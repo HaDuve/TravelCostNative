@@ -36,6 +36,9 @@ const SettingsSection = ({ multiTraveller }) => {
   const [trafficLightBudgetColors, setTrafficLightBudgetColors] = useState(
     settings.trafficLightBudgetColors
   );
+  const [askAiForGoodPrices, setAskAiForGoodPrices] = useState(
+    settings.askAiForGoodPrices
+  );
   const [showTrafficLightInfo, setShowTrafficLightInfo] = useState(false);
 
   const toggleShowFlags = () => {
@@ -126,6 +129,18 @@ const SettingsSection = ({ multiTraveller }) => {
       enabled: newValue,
     });
   };
+  const toggleAskAiForGoodPrices = () => {
+    const newValue = !askAiForGoodPrices;
+    const newSettings = {
+      ...settings,
+      askAiForGoodPrices: newValue,
+    };
+    setAskAiForGoodPrices(newValue);
+    saveSettings(newSettings);
+    trackEvent(VexoEvents.ASK_AI_FOR_GOOD_PRICES_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
+  };
   return (
     <View>
       {/* <View style={styles.switchContainer}>
@@ -188,6 +203,13 @@ const SettingsSection = ({ multiTraveller }) => {
         style={styles.switchContainer}
         state={showInternetSpeed}
         toggleState={toggleShowInternetSpeed}
+        labelStyle={{}}
+      />
+      <SettingsSwitch
+        label={i18n.t("settingsAskAiForGoodPrices")}
+        style={styles.switchContainer}
+        state={askAiForGoodPrices}
+        toggleState={toggleAskAiForGoodPrices}
         labelStyle={{}}
       />
       {multiTraveller && (

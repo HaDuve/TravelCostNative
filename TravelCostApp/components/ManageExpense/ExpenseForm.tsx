@@ -2059,6 +2059,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           </Animated.View>
           {/* Get Local Price Button Section */}
           {!hideAdvanced &&
+            settings.askAiForGoodPrices &&
             inputs.description.value &&
             inputs.currency.value &&
             inputs.country.value && (

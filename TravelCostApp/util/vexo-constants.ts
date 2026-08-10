@@ -79,6 +79,8 @@ export const VexoEvents = {
     "disable_number_animations_toggle_changed",
   TRAFFIC_LIGHT_BUDGET_COLORS_TOGGLE_CHANGED:
     "traffic_light_budget_colors_toggle_changed",
+  ASK_AI_FOR_GOOD_PRICES_TOGGLE_CHANGED:
+    "ask_ai_for_good_prices_toggle_changed",
   RESET_APP_INTRODUCTION_PRESSED: "reset_app_introduction_pressed",
   VISIT_FOOD_FOR_NOMADS_PRESSED: "visit_food_for_nomads_pressed",
   FEEDBACK_BUTTON_PRESSED: "feedback_button_pressed",

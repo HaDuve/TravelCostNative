@@ -237,6 +237,43 @@ describe("form ActionRow footers", () => {
       expect(rowShowsChevron(screen, "expense-form-cancel")).toBe(false);
     });
 
+    it("hides local price row when Ask AI for good prices is off", () => {
+      const screen = renderWithAppProviders(
+        <ExpenseForm
+          onCancel={jest.fn()}
+          onSubmit={jest.fn(async () => {})}
+          submitButtonLabel={i18n.t("update")}
+          isEditing
+          defaultValues={makeExpense({
+            amount: 0,
+            description: "Coffee",
+            country: "Germany",
+            currency: "EUR",
+            whoPaid: "Alice",
+            splitList: [{ userName: "Alice", amount: 0 }],
+          })}
+          pickedCat="food"
+          navigation={navigation as any}
+          editedExpenseId="e1"
+          newCat={false}
+          iconName="food"
+          dateISO=""
+        />,
+        {
+          trip: {
+            tripid: "t1",
+            tripCurrency: "EUR",
+            travellers: [{ uid: "u1", userName: "Alice" }],
+            fetchAndSetTravellers: jest.fn(async () => {}),
+          },
+          user: { userName: "Alice", lastCurrency: "EUR", lastCountry: "DE" },
+          settings: { settings: { askAiForGoodPrices: false } },
+        }
+      );
+
+      expect(screen.queryByTestId("expense-form-get-local-price")).toBeNull();
+    });
+
     it("shows contextual local price hint when product and country are set", () => {
       const screen = renderWithAppProviders(
         <ExpenseForm
@@ -267,6 +304,7 @@ describe("form ActionRow footers", () => {
             fetchAndSetTravellers: jest.fn(async () => {}),
           },
           user: { userName: "Alice", lastCurrency: "EUR", lastCountry: "DE" },
+          settings: { settings: { askAiForGoodPrices: true } },
         }
       );
 

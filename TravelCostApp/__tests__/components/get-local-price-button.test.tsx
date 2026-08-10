@@ -23,10 +23,40 @@ describe("GetLocalPriceButton", () => {
     jest.mocked(Alert.alert).mockRestore();
   });
 
+  it("is hidden when Ask AI for good prices is off", () => {
+    const screen = renderWithAppProviders(
+      <GetLocalPriceButton navigation={navigation as any} />,
+      {
+        wrapNavigation: false,
+        network: { isConnected: true },
+        settings: { settings: { askAiForGoodPrices: false } },
+      },
+    );
+
+    expect(screen.queryByTestId("profile-get-local-price")).toBeNull();
+  });
+
+  it("is visible when Ask AI for good prices is on", () => {
+    const screen = renderWithAppProviders(
+      <GetLocalPriceButton navigation={navigation as any} />,
+      {
+        wrapNavigation: false,
+        network: { isConnected: true },
+        settings: { settings: { askAiForGoodPrices: true } },
+      },
+    );
+
+    expect(screen.getByTestId("profile-get-local-price")).toBeTruthy();
+  });
+
   it("shows no chevron on the profile trigger row that opens a modal", () => {
     const screen = renderWithAppProviders(
       <GetLocalPriceButton navigation={navigation as any} />,
-      { wrapNavigation: false, network: { isConnected: true } },
+      {
+        wrapNavigation: false,
+        network: { isConnected: true },
+        settings: { settings: { askAiForGoodPrices: true } },
+      },
     );
 
     expect(
@@ -39,7 +69,11 @@ describe("GetLocalPriceButton", () => {
   it("shows hint text on the profile Local Price row", () => {
     const screen = renderWithAppProviders(
       <GetLocalPriceButton navigation={navigation as any} />,
-      { wrapNavigation: false, network: { isConnected: true } },
+      {
+        wrapNavigation: false,
+        network: { isConnected: true },
+        settings: { settings: { askAiForGoodPrices: true } },
+      },
     );
 
     expect(
@@ -50,7 +84,11 @@ describe("GetLocalPriceButton", () => {
   it("hides chevrons on modal footer rows", () => {
     const screen = renderWithAppProviders(
       <GetLocalPriceButton navigation={navigation as any} />,
-      { wrapNavigation: false, network: { isConnected: true } },
+      {
+        wrapNavigation: false,
+        network: { isConnected: true },
+        settings: { settings: { askAiForGoodPrices: true } },
+      },
     );
 
     fireEvent.press(screen.getByTestId("profile-get-local-price"));

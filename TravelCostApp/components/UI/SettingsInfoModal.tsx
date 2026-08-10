@@ -19,17 +19,21 @@ const SettingsInfoModal = ({ isVisible, title, text, onClose }) => {
       onBackButtonPress={onClose}
     >
       <View style={styles.infoModalContainer}>
-        <Text style={styles.infoTitleText}>{title}</Text>
-        <Text style={styles.infoContentText}>{text}</Text>
-        <ActionRow
-          tier="primary"
-          label={i18n.t("confirm")}
-          icon="checkmark-outline"
-          showChevron={false}
-          compact
-          onPress={onClose}
-          style={styles.confirmButton}
-        />
+        {isVisible && (
+          <>
+            <Text style={styles.infoTitleText}>{title}</Text>
+            <Text style={styles.infoContentText}>{text}</Text>
+            <ActionRow
+              tier="primary"
+              label={i18n.t("confirm")}
+              icon="checkmark-outline"
+              showChevron={false}
+              compact
+              onPress={onClose}
+              style={styles.confirmButton}
+            />
+          </>
+        )}
       </View>
     </Modal>
   );

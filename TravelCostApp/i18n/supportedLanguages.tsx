@@ -396,6 +396,7 @@ const en = {
   settingsShowTravellerIcon: "Show Nomad Icons",
   settingsTrafficLightBudgetColors: "Traffic Light Budget Colors",
   settingsAskAiForGoodPrices: "Ask AI for good prices",
+  settingsInfoButtonA11y: "More information about %{setting}",
   trafficLightInfoTitle: "Traffic Light Budget Colors",
   trafficLightInfoText:
     "Budget colors now use a traffic light system:\n\n🟢 Green: Under budget\n🟠 Orange: Over budget, but average spending is under budget\n🔴 Red: Over budget AND average spending is over budget\n\nThe average is calculated from the current period plus the previous period (e.g., this week + last week for daily view).",
@@ -419,7 +420,7 @@ const en = {
     "When turned on, your current connection speed is shown in the header on the overview and expense list screens.",
   askAiForGoodPricesInfoTitle: "Ask AI for good prices",
   askAiForGoodPricesInfoText:
-    "When turned on, you can ask AI whether a price is reasonable for your current location from your profile screen.",
+    "When turned on, you can ask AI whether a price is reasonable for your current location from your profile and on the expense form.",
   showWhoPaidInfoTitle: "Show nomad icons",
   showWhoPaidInfoText:
     "When turned on, a small icon shows which nomad paid for each expense. Only applies when your budget has more than one nomad.",
@@ -1066,6 +1067,7 @@ const de = {
   settingsShowTravellerIcon: "Nomaden-Icons anzeigen",
   settingsTrafficLightBudgetColors: "Ampel-Budget-Farben",
   settingsAskAiForGoodPrices: "KI nach guten Preisen fragen",
+  settingsInfoButtonA11y: "Mehr Informationen zu %{setting}",
   trafficLightInfoTitle: "Ampel-Budget-Farben",
   trafficLightInfoText:
     "Budget-Farben verwenden jetzt ein Ampelsystem:\n\n🟢 Grün: Unter Budget\n🟠 Orange: Über Budget, aber Durchschnittsausgaben sind unter Budget\n🔴 Rot: Über Budget UND Durchschnittsausgaben sind über Budget\n\nDer Durchschnitt wird aus der aktuellen Periode plus der vorherigen Periode berechnet (z.B. diese Woche + letzte Woche für Tagesansicht).",
@@ -1089,7 +1091,7 @@ const de = {
     "Wenn aktiviert, wird deine aktuelle Verbindungsgeschwindigkeit in der Kopfzeile auf der Übersichts- und Ausgabenlistenseite angezeigt.",
   askAiForGoodPricesInfoTitle: "KI nach guten Preisen fragen",
   askAiForGoodPricesInfoText:
-    "Wenn aktiviert, kannst du über dein Profil die KI fragen, ob ein Preis für deinen aktuellen Standort angemessen ist.",
+    "Wenn aktiviert, kannst du über dein Profil und im Ausgabenformular die KI fragen, ob ein Preis für deinen aktuellen Standort angemessen ist.",
   showWhoPaidInfoTitle: "Nomaden-Icons anzeigen",
   showWhoPaidInfoText:
     "Wenn aktiviert, zeigt ein kleines Icon an, welcher Nomade für jede Ausgabe bezahlt hat. Gilt nur, wenn dein Budget mehr als einen Nomaden hat.",
@@ -1750,6 +1752,7 @@ const fr = {
   settingsShowTravellerIcon: "Afficher les icônes de nomades",
   settingsTrafficLightBudgetColors: "Couleurs de budget feux de circulation",
   settingsAskAiForGoodPrices: "Demander à l'IA de bons prix",
+  settingsInfoButtonA11y: "Plus d'informations sur %{setting}",
   trafficLightInfoTitle: "Couleurs de budget feux de circulation",
   trafficLightInfoText:
     "Les couleurs du budget utilisent maintenant un système de feux de circulation:\n\n🟢 Vert: Sous le budget\n🟠 Orange: Au-dessus du budget, mais les dépenses moyennes sont sous le budget\n🔴 Rouge: Au-dessus du budget ET les dépenses moyennes sont au-dessus du budget\n\nLa moyenne est calculée à partir de la période actuelle plus la période précédente (par exemple, cette semaine + la semaine dernière pour la vue quotidienne).",
@@ -1773,7 +1776,7 @@ const fr = {
     "Lorsque activé, votre vitesse de connexion actuelle s'affiche dans l'en-tête des écrans de vue d'ensemble et de liste des dépenses.",
   askAiForGoodPricesInfoTitle: "Demander à l'IA de bons prix",
   askAiForGoodPricesInfoText:
-    "Lorsque activé, vous pouvez demander à l'IA si un prix est raisonnable pour votre emplacement actuel depuis votre écran de profil.",
+    "Lorsque activé, vous pouvez demander à l'IA si un prix est raisonnable pour votre emplacement actuel depuis votre profil et dans le formulaire de dépense.",
   showWhoPaidInfoTitle: "Afficher les icônes de nomades",
   showWhoPaidInfoText:
     "Lorsque activé, une petite icône indique quel nomade a payé chaque dépense. S'applique uniquement lorsque votre budget compte plus d'un nomade.",
@@ -2423,6 +2426,7 @@ const ru = {
   settingsShowTravellerIcon: "Показывать иконки номадов",
   settingsTrafficLightBudgetColors: "Цвета бюджета светофора",
   settingsAskAiForGoodPrices: "Спросить ИИ о хороших ценах",
+  settingsInfoButtonA11y: "Подробнее о %{setting}",
   trafficLightInfoTitle: "Цвета бюджета светофора",
   trafficLightInfoText:
     "Цвета бюджета теперь используют систему светофора:\n\n🟢 Зеленый: В пределах бюджета\n🟠 Оранжевый: Превышен бюджет, но средние расходы в пределах бюджета\n🔴 Красный: Превышен бюджет И средние расходы превышают бюджет\n\nСреднее значение рассчитывается из текущего периода плюс предыдущий период (например, эта неделя + прошлая неделя для дневного просмотра).",
@@ -2446,7 +2450,7 @@ const ru = {
     "Когда включено, текущая скорость соединения отображается в заголовке на экранах обзора и списка расходов.",
   askAiForGoodPricesInfoTitle: "Спросить ИИ о хороших ценах",
   askAiForGoodPricesInfoText:
-    "Когда включено, вы можете спросить ИИ, разумна ли цена для вашего текущего местоположения, с экрана профиля.",
+    "Когда включено, вы можете спросить ИИ, разумна ли цена для вашего текущего местоположения, с экрана профиля и в форме расхода.",
   showWhoPaidInfoTitle: "Показывать иконки номадов",
   showWhoPaidInfoText:
     "Когда включено, маленькая иконка показывает, какой номад оплатил каждый расход. Применяется только если в бюджете больше одного номада.",

@@ -53,6 +53,8 @@ const SETTINGS_INFO_CONTENT = {
   },
 };
 
+export const SETTINGS_TOGGLE_INFO_KEYS = Object.keys(SETTINGS_INFO_CONTENT);
+
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
   const [showFlags, setShowFlags] = useState(settings.showFlags);
@@ -80,13 +82,19 @@ const SettingsSection = ({ multiTraveller }) => {
   );
   const [activeInfoKey, setActiveInfoKey] = useState(null);
 
-  const infoButtonFor = (settingKey) => (
-    <InfoButton
-      containerStyle={styles.infoButton}
-      testID={`settings-info-${settingKey}`}
-      onPress={() => setActiveInfoKey(settingKey)}
-    />
-  );
+  const infoButtonFor = (settingKey) => {
+    const info = SETTINGS_INFO_CONTENT[settingKey];
+    return (
+      <InfoButton
+        containerStyle={styles.infoButton}
+        testID={`settings-info-${settingKey}`}
+        accessibilityLabel={i18n.t("settingsInfoButtonA11y", {
+          setting: i18n.t(info.titleKey),
+        })}
+        onPress={() => setActiveInfoKey(settingKey)}
+      />
+    );
+  };
 
   const activeInfo = activeInfoKey ? SETTINGS_INFO_CONTENT[activeInfoKey] : null;
 

@@ -28,6 +28,7 @@ export type TripPeriodChromeProps = {
   onPeriodItemsChange: (items: PeriodItem[]) => void;
   expenses: ExpenseData[];
   summaryStyle?: StyleProp<ViewStyle>;
+  showSummary?: boolean;
   onPeriodOpen?: () => void;
   onPeriodClose?: () => void;
   onPeriodSelectItem?: (item: PeriodItem | null) => void;
@@ -45,6 +46,7 @@ function TripPeriodChrome({
   onPeriodItemsChange,
   expenses,
   summaryStyle,
+  showSummary = true,
   onPeriodOpen,
   onPeriodClose,
   onPeriodSelectItem,
@@ -101,11 +103,13 @@ function TripPeriodChrome({
           textStyle={styles.dropdownTextStyle}
         />
 
-        <ExpensesSummary
-          expenses={expenses}
-          periodName={periodValue}
-          style={summaryStyle}
-        />
+        {showSummary ? (
+          <ExpensesSummary
+            expenses={expenses}
+            periodName={periodValue}
+            style={summaryStyle}
+          />
+        ) : null}
       </View>
 
       <View
@@ -158,6 +162,7 @@ TripPeriodChrome.propTypes = {
   onPeriodItemsChange: PropTypes.func.isRequired,
   expenses: PropTypes.array.isRequired,
   summaryStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  showSummary: PropTypes.bool,
   onPeriodOpen: PropTypes.func,
   onPeriodClose: PropTypes.func,
   onPeriodSelectItem: PropTypes.func,

@@ -165,6 +165,8 @@ const OverviewScreen = ({ navigation }) => {
   // );
   const { isTablet } = useContext(OrientationContext);
   const layout = useLayoutProfile();
+  const compactFab = layout.breakpoint === "wide";
+
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <ContentFrame
@@ -228,13 +230,15 @@ const OverviewScreen = ({ navigation }) => {
 
       {/* FAB Toggle Button */}
       <Pressable
+        testID="overview-graph-toggle"
         onPress={toggleContent}
         style={({ pressed }) => [
           styles.fabToggleButton,
+          compactFab && styles.fabToggleButtonCompact,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <ToggleButton toggled={userCtx.isShowingGraph} />
+        <ToggleButton toggled={userCtx.isShowingGraph} compact={compactFab} />
       </Pressable>
     </View>
   );
@@ -262,6 +266,10 @@ const styles = StyleSheet.create({
   },
   fabToggleButton: {
     ...shadowRegressionStyles.overviewFabToggleButton,
+  },
+  fabToggleButtonCompact: {
+    marginLeft: constantScale(-39, 0.06),
+    bottom: constantScale(16, 0.5),
   },
 });
 

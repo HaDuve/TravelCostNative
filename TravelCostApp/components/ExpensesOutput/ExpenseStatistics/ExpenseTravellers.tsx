@@ -23,6 +23,8 @@ import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
+import { useLayoutProfile } from "../../../store/layout-context";
+import { usesLandscapeStatisticsRow } from "../../../util/layout";
 
 const ExpenseTravellers = ({
   expenses,
@@ -37,7 +39,9 @@ const ExpenseTravellers = ({
   );
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
-  const useRowFormat = !isPortrait && !forcePortraitFormat;
+  const layout = useLayoutProfile();
+  const useRowFormat =
+    usesLandscapeStatisticsRow(layout, isPortrait) && !forcePortraitFormat;
   const totalSum = useMemo(
     () => (expenses ? getExpensesSum(expenses) : 0),
     [expenses]

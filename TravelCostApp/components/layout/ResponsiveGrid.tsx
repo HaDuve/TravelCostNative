@@ -38,11 +38,11 @@ export default function ResponsiveGrid({
   style,
   testID,
 }: ResponsiveGridProps) {
-  const isWide = layout.breakpoint === "wide";
+  const isMultiColumn = layout.breakpoint !== "narrow";
   const [leftColumn, rightColumn] = splitColumnFirst(items);
   const totalWidth = columnWidths[0] + columnWidths[1];
 
-  if (!isWide) {
+  if (!isMultiColumn) {
     return (
       <View testID={testID} style={style}>
         {items.map((item) => (

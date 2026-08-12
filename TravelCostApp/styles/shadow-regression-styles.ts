@@ -64,7 +64,7 @@ export const shadowRegressionStyles = StyleSheet.create({
   },
   overviewDropdownContainer: {
     ...overviewHeaderCardBase,
-    marginTop: periodLayout.periodDateHeader.marginTop,
+    marginTop: periodLayout.dropdownContainer.marginTop,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -1,21 +1,47 @@
+import { Dimensions } from "react-native";
+
 import { layoutFor } from "../../util/layout";
+import { dynamicScale } from "../../util/scalingUtil";
 import { tripPeriodLayoutTokens } from "../../styles/trip-period-layout-tokens";
 
 describe("trip-period-layout-tokens", () => {
-  it("builds period header spacing from fixed layout tokens instead of dynamicScale", () => {
-    const layout = layoutFor({ width: 390, height: 844 });
-    const tokens = tripPeriodLayoutTokens(layout);
+  const phoneViewport = { width: 390, height: 844 };
 
-    expect(tokens.periodHeaderRow.gap).toBe(16);
-    expect(tokens.periodHeaderRow.paddingHorizontal).toBe(16);
-    expect(tokens.periodHeaderLabelFontSize).toBe(28);
+  beforeEach(() => {
+    jest.spyOn(Dimensions, "get").mockReturnValue({
+      width: phoneViewport.width,
+      height: phoneViewport.height,
+      scale: 3,
+      fontScale: 1,
+    });
   });
 
-  it("uses layout type scale for period header label typography only", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("preserves narrow-phone period chrome sizes from the legacy dynamicScale baseline", () => {
+    const layout = layoutFor(phoneViewport);
+    const tokens = tripPeriodLayoutTokens(layout);
+
+    expect(tokens.headerCard.minHeight).toBe(dynamicScale(52, true));
+    expect(tokens.headerCard.paddingVertical).toBe(dynamicScale(4, true));
+    expect(tokens.dropdownContainer.marginTop).toBe(dynamicScale(2, true));
+    expect(tokens.periodHeaderRow.gap).toBe(dynamicScale(12, true));
+    expect(tokens.periodHeaderRow.marginTop).toBe(dynamicScale(18, true));
+    expect(tokens.periodHeaderRow.paddingHorizontal).toBe(dynamicScale(12));
+    expect(tokens.periodDateHeader.marginTop).toBe(dynamicScale(12, true));
+    expect(tokens.periodDateHeader.marginLeft).toBe(dynamicScale(18));
+    expect(tokens.periodDateHeader.marginBottom).toBe(dynamicScale(-4, true));
+    expect(tokens.periodHeaderLabelFontSize).toBe(dynamicScale(28, false, 0.5));
+  });
+
+  it("uses layout spacing tokens on wide breakpoints", () => {
     const wide = layoutFor({ width: 1024, height: 768 });
     const tokens = tripPeriodLayoutTokens(wide);
 
     expect(tokens.periodHeaderLabelFontSize).toBe(34);
     expect(tokens.periodHeaderRow.gap).toBe(20);
+    expect(tokens.headerCard.minHeight).toBe(40);
   });
 });

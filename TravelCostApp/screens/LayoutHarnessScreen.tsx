@@ -17,7 +17,12 @@ export default function LayoutHarnessScreen() {
   const liveComparison = compareLayoutToLegacyScaling({ width, height });
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView
+      contentContainerStyle={{
+        padding: liveLayout.space(3),
+        gap: liveLayout.space(3),
+      }}
+    >
       <Text testID="layout-harness-live-breakpoint">
         Live breakpoint: {liveLayout.breakpoint}
       </Text>

@@ -45,4 +45,48 @@ describe("OrientationContext adapter", () => {
       "PORTRAIT:tablet:portrait"
     );
   });
+
+  it("keeps phone portrait on the narrow layout profile", () => {
+    jest.spyOn(Dimensions, "get").mockReturnValue({
+      width: 390,
+      height: 844,
+      scale: 3,
+      fontScale: 1,
+    });
+
+    const screen = renderWithAppProviders(
+      <LayoutContextProvider>
+        <OrientationContextProvider>
+          <Probe />
+        </OrientationContextProvider>
+      </LayoutContextProvider>,
+      { wrapNavigation: false }
+    );
+
+    expect(screen.getByTestId("orientation-probe")).toHaveTextContent(
+      "PORTRAIT:phone:portrait"
+    );
+  });
+
+  it("treats landscape phone widths at or above 600px as tablet layout", () => {
+    jest.spyOn(Dimensions, "get").mockReturnValue({
+      width: 844,
+      height: 390,
+      scale: 3,
+      fontScale: 1,
+    });
+
+    const screen = renderWithAppProviders(
+      <LayoutContextProvider>
+        <OrientationContextProvider>
+          <Probe />
+        </OrientationContextProvider>
+      </LayoutContextProvider>,
+      { wrapNavigation: false }
+    );
+
+    expect(screen.getByTestId("orientation-probe")).toHaveTextContent(
+      "LANDSCAPE:tablet:landscape"
+    );
+  });
 });

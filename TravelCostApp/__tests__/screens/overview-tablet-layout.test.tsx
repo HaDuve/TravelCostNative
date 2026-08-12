@@ -148,6 +148,15 @@ describe("Overview tablet layout", () => {
     expect(chartStyle.width).toBeLessThanOrEqual(600);
   });
 
+  it("stacks the graph list below the chart inside ContentFrame on wide layouts", () => {
+    const screen = renderOverviewWithLayout(1194, 834, {
+      isShowingGraph: true,
+      expenses: graphExpensesContext,
+    });
+
+    expect(screen.queryByTestId("expense-graph-side-chart")).toBeNull();
+  });
+
   it("uses a smaller graph toggle on wide layouts", () => {
     const screen = renderOverviewWithLayout(1194, 834);
     const fabStyle = StyleSheet.flatten(

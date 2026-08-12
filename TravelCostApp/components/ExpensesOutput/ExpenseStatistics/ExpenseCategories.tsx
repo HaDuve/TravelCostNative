@@ -18,6 +18,8 @@ import { toExpenseNavigationDtos } from "../../../util/expense-navigation-dto";
 import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
+import { useLayoutProfile } from "../../../store/layout-context";
+import { usesLandscapeStatisticsRow } from "../../../util/layout";
 
 const ExpenseCategories = ({
   expenses,
@@ -32,8 +34,10 @@ const ExpenseCategories = ({
   );
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
 
-  const useRowFormat = !isPortrait && !forcePortraitFormat;
+  const useRowFormat =
+    usesLandscapeStatisticsRow(layout, isPortrait) && !forcePortraitFormat;
   const totalSum = useMemo(
     () => (expenses ? getExpensesSum(expenses) : 0),
     [expenses]

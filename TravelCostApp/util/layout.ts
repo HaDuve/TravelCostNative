@@ -111,3 +111,11 @@ export function layoutFor(viewport: LayoutViewport): LayoutProfile {
     type: (size) => typeForBreakpoint(breakpoint, size),
   };
 }
+
+/** Phone landscape only — ContentFrame on medium/wide is too narrow for chart + list side by side. */
+export function usesLandscapeStatisticsRow(
+  layout: LayoutProfile,
+  isPortrait: boolean
+): boolean {
+  return !isPortrait && layout.breakpoint === "narrow";
+}

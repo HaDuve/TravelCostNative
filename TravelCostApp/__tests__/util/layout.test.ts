@@ -1,4 +1,4 @@
-import { controlWidthStyle, layoutFor } from "../../util/layout";
+import { controlWidthStyle, layoutFor, usesLandscapeStatisticsRow } from "../../util/layout";
 
 describe("controlWidthStyle", () => {
   it("stretches fill controls full width on narrow viewports", () => {
@@ -88,5 +88,17 @@ describe("layoutFor", () => {
     expect(medium.type(20)).toBe(21);
     expect(wide.type(20)).toBe(24);
     expect(wide.space(3)).not.toBe(wide.type(16));
+  });
+});
+
+describe("usesLandscapeStatisticsRow", () => {
+  it("allows side-by-side chart and list only on narrow phone landscape", () => {
+    const narrowLandscape = layoutFor({ width: 580, height: 360 });
+    const phoneLandscape = layoutFor({ width: 844, height: 390 });
+    const tabletLandscape = layoutFor({ width: 1194, height: 834 });
+
+    expect(usesLandscapeStatisticsRow(narrowLandscape, false)).toBe(true);
+    expect(usesLandscapeStatisticsRow(phoneLandscape, false)).toBe(false);
+    expect(usesLandscapeStatisticsRow(tabletLandscape, false)).toBe(false);
   });
 });

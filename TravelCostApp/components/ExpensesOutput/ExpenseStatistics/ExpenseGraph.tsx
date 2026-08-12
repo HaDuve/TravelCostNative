@@ -28,6 +28,8 @@ import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
+import { useLayoutProfile } from "../../../store/layout-context";
+import { usesLandscapeStatisticsRow } from "../../../util/layout";
 import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 
 const ExpenseGraph = ({
@@ -39,6 +41,8 @@ const ExpenseGraph = ({
   refreshControl,
 }) => {
   const { isPortrait } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
+  const useSideBySideGraph = usesLandscapeStatisticsRow(layout, isPortrait);
 
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
@@ -506,8 +510,8 @@ const ExpenseGraph = ({
         exiting={FadeOutLeft.duration(500)}
         style={styles.listContainer}
       >
-        {!isPortrait && (
-          <View style={styles.graphContainer}>
+        {useSideBySideGraph && (
+          <View style={styles.graphContainer} testID="expense-graph-side-chart">
             <ExpenseChart
               inputData={listExpenseSumBudgets}
               xAxis={xAxis}
@@ -528,10 +532,10 @@ const ExpenseGraph = ({
             <View
               style={[
                 styles.graphContainer,
-                !isPortrait && styles.landscapeGraphContainer,
+                useSideBySideGraph && styles.landscapeGraphContainer,
               ]}
             >
-              {isPortrait && (
+              {!useSideBySideGraph && (
                 <ExpenseChart
                   inputData={listExpenseSumBudgets}
                   xAxis={xAxis}

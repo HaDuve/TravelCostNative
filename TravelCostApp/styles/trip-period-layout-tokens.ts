@@ -62,7 +62,7 @@ function widePeriodChrome(layout: LayoutProfile) {
     periodDateHeader: {
       marginTop: layout.space(3),
       marginLeft: layout.space(4),
-      marginBottom: -layout.space(1),
+      marginBottom: layout.space(1),
     },
     headerCard: {
       ...shared.headerCard,

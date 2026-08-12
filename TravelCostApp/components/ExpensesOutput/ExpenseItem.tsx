@@ -28,7 +28,8 @@ import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
+import { useLayoutProfile } from "../../store/layout-context";
+import { expenseListRowLayoutTokens } from "../../styles/expense-list-row-layout-tokens";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -286,7 +287,8 @@ function ExpenseItem(props): JSX.Element {
   }, [date, todayString]);
   configureDateString();
 
-  const { isLandscape } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
+  const rowLayout = expenseListRowLayoutTokens(layout, layoutVariant);
 
   // if (!id) return <></>;
   return (
@@ -303,15 +305,10 @@ function ExpenseItem(props): JSX.Element {
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
         <View
+          testID="expense-list-row-shell"
           style={[
             styles.expenseItem,
             {
-              minHeight: isTemplatePickerRow
-                ? constantScale(72, 0.5)
-                : constantScale(55, 0.5),
-              height: isTemplatePickerRow
-                ? undefined
-                : constantScale(55, 0.5),
               paddingLeft: dynamicScale(16),
               ...Platform.select({
                 ios: {
@@ -322,11 +319,8 @@ function ExpenseItem(props): JSX.Element {
                 },
               }),
             },
+            rowLayout.rowShell,
             isTemplatePickerRow && styles.expenseItemTemplatePicker,
-            isLandscape &&
-              !isTemplatePickerRow && {
-                height: dynamicScale(100, true),
-              },
           ]}
         >
           <View
@@ -416,6 +410,7 @@ function ExpenseItem(props): JSX.Element {
           <View
             style={[
               styles.amountContainer,
+              rowLayout.amountColumn,
               isTemplatePickerRow && styles.amountContainerTemplatePicker,
             ]}
           >
@@ -474,7 +469,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   expenseItemTemplatePicker: {
-    alignItems: "flex-start",
     paddingVertical: dynamicScale(10, true),
     width: "100%",
   },

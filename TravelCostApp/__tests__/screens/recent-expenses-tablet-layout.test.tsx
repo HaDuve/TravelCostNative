@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Dimensions, StyleSheet } from "react-native";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
@@ -72,8 +73,6 @@ jest.mock("../../util/refreshWithToast", () => ({
   refreshWithToast: jest.fn(async () => {}),
 }));
 
-import { Dimensions, StyleSheet } from "react-native";
-
 import RecentExpenses from "../../screens/RecentExpenses";
 import LayoutContextProvider from "../../store/layout-context";
 import OrientationContextProvider from "../../store/orientation-context";
@@ -83,12 +82,6 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 const monthExpenses = [
   makeExpense({ id: "e1", calcAmount: 75, amount: 75 }),
 ];
-
-function flattenScreenContainer(screen: { getByTestId: (id: string) => any }) {
-  return StyleSheet.flatten(
-    screen.getByTestId("recent-expenses-screen").props.style
-  ) as Record<string, unknown>;
-}
 
 function renderRecentExpensesWithLayout(width: number, height: number) {
   jest.spyOn(Dimensions, "get").mockReturnValue({
@@ -124,16 +117,34 @@ describe("RecentExpenses tablet layout adapter", () => {
 
   it("does not apply tablet padding on phone portrait widths", () => {
     const screen = renderRecentExpensesWithLayout(390, 844);
-    const container = flattenScreenContainer(screen);
+    const container = StyleSheet.flatten(
+      screen.getByTestId("recent-expenses-screen").props.style
+    ) as Record<string, unknown>;
 
     expect(container.paddingTop).toBeUndefined();
   });
 
   it("applies tablet padding when the layout profile is no longer narrow", () => {
-    const portrait = flattenScreenContainer(renderRecentExpensesWithLayout(390, 844));
-    const landscape = flattenScreenContainer(renderRecentExpensesWithLayout(844, 390));
+    const portrait = StyleSheet.flatten(
+      renderRecentExpensesWithLayout(390, 844).getByTestId("recent-expenses-screen")
+        .props.style
+    ) as Record<string, unknown>;
+    const landscape = StyleSheet.flatten(
+      renderRecentExpensesWithLayout(844, 390).getByTestId("recent-expenses-screen")
+        .props.style
+    ) as Record<string, unknown>;
 
     expect(portrait.paddingTop).toBeUndefined();
     expect(landscape.paddingTop).toBeGreaterThan(0);
+  });
+
+  it("wraps ledger content in an 800px ContentFrame on wide layouts", () => {
+    const screen = renderRecentExpensesWithLayout(1194, 834);
+    const frame = StyleSheet.flatten(
+      screen.getByTestId("recent-expenses-content-frame").props.style
+    ) as Record<string, unknown>;
+
+    expect(frame.maxWidth).toBe(800);
+    expect(frame.alignSelf).toBe("center");
   });
 });

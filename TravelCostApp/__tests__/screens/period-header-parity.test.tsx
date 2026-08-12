@@ -2,7 +2,11 @@ import * as React from "react";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
-  return { ...actual, useScrollToTop: jest.fn() };
+  return {
+    ...actual,
+    useScrollToTop: jest.fn(),
+    useFocusEffect: jest.fn(),
+  };
 });
 
 jest.mock("expo-haptics", () => ({
@@ -25,7 +29,6 @@ jest.mock("react-native-dropdown-picker", () => {
     );
   };
 });
-
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -73,11 +76,13 @@ jest.mock("../../util/refreshWithToast", () => ({
   refreshWithToast: jest.fn(async () => {}),
 }));
 
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 import OverviewScreen from "../../screens/OverviewScreen";
 import RecentExpenses from "../../screens/RecentExpenses";
-import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
+import TripPeriodChrome from "../../components/layout/TripPeriodChrome";
+import LayoutContextProvider from "../../store/layout-context";
+import OrientationContextProvider from "../../store/orientation-context";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 
@@ -97,89 +102,100 @@ function flattenDateHeaderStyle(screen: { getByTestId: (id: string) => any }) {
   ) as Record<string, unknown>;
 }
 
+function renderScreenWithLayout(
+  Screen: typeof OverviewScreen | typeof RecentExpenses,
+  width: number,
+  height: number
+) {
+  jest.spyOn(Dimensions, "get").mockReturnValue({
+    width,
+    height,
+    scale: 2,
+    fontScale: 1,
+  });
+
+  return renderWithAppProviders(
+    <LayoutContextProvider>
+      <OrientationContextProvider>
+        <Screen navigation={{ navigate: jest.fn() } as any} />
+      </OrientationContextProvider>
+    </LayoutContextProvider>,
+    {
+      wrapNavigation: false,
+      user: {
+        isShowingGraph: false,
+        setIsShowingGraph: jest.fn(),
+        periodName: "month",
+      },
+      expenses: {
+        expenses: monthExpenses,
+        getRecentExpenses: () => monthExpenses,
+      },
+    }
+  );
+}
+
 describe("period header parity", () => {
-  it("Overview and Recent Expenses share the same period header row layout", () => {
-    const navigation = { navigate: jest.fn() };
-    const sharedRow = StyleSheet.flatten(
-      shadowRegressionStyles.overviewPeriodHeaderRow
-    ) as Record<string, unknown>;
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    const overview = renderWithAppProviders(
-      <OverviewScreen navigation={navigation as any} />,
-      {
-        user: {
-          isShowingGraph: false,
-          setIsShowingGraph: jest.fn(),
-        },
-        expenses: {
-          expenses: monthExpenses,
-          getRecentExpenses: () => monthExpenses,
-        },
-      }
+  it("TripPeriodChrome keeps the same date header spacing with or without sync slot", () => {
+    const withSync = flattenDateHeaderStyle(
+      renderWithAppProviders(
+        <LayoutContextProvider>
+          <TripPeriodChrome
+            tripLabel="Japan 2026 - Aug 2026"
+            syncSlot={<></>}
+            periodValue="month"
+            periodItems={[{ label: "Month", value: "month" }]}
+            periodOpen={false}
+            onPeriodOpenChange={jest.fn()}
+            onPeriodValueChange={jest.fn()}
+            onPeriodItemsChange={jest.fn()}
+            expenses={monthExpenses}
+          />
+        </LayoutContextProvider>,
+        { wrapNavigation: false }
+      )
     );
 
-    const recent = renderWithAppProviders(
-      <RecentExpenses navigation={navigation as any} />,
-      {
-        expenses: {
-          expenses: monthExpenses,
-          getRecentExpenses: () => monthExpenses,
-        },
-        user: {
-          periodName: "month",
-        },
-      }
+    const withoutSync = flattenDateHeaderStyle(
+      renderWithAppProviders(
+        <LayoutContextProvider>
+          <TripPeriodChrome
+            tripLabel="Japan 2026 - Aug 2026"
+            periodValue="month"
+            periodItems={[{ label: "Month", value: "month" }]}
+            periodOpen={false}
+            onPeriodOpenChange={jest.fn()}
+            onPeriodValueChange={jest.fn()}
+            onPeriodItemsChange={jest.fn()}
+            expenses={monthExpenses}
+          />
+        </LayoutContextProvider>,
+        { wrapNavigation: false }
+      )
     );
+
+    expect(withSync.marginTop).toBe(withoutSync.marginTop);
+    expect(withSync.marginLeft).toBe(withoutSync.marginLeft);
+    expect(withSync.marginBottom).toBe(withoutSync.marginBottom);
+  });
+
+  it("Overview and Recent Expenses share TripPeriodChrome header layout on tablet landscape", () => {
+    const overview = renderScreenWithLayout(OverviewScreen, 1194, 834);
+    const recent = renderScreenWithLayout(RecentExpenses, 1194, 834);
 
     const overviewRow = flattenHeaderStyle(overview);
     const recentRow = flattenHeaderStyle(recent);
-
-    expect(overviewRow.gap).toBe(sharedRow.gap);
-    expect(recentRow.gap).toBe(sharedRow.gap);
-    expect(overviewRow.marginTop).toBe(recentRow.marginTop);
-    expect(overviewRow.paddingHorizontal).toBe(recentRow.paddingHorizontal);
-    expect(overviewRow.alignItems).toBe("stretch");
-  });
-
-  it("Overview and Recent Expenses share the same trip date header spacing", () => {
-    const navigation = { navigate: jest.fn() };
-    const sharedDateHeader = StyleSheet.flatten(
-      shadowRegressionStyles.overviewPeriodDateHeader
-    ) as Record<string, unknown>;
-
-    const overview = renderWithAppProviders(
-      <OverviewScreen navigation={navigation as any} />,
-      {
-        user: {
-          isShowingGraph: false,
-          setIsShowingGraph: jest.fn(),
-        },
-        expenses: {
-          expenses: monthExpenses,
-          getRecentExpenses: () => monthExpenses,
-        },
-      }
-    );
-
-    const recent = renderWithAppProviders(
-      <RecentExpenses navigation={navigation as any} />,
-      {
-        expenses: {
-          expenses: monthExpenses,
-          getRecentExpenses: () => monthExpenses,
-        },
-        user: {
-          periodName: "month",
-        },
-      }
-    );
-
     const overviewDate = flattenDateHeaderStyle(overview);
     const recentDate = flattenDateHeaderStyle(recent);
 
-    expect(overviewDate.marginTop).toBe(sharedDateHeader.marginTop);
-    expect(recentDate.marginTop).toBe(sharedDateHeader.marginTop);
-    expect(overviewDate.marginLeft).toBe(recentDate.marginLeft);
+    expect(overviewRow.gap).toBe(recentRow.gap);
+    expect(overviewRow.marginTop).toBe(recentRow.marginTop);
+    expect(overviewRow.paddingHorizontal).toBe(recentRow.paddingHorizontal);
     expect(overviewDate.marginBottom).toBe(recentDate.marginBottom);
+    expect(Number(overviewDate.marginBottom)).toBeGreaterThanOrEqual(0);
   });
 });

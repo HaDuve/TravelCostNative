@@ -9,6 +9,8 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { MemoizedExpensesOutput } from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";
+import TripPeriodChrome from "../components/layout/TripPeriodChrome";
+import ContentFrame from "../components/layout/ContentFrame";
 import { AuthContext } from "../store/auth-context";
 import {
   ExpenseContextType,
@@ -20,13 +22,8 @@ import { UserContext } from "../store/user-context";
 import { getOfflineQueue } from "../util/offline-queue";
 import { fetchTravelerIsTouched } from "../util/http";
 
-import { StyleSheet, Text, View, RefreshControl } from "react-native";
-import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
+import { StyleSheet, View, RefreshControl } from "react-native";
 import { GlobalStyles } from "../constants/styles";
-import {
-  periodHeaderLabelFontSize,
-  shadowRegressionStyles,
-} from "../styles/shadow-regression-styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import NamingBanner from "../components/UI/NamingBanner";
 import { DateTime } from "luxon";
@@ -51,6 +48,7 @@ import { memo } from "react";
 import { getMMKVObject, MMKV_KEYS } from "../store/mmkv";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import { useLayoutProfile } from "../store/layout-context";
 import { refreshWithToast } from "../util/refreshWithToast";
 import {
   dismissNamingBanner,
@@ -66,7 +64,8 @@ function RecentExpenses({ navigation }) {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
-  const { isPortrait, isTablet } = useContext(OrientationContext);
+  const { isTablet } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const { settings } = useContext(SettingsContext);
@@ -387,78 +386,46 @@ function RecentExpenses({ navigation }) {
       testID="recent-expenses-screen"
       style={[styles.container, isTablet && styles.tabletPaddingTop]}
     >
-      <View
-        testID="period-date-header"
-        style={[
-          styles.dateHeader,
-          !isPortrait && styles.landscapeDateHeader,
-          isTablet && styles.landscapeDateHeader,
-        ]}
+      <ContentFrame
+        layout={layout}
+        style={styles.contentFrame}
+        testID="recent-expenses-content-frame"
       >
-        <View style={styles.dateHeaderContent}>
-          <Text style={styles.dateString}>
-            {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
-            {offlineString}
-          </Text>
-          <MiniSyncIndicator
-            isVisible={expensesCtx.isSyncing}
-            size={dynamicScale(16, false, 0.5)}
-          />
-        </View>
-      </View>
-
-      <View
-        testID="period-header-row"
-        style={[styles.header, !isPortrait && styles.landscapeHeader]}
-      >
-        <DropDownPicker
-          open={open}
-          value={PeriodValue}
-          items={items}
-          showTickIcon={false}
-          setOpen={() => {
+        <TripPeriodChrome
+          tripLabel={`${truncateString(tripCtx.tripName, 23)} - ${dateTimeString}${offlineString}`}
+          syncSlot={
+            <MiniSyncIndicator
+              isVisible={expensesCtx.isSyncing}
+              size={dynamicScale(16, false, 0.5)}
+            />
+          }
+          periodValue={PeriodValue}
+          periodItems={items}
+          periodOpen={open}
+          onPeriodOpenChange={(nextOpen) => {
             requestAnimationFrame(() => {
-              setOpen(!open);
+              setOpen(nextOpen);
               Toast.hide();
             });
           }}
-          placeholder={""}
-          onOpen={() => {
+          onPeriodValueChange={userCtx.setPeriodString}
+          onPeriodItemsChange={setItems}
+          onPeriodOpen={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          onClose={() => {
+          onPeriodClose={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          onSelectItem={() => {
+          onPeriodSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={userCtx.setPeriodString}
-          setItems={setItems}
-          containerStyle={styles.dropdownContainer}
-          dropDownContainerStyle={styles.dropdownContainerDropdown}
-          itemProps={{
-            style: {
-              height: dynamicScale(50, false, 0.5),
-              padding: dynamicScale(4, false, 0.5),
-              marginLeft: dynamicScale(4),
-            },
-          }}
-          style={styles.dropdown}
-          textStyle={styles.dropdownTextStyle}
+          expenses={recentExpenses}
         />
-
-        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
-      </View>
-      <View
-        style={[
-          shadowRegressionStyles.overviewDividerBar,
-          !isPortrait && styles.landscapeBar,
-        ]}
-      ></View>
-      {showNamingBanner && (
-        <NamingBanner onNameIt={handleNameIt} onLater={handleNamingLater} />
-      )}
-      {ExpensesOutputJSX}
+        {showNamingBanner && (
+          <NamingBanner onNameIt={handleNameIt} onLater={handleNamingLater} />
+        )}
+        {ExpensesOutputJSX}
+      </ContentFrame>
 
       <AddExpenseButton navigation={navigation} />
     </View>
@@ -489,60 +456,7 @@ const styles = StyleSheet.create({
   tabletPaddingTop: {
     paddingTop: constantScale(16, 0.5),
   },
-  dateHeader: {
-    ...shadowRegressionStyles.overviewPeriodDateHeader,
-  },
-  dateHeaderContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  landscapeDateHeader: {
-    marginTop: dynamicScale(4, true),
-    marginBottom: dynamicScale(-24, true),
-    alignSelf: "center",
-  },
-  dateString: {
-    fontSize: dynamicScale(12, false, 0.5),
-    fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
-  },
-  header: {
-    ...shadowRegressionStyles.overviewPeriodHeaderRow,
-  },
-  landscapeHeader: {
-    marginTop: dynamicScale(4, true),
-    // marginBottom: dynamicScale(-12, true),
-    zIndex: 10,
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: dynamicScale(12),
-  },
-  dropdownContainer: {
-    ...shadowRegressionStyles.overviewDropdownContainer,
-  },
-  dropdownContainerDropdown: {
-    maxHeight: dynamicScale(600, true),
-    ...shadowRegressionStyles.dropdownListContainer,
-  },
-  dropdown: {
-    ...shadowRegressionStyles.overviewDropdownInner,
-  },
-  dropdownTextStyle: {
-    fontSize:
-      i18n.locale == "fr"
-        ? dynamicScale(20, false, 0.5)
-        : periodHeaderLabelFontSize,
-    fontWeight: "bold",
-  },
-  scaledUpTextStyle: {
-    fontSize: dynamicScale(24, false, 0.5),
-  },
-  zBehind: {
-    zIndex: 10,
-  },
-  landscapeBar: {
-    marginTop: dynamicScale(12, true),
-    marginBottom: dynamicScale(-12, true),
+  contentFrame: {
+    flex: 1,
   },
 });

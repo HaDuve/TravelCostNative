@@ -19,7 +19,6 @@ import uniqBy from "lodash.uniqby";
 import ProfileIdentity from "../components/ManageProfile/ProfileIdentity";
 import ProfileToolbar from "../components/ManageProfile/ProfileToolbar";
 import TripListRow from "../components/ProfileOutput/TripListRow";
-import MyBudgetsHubActions from "../components/ProfileOutput/MyBudgetsHubActions";
 import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
@@ -47,6 +46,7 @@ import { NetworkContext } from "../store/network-context";
 import { dynamicScale, constantScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import ActionRow from "../components/UI/ActionRow";
+import { ActionRowGrid } from "../components/UI/ActionRowStack";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import IconButton from "../components/UI/IconButton";
@@ -237,29 +237,66 @@ const ProfileScreen = ({ navigation }) => {
     () => (
       <View testID="profile-scroll-header">
         <ProfileIdentity navigation={navigation} />
-        <View style={styles.profileActions}>
-          <GetLocalPriceButton navigation={navigation} />
-          <ActionRow
-            testID="profile-feedback"
-            tier="secondary"
-            label={i18n.t("supportFeedbackLabel")}
-            hint={i18n.t("supportFeedbackHint")}
-            icon="chatbubble-ellipses-outline"
-            showChevron={false}
-            onPress={() => {
-              trackEvent(VexoEvents.FEEDBACK_BUTTON_PRESSED);
-              setIsFeedbackModalVisible(true);
-            }}
-          />
-        </View>
+        <ActionRowGrid
+          testID="profile-action-grid"
+          items={[
+            {
+              key: "local-price",
+              render: () => <GetLocalPriceButton navigation={navigation} />,
+            },
+            {
+              key: "feedback",
+              render: () => (
+                <ActionRow
+                  testID="profile-feedback"
+                  tier="secondary"
+                  label={i18n.t("supportFeedbackLabel")}
+                  hint={i18n.t("supportFeedbackHint")}
+                  icon="chatbubble-ellipses-outline"
+                  showChevron={false}
+                  onPress={() => {
+                    trackEvent(VexoEvents.FEEDBACK_BUTTON_PRESSED);
+                    setIsFeedbackModalVisible(true);
+                  }}
+                />
+              ),
+            },
+            {
+              key: "add-budget",
+              render: () => (
+                <ActionRow
+                  testID="my-budgets-add-another"
+                  tier="primary"
+                  label={i18n.t("addAnotherBudget")}
+                  hint={i18n.t("addAnotherBudgetHint")}
+                  icon="add-circle-outline"
+                  onPress={() => {
+                    trackEvent(VexoEvents.CREATE_TRIP_FROM_PROFILE_PRESSED);
+                    navigation.navigate("ManageTrip", { mode: "addAnother" });
+                  }}
+                />
+              ),
+            },
+            {
+              key: "join-budget",
+              render: () => (
+                <ActionRow
+                  testID="my-budgets-join"
+                  tier="secondary"
+                  label={i18n.t("joinBudget")}
+                  hint={i18n.t("joinBudgetHint")}
+                  icon="people-outline"
+                  onPress={() => {
+                    trackEvent(VexoEvents.TRIP_JOINED);
+                    navigation.navigate("Join");
+                  }}
+                />
+              ),
+            },
+          ]}
+        />
         <View style={styles.tripHubSection}>
           <Text style={styles.tripListTitle}>{i18n.t("myBudgets")}</Text>
-          <MyBudgetsHubActions
-            onJoin={() => navigation.navigate("Join")}
-            onAddAnother={() =>
-              navigation.navigate("ManageTrip", { mode: "addAnother" })
-            }
-          />
           <Text style={styles.listSectionLabel}>{i18n.t("yourBudgets")}</Text>
         </View>
       </View>
@@ -357,9 +394,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingBottom: dynamicScale(8, true),
-  },
-  profileActions: {
-    marginBottom: dynamicScale(8, true),
   },
   tripHubSection: {
     marginBottom: dynamicScale(8, true),

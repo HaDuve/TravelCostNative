@@ -9,10 +9,12 @@ import PropTypes from "prop-types";
 import BackButton from "../components/UI/BackButton";
 import BlurPremium from "../components/Premium/BlurPremium";
 import ActionRowStack from "../components/UI/ActionRowStack";
+import ModalFrame from "../components/layout/ModalFrame";
 import { buildAddExpenseHereAction } from "../components/UI/AddExpensesHereButton";
 import { useNavigation } from "@react-navigation/native";
 import { getEarliestDate } from "../util/date";
 import { ExpenseData } from "../util/expense";
+import { useLayoutProfile } from "../store/layout-context";
 import {
   expenseDateToIsoString,
   hydrateExpensesFromNavigationDtos,
@@ -32,6 +34,7 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
       };
   const withArgs = expensesAsArg ? true : false;
   const navigation = useNavigation();
+  const layout = useLayoutProfile();
   const earliestDate = getEarliestDate(
     expenses.map((exp: ExpenseData) => expenseDateToIsoString(exp.date))
   );
@@ -51,56 +54,62 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
   // }
   return (
     <View style={styles.container}>
-      {!withArgs && (
-        <>
-          <View style={styles.titleContainer}>
-            <BackButton
-              style={{ marginTop: -20, marginBottom: 0, padding: 4 }}
-            ></BackButton>
-            <Text style={styles.titleText}>{dayString}</Text>
-          </View>
+      <ModalFrame
+        layout={layout}
+        testID="filtered-expenses-modal-frame"
+        style={styles.modalFrame}
+      >
+        {!withArgs && (
+          <>
+            <View style={styles.titleContainer}>
+              <BackButton
+                style={{ marginTop: -20, marginBottom: 0, padding: 4 }}
+              ></BackButton>
+              <Text style={styles.titleText}>{dayString}</Text>
+            </View>
 
-          <View style={styles.shadow}></View>
-        </>
-      )}
-      <ExpensesOutput
-        expenses={expenses}
-        showSumForTravellerName={showSumForTravellerName}
-        isFiltered
-      />
-      {/* <BlurPremium canBack /> */}
-      {!withArgs && (
-        <View style={styles.footerActions}>
-          {addExpenseAction ? (
-            <ActionRowStack
-              showChevron={false}
-              actions={[
-                addExpenseAction,
-                {
-                  testID: "filtered-expenses-back",
-                  tier: "secondary",
-                  label: i18n.t("back"),
-                  icon: "arrow-back-outline",
-                  onPress: () => navigation.pop(),
-                },
-              ]}
-            />
-          ) : (
-            <ActionRowStack
-              showChevron={false}
-              actions={[
-                {
-                  testID: "filtered-expenses-back",
-                  tier: "secondary",
-                  label: i18n.t("back"),
-                  icon: "arrow-back-outline",
-                  onPress: () => navigation.pop(),
-                },
-              ]}
-            />
-          )}
-        </View>
-      )}
+            <View style={styles.shadow}></View>
+          </>
+        )}
+        <ExpensesOutput
+          expenses={expenses}
+          showSumForTravellerName={showSumForTravellerName}
+          isFiltered
+        />
+        {/* <BlurPremium canBack /> */}
+        {!withArgs && (
+          <View style={styles.footerActions}>
+            {addExpenseAction ? (
+              <ActionRowStack
+                showChevron={false}
+                actions={[
+                  addExpenseAction,
+                  {
+                    testID: "filtered-expenses-back",
+                    tier: "secondary",
+                    label: i18n.t("back"),
+                    icon: "arrow-back-outline",
+                    onPress: () => navigation.pop(),
+                  },
+                ]}
+              />
+            ) : (
+              <ActionRowStack
+                showChevron={false}
+                actions={[
+                  {
+                    testID: "filtered-expenses-back",
+                    tier: "secondary",
+                    label: i18n.t("back"),
+                    icon: "arrow-back-outline",
+                    onPress: () => navigation.pop(),
+                  },
+                ]}
+              />
+            )}
+          </View>
+        )}
+      </ModalFrame>
     </View>
   );
 };
@@ -119,8 +128,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: "1%",
-    // center the content
     justifyContent: "center",
+  },
+  modalFrame: {
+    flex: 1,
   },
   titleText: {
     fontSize: 20,

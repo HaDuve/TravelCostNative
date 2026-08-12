@@ -7,10 +7,15 @@ export type LayoutViewport = {
   height: number;
 };
 
+export const CONTROL_MAX_WIDTH = 480;
+
+export type ControlWidthMode = "fill" | "hug";
+
 export type LayoutProfile = {
   breakpoint: LayoutBreakpoint;
   orientation: LayoutOrientation;
   contentMaxWidth: number;
+  controlMaxWidth: number;
   space: (token: LayoutSpaceToken) => number;
   type: (size: number) => number;
 };
@@ -65,6 +70,35 @@ function typeForBreakpoint(breakpoint: LayoutBreakpoint, size: number) {
   return Math.round(size * TYPE_SCALE_BY_BREAKPOINT[breakpoint]);
 }
 
+export function controlWidthStyle(
+  layout: LayoutProfile,
+  mode: ControlWidthMode = "fill"
+) {
+  const touchTarget = { minHeight: 44, minWidth: 44 };
+
+  if (layout.breakpoint === "narrow") {
+    if (mode === "hug") {
+      return { alignSelf: "flex-start" as const, ...touchTarget };
+    }
+    return { alignSelf: "stretch" as const, width: "100%" as const, ...touchTarget };
+  }
+
+  if (mode === "hug") {
+    return {
+      alignSelf: "flex-start" as const,
+      maxWidth: layout.controlMaxWidth,
+      ...touchTarget,
+    };
+  }
+
+  return {
+    alignSelf: "center" as const,
+    width: "100%" as const,
+    maxWidth: layout.controlMaxWidth,
+    ...touchTarget,
+  };
+}
+
 export function layoutFor(viewport: LayoutViewport): LayoutProfile {
   const breakpoint = breakpointFor(viewport.width);
 
@@ -72,6 +106,7 @@ export function layoutFor(viewport: LayoutViewport): LayoutProfile {
     breakpoint,
     orientation: orientationFor(viewport),
     contentMaxWidth: 800,
+    controlMaxWidth: CONTROL_MAX_WIDTH,
     space: (token) => spaceForBreakpoint(breakpoint, token),
     type: (size) => typeForBreakpoint(breakpoint, size),
   };

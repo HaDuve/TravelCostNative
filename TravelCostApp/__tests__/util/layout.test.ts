@@ -1,4 +1,46 @@
-import { layoutFor } from "../../util/layout";
+import { controlWidthStyle, layoutFor } from "../../util/layout";
+
+describe("controlWidthStyle", () => {
+  it("stretches fill controls full width on narrow viewports", () => {
+    const layout = layoutFor({ width: 390, height: 844 });
+    expect(controlWidthStyle(layout, "fill")).toEqual({
+      alignSelf: "stretch",
+      width: "100%",
+      minHeight: 44,
+      minWidth: 44,
+    });
+  });
+
+  it("hugs back controls on narrow viewports without forcing full width", () => {
+    const layout = layoutFor({ width: 390, height: 844 });
+    expect(controlWidthStyle(layout, "hug")).toEqual({
+      alignSelf: "flex-start",
+      minHeight: 44,
+      minWidth: 44,
+    });
+  });
+
+  it("centers fill controls with a max width on wide viewports", () => {
+    const layout = layoutFor({ width: 1024, height: 768 });
+    expect(controlWidthStyle(layout, "fill")).toEqual({
+      alignSelf: "center",
+      width: "100%",
+      maxWidth: 480,
+      minHeight: 44,
+      minWidth: 44,
+    });
+  });
+
+  it("hugs back controls with a max width on wide viewports", () => {
+    const layout = layoutFor({ width: 1024, height: 768 });
+    expect(controlWidthStyle(layout, "hug")).toEqual({
+      alignSelf: "flex-start",
+      maxWidth: 480,
+      minHeight: 44,
+      minWidth: 44,
+    });
+  });
+});
 
 describe("layoutFor", () => {
   it("maps a phone viewport to a narrow profile with 800 content max width", () => {

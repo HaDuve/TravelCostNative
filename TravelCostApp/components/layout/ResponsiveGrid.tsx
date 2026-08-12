@@ -5,23 +5,28 @@ import type { LayoutProfile } from "../../util/layout";
 
 type ResponsiveGridItem = {
   key: string;
+  column?: "left" | "right";
   render: () => React.ReactNode;
 };
+
+type ResponsiveGridColumnMode = "breakpoint" | "landscape";
 
 type ResponsiveGridProps = {
   layout: LayoutProfile;
   items: ResponsiveGridItem[];
   columnWidths?: [number, number];
+  multiColumnWhen?: ResponsiveGridColumnMode;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
 
-function splitColumnFirst(items: ResponsiveGridItem[]) {
+function assignColumns(items: ResponsiveGridItem[]) {
   const left: ResponsiveGridItem[] = [];
   const right: ResponsiveGridItem[] = [];
 
   items.forEach((item, index) => {
-    if (index % 2 === 0) {
+    const side = item.column ?? (index % 2 === 0 ? "left" : "right");
+    if (side === "left") {
       left.push(item);
       return;
     }
@@ -35,11 +40,15 @@ export default function ResponsiveGrid({
   layout,
   items,
   columnWidths = [1, 1],
+  multiColumnWhen = "breakpoint",
   style,
   testID,
 }: ResponsiveGridProps) {
-  const isMultiColumn = layout.breakpoint !== "narrow";
-  const [leftColumn, rightColumn] = splitColumnFirst(items);
+  const isMultiColumn =
+    multiColumnWhen === "landscape"
+      ? layout.orientation === "landscape"
+      : layout.breakpoint !== "narrow";
+  const [leftColumn, rightColumn] = assignColumns(items);
   const totalWidth = columnWidths[0] + columnWidths[1];
 
   if (!isMultiColumn) {

@@ -1,7 +1,11 @@
 import * as React from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
 
-import type { LayoutProfile } from "../../util/layout";
+import {
+  controlWidthStyle,
+  type ControlWidthMode,
+  type LayoutProfile,
+} from "../../util/layout";
 
 type ContentFrameProps = {
   layout: LayoutProfile;
@@ -29,6 +33,28 @@ export default function ContentFrame({
         style,
       ]}
     >
+      {children}
+    </View>
+  );
+}
+
+type ControlFrameProps = {
+  layout: LayoutProfile;
+  children: React.ReactNode;
+  mode?: ControlWidthMode;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+};
+
+export function ControlFrame({
+  layout,
+  children,
+  mode = "fill",
+  style,
+  testID,
+}: ControlFrameProps) {
+  return (
+    <View testID={testID} style={[controlWidthStyle(layout, mode), style]}>
       {children}
     </View>
   );

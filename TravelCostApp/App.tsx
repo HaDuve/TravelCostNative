@@ -95,12 +95,14 @@ import TripSummaryScreen from "./screens/TripSummaryScreen";
 import { versionCheck } from "./util/version";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ChangelogScreen from "./screens/ChangelogScreen";
+import LayoutHarnessScreen from "./screens/LayoutHarnessScreen";
 import { Badge } from "react-native-paper";
 import { ExpenseData } from "./util/expense";
 
 import safeLogError from "./util/error";
 import { constantScale, dynamicScale } from "./util/scalingUtil";
 import OrientationContextProvider from "./store/orientation-context";
+import LayoutContextProvider from "./store/layout-context";
 import {
   initializeVexo,
   identifyUser,
@@ -322,6 +324,17 @@ function AuthenticatedStack() {
               presentation: "modal",
             }}
           />
+          {__DEV__ ? (
+            <Stack.Screen
+              name="LayoutHarness"
+              component={LayoutHarnessScreen}
+              options={{
+                headerShown: true,
+                title: "Layout harness",
+                presentation: "modal",
+              }}
+            />
+          ) : null}
 
           <Stack.Screen
             name="Changelog"
@@ -862,13 +875,15 @@ export default function App() {
                   <UserContextProvider>
                     <SettingsProvider>
                       <NetworkProvider>
-                        <OrientationContextProvider>
-                          <GestureHandlerRootView style={{ flex: 1 }}>
-                            <Root />
+                        <LayoutContextProvider>
+                          <OrientationContextProvider>
+                            <GestureHandlerRootView style={{ flex: 1 }}>
+                              <Root />
 
-                            <ToastComponent />
-                          </GestureHandlerRootView>
-                        </OrientationContextProvider>
+                              <ToastComponent />
+                            </GestureHandlerRootView>
+                          </OrientationContextProvider>
+                        </LayoutContextProvider>
                       </NetworkProvider>
                     </SettingsProvider>
                   </UserContextProvider>

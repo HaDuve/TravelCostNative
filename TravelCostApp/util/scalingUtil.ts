@@ -1,3 +1,7 @@
+/**
+ * Legacy screen scaling helpers. Layout spacing and breakpoints belong in `util/layout`.
+ * Do not use dynamicScale/constantScale for padding, gaps, or margins on new work (#387).
+ */
 import { Dimensions, PixelRatio } from "react-native";
 
 // this Dimensions.get will only be called once at the start of the app
@@ -7,6 +11,7 @@ const { width: Startup_Width, height: Startup_Height } =
 //Guideline sizes are based on standard ~5" screen mobile device
 const guidelineBaseWidth = 375;
 const guidelineBaseHeight = 667;
+// Isolated legacy multiplier — must not be used for layout spacing tokens.
 const tabletScaleMult = 1.2;
 const phoneScaleMult = 0.9;
 

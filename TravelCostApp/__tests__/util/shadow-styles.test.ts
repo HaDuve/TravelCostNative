@@ -2,13 +2,18 @@ import { StyleSheet } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
-import { dynamicScale } from "../../util/scalingUtil";
+import { tripPeriodLayoutTokens } from "../../styles/trip-period-layout-tokens";
+import { layoutFor } from "../../util/layout";
 import {
   assertSolidBackgroundForShadow,
   styleHasShadow,
 } from "../../util/shadow-styles";
 
 describe("shadow styles", () => {
+  const periodLayout = tripPeriodLayoutTokens(
+    layoutFor({ width: 390, height: 844 })
+  );
+
   it("detects shadow props on a style object", () => {
     expect(styleHasShadow({ shadowColor: "#000", shadowOpacity: 0.5 })).toBe(
       true
@@ -40,7 +45,7 @@ describe("shadow styles", () => {
       shadowRegressionStyles.expenseGraphCategoryCard
     ) as Record<string, unknown>;
 
-    expect(flat.height).toBe(dynamicScale(52, true));
+    expect(flat.height).toBe(periodLayout.headerCard.minHeight);
     expect(flat.justifyContent).toBe("center");
   });
 
@@ -99,8 +104,8 @@ describe("shadow styles", () => {
       shadowRegressionStyles.overviewDropdownContainer
     ) as Record<string, unknown>;
 
-    expect(dropdown.minHeight).toBe(dynamicScale(52, true));
-    expect(dropdown.paddingVertical).toBe(dynamicScale(4, true));
+    expect(dropdown.minHeight).toBe(periodLayout.headerCard.minHeight);
+    expect(dropdown.paddingVertical).toBe(periodLayout.headerCard.paddingVertical);
   });
 
   it("overview period header row separates cards with explicit gap", () => {

@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, type ScaledSize } from "react-native";
+
+function readWindowSize(): ScaledSize {
+  return Dimensions.get("window");
+}
 
 export function useWindowSize() {
-  const [windowSize, setWindowSize] = useState({
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  });
+  const [windowSize, setWindowSize] = useState(readWindowSize);
 
   useEffect(() => {
-    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
-      setWindowSize({ width, height });
+    const subscription = Dimensions.addEventListener("change", (event) => {
+      const next = event?.window;
+      if (
+        next &&
+        typeof next.width === "number" &&
+        typeof next.height === "number"
+      ) {
+        setWindowSize(next);
+      }
     });
+
+    return () => subscription.remove();
   }, []);
 
   return windowSize;

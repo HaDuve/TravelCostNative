@@ -11,6 +11,7 @@ __Newest Changes:
 - Fixed Overview day list layout on tablet and Mac inside the content frame
 - Improved expense forms and action buttons on larger screens
 - Improved Split Summary, Profile, and filtered lists on tablet and Mac
+- Fixed startup crash when screen size events are invalid during launch
 - Bugfixes and performance improvements
 
 __Other Changes:

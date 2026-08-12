@@ -98,21 +98,23 @@ From the result:
 | Newest block **published ≥ 24h ago** (or no reliable timestamp) | **Bump** via `version:bump:eas` — moves current block to `__Other Changes__` |
 | Store release (`version:bump`) | Script creates new patch version block (e.g. `1.3.006`) — 24h rule does not apply |
 
-**Consolidation (under 24h):** merge new user-visible changes from the diff into the existing `__Newest Changes__` bullets. Combine related features on one line; keep `Bugfixes and performance improvements` on its own line. Same OTA suffix stays live — users see one changelog entry, not a new letter every few hours.
+**Consolidation (under 24h):** add or edit short bullets in the existing `__Newest Changes__` block — one idea per `-` line; keep `Bugfixes and performance improvements` on its own line. Same OTA suffix stays live — users see one changelog entry, not a new letter every few hours.
 
 ### 2c — Write bullets from the diff
 
 Summarize **user-visible** changes only. Style rules: [changelog-style.md](changelog-style.md).
 
 Quick rules:
-- **OTA patch:** 1 feature bullet + `Bugfixes and performance improvements` on its **own line** (2 bullets total). Pure internal fixes → bugfixes line only.
-- **Consolidation (under 24h):** edit existing bullets manually — do not use `version:bump:eas --notes`; merge new work into the current feature line(s).
+- **Short bullets:** one scannable idea per `-` line; split related work into several bullets instead of one long line. See [changelog-style.md](changelog-style.md#short-bullets-required-rule).
+- **Headline first:** the first `-` bullet becomes the EAS update message title.
+- **OTA patch:** typically **2–4 short feature bullets** + `Bugfixes and performance improvements` on its **own line**. Pure internal fixes → bugfixes line only.
+- **Consolidation (under 24h):** add or edit bullets in place — do not use `version:bump:eas --notes`.
 - **Store release:** up to 2–3 feature bullets, then `Bugfixes and performance improvements` on its **own line**.
 - **Never** combine bugfixes with a feature on one line (see [changelog-style.md](changelog-style.md)).
 - Mirror recent tone: `Added …`, `Improved …`, `Fixed …`, `New …`; screen names as in the app.
-- Pass multiple `--notes` to bump scripts — one per bullet:
+- Pass one `--notes` per bullet to bump scripts:
   ```bash
-  pnpm run version:bump:eas -- --notes "Improved offline ranged expenses" "Bugfixes and performance improvements"
+  pnpm run version:bump:eas -- --notes "Improved Ask AI local price on Profile" "Added Settings info buttons" "Bugfixes and performance improvements"
   ```
 
 Scan changed files for user-facing hints — e.g. `screens/`, `components/`, `i18n/` keys — not commit messages alone.

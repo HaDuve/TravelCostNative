@@ -3,7 +3,9 @@ Changelog Travel Expense App
 __Newest Changes:
 
 1.3.005l
-- Improved Ask AI local price on Profile with optional country, currency, and date range; added Settings info buttons and Ask AI toggle; improved ranged local-price deal prompts
+- Improved Ask AI local price on Profile with optional country, currency, and date range
+- Added Settings info buttons and Ask AI toggle
+- Improved ranged local-price deal prompts
 - Bugfixes and performance improvements
 
 __Other Changes:

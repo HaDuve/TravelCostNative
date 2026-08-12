@@ -1,4 +1,33 @@
 import { ChartData, ChartOptions } from "./chartHelpers";
+import {
+  layoutFor,
+  type LayoutBreakpoint,
+  type LayoutOrientation,
+} from "../../util/layout";
+
+export type ChartKind = "bar" | "pie";
+
+export type ChartDimensionsInput = {
+  kind: ChartKind;
+  containerWidth: number;
+  breakpoint: LayoutBreakpoint;
+  orientation?: LayoutOrientation;
+};
+
+export type ChartDimensions = {
+  width: number;
+  height: number;
+  paddingHorizontal: number;
+};
+
+const CHART_MAX_WIDTH = {
+  bar: 600,
+  pie: 400,
+} as const;
+
+const CHART_MAX_HEIGHT = {
+  pie: 400,
+} as const;
 
 export interface ExpenseData {
   day?: string;
@@ -171,16 +200,44 @@ export class ChartController {
     );
   }
 
-  static getChartDimensions(isLandscape: boolean): {
-    width: number;
-    height: number;
-  } {
-    const height = isLandscape ? 280 : 320;
+  static getChartDimensions({
+    kind,
+    containerWidth,
+    breakpoint,
+    orientation = "portrait",
+  }: ChartDimensionsInput): ChartDimensions {
+    const layout = layoutFor({
+      width:
+        breakpoint === "wide" ? 1024 : breakpoint === "medium" ? 700 : 390,
+      height: orientation === "landscape" ? 768 : 844,
+    });
+    const paddingHorizontal = layout.space(2);
+    const availableWidth = Math.max(
+      0,
+      containerWidth - paddingHorizontal * 2
+    );
 
-    // Use most of available width with padding
+    if (kind === "pie") {
+      const size = Math.min(
+        availableWidth,
+        CHART_MAX_WIDTH.pie,
+        CHART_MAX_HEIGHT.pie
+      );
+
+      return {
+        width: size,
+        height: size,
+        paddingHorizontal,
+      };
+    }
+
+    const width = Math.min(availableWidth, CHART_MAX_WIDTH.bar);
+    const height = orientation === "landscape" ? 280 : 320;
+
     return {
-      width: undefined, // Let container handle width
+      width,
       height,
+      paddingHorizontal,
     };
   }
 }

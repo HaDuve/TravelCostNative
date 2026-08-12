@@ -1,11 +1,10 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { useContext } from "react";
-import { dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
 import { GlobalStyles } from "../../constants/styles";
 import { getCatLocalized } from "../../util/category";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { useLayoutProfile } from "../../store/layout-context";
+import { useWindowSize } from "../Hooks/useWindowSize";
 
 import WebViewChart from "../charts/WebViewChart";
 import { ChartController, CategoryData } from "../charts/controller";
@@ -19,9 +18,16 @@ const CategoryChart = React.memo(
     inputData: CategoryData[];
     tripCurrency: string;
   }) => {
-    const { isPortrait } = useContext(OrientationContext);
-
-    const { width, height } = ChartController.getChartDimensions(isPortrait);
+    const layout = useLayoutProfile();
+    const { width: windowWidth } = useWindowSize();
+    const containerWidth = Math.min(windowWidth, layout.contentMaxWidth);
+    const { width, height, paddingHorizontal } =
+      ChartController.getChartDimensions({
+        kind: "pie",
+        containerWidth,
+        breakpoint: layout.breakpoint,
+        orientation: layout.orientation,
+      });
 
     const chartData = useMemo(() => {
       if (!inputData || inputData.length === 0) {
@@ -52,7 +58,7 @@ const CategoryChart = React.memo(
     };
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingHorizontal, height }]}>
         <WebViewChart
           data={highchartsData}
           options={chartOptions}
@@ -73,11 +79,8 @@ export default CategoryChart;
 
 const styles = StyleSheet.create({
   container: {
-    padding: dynamicScale(8),
-    paddingTop: dynamicScale(40, true),
     justifyContent: "center",
     alignItems: "center",
-    height: dynamicScale(320, true),
   },
   chart: {
     backgroundColor: "transparent",

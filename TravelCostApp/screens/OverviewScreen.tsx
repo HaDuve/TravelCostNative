@@ -17,6 +17,8 @@ import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import TripPeriodChrome from "../components/layout/TripPeriodChrome";
 import ContentFrame from "../components/layout/ContentFrame";
+import OverviewBody from "../components/layout/OverviewBody";
+import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 
@@ -165,6 +167,26 @@ const OverviewScreen = ({ navigation }) => {
   // );
   const { isTablet } = useContext(OrientationContext);
   const layout = useLayoutProfile();
+  const isWideLayout = layout.breakpoint !== "narrow";
+  const chartSection = (
+    <MemoizedExpensesOverview
+      navigation={navigation}
+      expenses={recentExpenses}
+      periodName={PeriodValue}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing || isFetching}
+          onRefresh={onRefresh}
+          tintColor={GlobalStyles.colors.textColor}
+          colors={[GlobalStyles.colors.textColor]}
+          style={{
+            backgroundColor: "transparent",
+          }}
+        />
+      }
+    />
+  );
+
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <ContentFrame
@@ -203,25 +225,21 @@ const OverviewScreen = ({ navigation }) => {
             });
           }}
           expenses={recentExpenses}
+          showSummary={!isWideLayout}
           summaryStyle={styles.customSummaryStyle}
         />
 
         <View style={{ flex: 1 }}>
-          <MemoizedExpensesOverview
-            navigation={navigation}
-            expenses={recentExpenses}
-            periodName={PeriodValue}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing || isFetching}
-                onRefresh={onRefresh}
-                tintColor={GlobalStyles.colors.textColor}
-                colors={[GlobalStyles.colors.textColor]}
-                style={{
-                  backgroundColor: "transparent",
-                }}
+          <OverviewBody
+            layout={layout}
+            summary={
+              <ExpensesSummary
+                expenses={recentExpenses}
+                periodName={PeriodValue}
+                style={styles.customSummaryStyle}
               />
             }
+            chart={chartSection}
           />
         </View>
       </ContentFrame>

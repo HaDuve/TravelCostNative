@@ -4,11 +4,11 @@ import { StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
-import { dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import { SettingsContext } from "../../store/settings-context";
+import { useLayoutProfile } from "../../store/layout-context";
+import { useWindowSize } from "../Hooks/useWindowSize";
 
 import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
@@ -35,7 +35,8 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   periodType,
   onWebViewRef,
 }) => {
-  const { isLandscape } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
+  const { width: windowWidth } = useWindowSize();
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
@@ -76,7 +77,14 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     tripCtx,
   ]);
 
-  const { width, height } = ChartController.getChartDimensions(isLandscape);
+  const containerWidth = Math.min(windowWidth, layout.contentMaxWidth);
+  const { width, height, paddingHorizontal } =
+    ChartController.getChartDimensions({
+      kind: "bar",
+      containerWidth,
+      breakpoint: layout.breakpoint,
+      orientation: layout.orientation,
+    });
 
   const chartData = useMemo(() => {
     if (!inputData || inputData.length === 0) {
@@ -105,7 +113,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   }, [budget, colors, currency]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingHorizontal }]}>
       <WebViewChart
         data={highchartsData}
         options={chartOptions}
@@ -135,7 +143,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: dynamicScale(8),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

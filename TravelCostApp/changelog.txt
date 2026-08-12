@@ -6,6 +6,8 @@ __Newest Changes:
 - Improved Ask AI local price on Profile with optional country, currency, and date range
 - Added Settings info buttons and Ask AI toggle
 - Improved ranged local-price deal prompts
+- Improved Overview and Recent Expenses on tablet and Mac
+- Improved expense forms and action buttons on larger screens
 - Bugfixes and performance improvements
 
 __Other Changes:

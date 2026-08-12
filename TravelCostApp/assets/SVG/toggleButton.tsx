@@ -4,10 +4,10 @@ import { constantScale } from "../../util/scalingUtil";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
-const Width = constantScale(98, 0.08);
-const Height = constantScale(80, 0.08);
-
-function ToggleButton({ toggled = false }) {
+function ToggleButton({ toggled = false, compact = false }) {
+  const scale = compact ? 0.06 : 0.08;
+  const width = constantScale(98, scale);
+  const height = constantScale(50, scale);
   const borderColor = GlobalStyles.colors.primary400;
   const color1toggle = toggled
     ? GlobalStyles.colors.primary400
@@ -18,8 +18,8 @@ function ToggleButton({ toggled = false }) {
   return (
     <Svg
       xmlns="http://www.w3.org/2000/svg"
-      width={Width}
-      height={Height}
+      width={width}
+      height={height}
       fill="none"
       viewBox="0 0 98 50"
     >
@@ -58,4 +58,5 @@ export default ToggleButton;
 
 ToggleButton.propTypes = {
   toggled: PropTypes.bool,
+  compact: PropTypes.bool,
 };

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Dimensions, StyleSheet } from "react-native";
-import { fireEvent, within } from "@testing-library/react-native";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
@@ -115,41 +114,15 @@ describe("Overview tablet layout", () => {
     expect(screen.queryByTestId("overview-body-grid")).toBeNull();
   });
 
-  it("keeps summary in the period chrome on medium widths", () => {
-    const screen = renderOverviewWithLayout(700, 900);
+  it("keeps summary in the period chrome on wide layouts", () => {
+    const screen = renderOverviewWithLayout(1194, 834);
 
     expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
     expect(screen.queryByTestId("overview-body-grid")).toBeNull();
   });
 
-  it("uses a 30/70 summary and chart grid on wide layouts", () => {
-    const screen = renderOverviewWithLayout(1194, 834);
-    const grid = screen.getByTestId("overview-body-grid");
-    const [leftColumn, rightColumn] = screen.getAllByTestId(
-      "responsive-grid-column"
-    );
-
-    const leftStyle = StyleSheet.flatten(leftColumn.props.style) as Record<
-      string,
-      unknown
-    >;
-    const rightStyle = StyleSheet.flatten(rightColumn.props.style) as Record<
-      string,
-      unknown
-    >;
-
-    expect(leftStyle.flexGrow).toBe(3);
-    expect(rightStyle.flexGrow).toBe(7);
-    expect(within(leftColumn).getByTestId("expenses-summary-pressable")).toBeTruthy();
-    expect(within(rightColumn).getByTestId("mock-webview-chart")).toBeTruthy();
-    expect(within(grid).getByTestId("expenses-summary-pressable")).toBeTruthy();
-  });
-
   it("caps pie charts through ChartController on wide layouts", () => {
     const screen = renderOverviewWithLayout(1194, 834);
-    fireEvent(screen.getByTestId("overview-chart-column"), "layout", {
-      nativeEvent: { layout: { width: 520, height: 400, x: 0, y: 0 } },
-    });
     const chart = screen.getByTestId("mock-webview-chart");
     const chartStyle = StyleSheet.flatten(chart.props.style) as Record<
       string,
@@ -158,17 +131,12 @@ describe("Overview tablet layout", () => {
 
     expect(chartStyle.width).toBeLessThanOrEqual(400);
     expect(chartStyle.height).toBeLessThanOrEqual(400);
-    expect(chartStyle.width).toBeLessThanOrEqual(520);
   });
 
-  it("sizes bar charts to the measured chart column width on wide layouts", () => {
+  it("caps bar charts at 600px on wide layouts", () => {
     const screen = renderOverviewWithLayout(1194, 834, {
       isShowingGraph: true,
       expenses: graphExpensesContext,
-    });
-
-    fireEvent(screen.getByTestId("overview-chart-column"), "layout", {
-      nativeEvent: { layout: { width: 520, height: 400, x: 0, y: 0 } },
     });
 
     const chart = screen.getByTestId("mock-webview-chart");
@@ -177,7 +145,15 @@ describe("Overview tablet layout", () => {
       unknown
     >;
 
-    expect(chartStyle.width).toBeLessThanOrEqual(520);
     expect(chartStyle.width).toBeLessThanOrEqual(600);
+  });
+
+  it("uses a smaller graph toggle on wide layouts", () => {
+    const screen = renderOverviewWithLayout(1194, 834);
+    const fabStyle = StyleSheet.flatten(
+      screen.getByTestId("overview-graph-toggle").props.style
+    ) as Record<string, unknown>;
+
+    expect(fabStyle.marginLeft).toBeDefined();
   });
 });

@@ -17,8 +17,6 @@ import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import TripPeriodChrome from "../components/layout/TripPeriodChrome";
 import ContentFrame from "../components/layout/ContentFrame";
-import OverviewBody from "../components/layout/OverviewBody";
-import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 
@@ -41,7 +39,6 @@ import { showBanner } from "../components/UI/ToastComponent";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import { useLayoutProfile } from "../store/layout-context";
-import { isOverviewWideLayout } from "../styles/overview-layout-tokens";
 import { OnboardingFlags } from "../types/onboarding";
 import { refreshWithToast } from "../util/refreshWithToast";
 import { getOfflineQueue } from "../util/offline-queue";
@@ -168,25 +165,7 @@ const OverviewScreen = ({ navigation }) => {
   // );
   const { isTablet } = useContext(OrientationContext);
   const layout = useLayoutProfile();
-  const isWideLayout = isOverviewWideLayout(layout);
-  const chartSection = (
-    <MemoizedExpensesOverview
-      navigation={navigation}
-      expenses={recentExpenses}
-      periodName={PeriodValue}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing || isFetching}
-          onRefresh={onRefresh}
-          tintColor={GlobalStyles.colors.textColor}
-          colors={[GlobalStyles.colors.textColor]}
-          style={{
-            backgroundColor: "transparent",
-          }}
-        />
-      }
-    />
-  );
+  const compactFab = layout.breakpoint === "wide";
 
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
@@ -226,34 +205,40 @@ const OverviewScreen = ({ navigation }) => {
             });
           }}
           expenses={recentExpenses}
-          showSummary={!isWideLayout}
           summaryStyle={styles.customSummaryStyle}
         />
 
         <View style={{ flex: 1 }}>
-          <OverviewBody
-            layout={layout}
-            summary={
-              <ExpensesSummary
-                expenses={recentExpenses}
-                periodName={PeriodValue}
-                style={styles.customSummaryStyle}
+          <MemoizedExpensesOverview
+            navigation={navigation}
+            expenses={recentExpenses}
+            periodName={PeriodValue}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing || isFetching}
+                onRefresh={onRefresh}
+                tintColor={GlobalStyles.colors.textColor}
+                colors={[GlobalStyles.colors.textColor]}
+                style={{
+                  backgroundColor: "transparent",
+                }}
               />
             }
-            chart={chartSection}
           />
         </View>
       </ContentFrame>
 
       {/* FAB Toggle Button */}
       <Pressable
+        testID="overview-graph-toggle"
         onPress={toggleContent}
         style={({ pressed }) => [
           styles.fabToggleButton,
+          compactFab && styles.fabToggleButtonCompact,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <ToggleButton toggled={userCtx.isShowingGraph} />
+        <ToggleButton toggled={userCtx.isShowingGraph} compact={compactFab} />
       </Pressable>
     </View>
   );
@@ -281,6 +266,10 @@ const styles = StyleSheet.create({
   },
   fabToggleButton: {
     ...shadowRegressionStyles.overviewFabToggleButton,
+  },
+  fabToggleButtonCompact: {
+    marginLeft: constantScale(-39, 0.06),
+    bottom: constantScale(16, 0.5),
   },
 });
 

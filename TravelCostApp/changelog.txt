@@ -7,7 +7,8 @@ __Newest Changes:
 - Added Settings info buttons and Ask AI toggle
 - Improved ranged local-price deal prompts
 - Improved Overview and Recent Expenses on tablet and Mac
-- Improved Overview chart sizing and summary layout on tablet and Mac
+- Improved Overview chart sizing on tablet and Mac
+- Smaller graph toggle on tablet and Mac
 - Improved expense forms and action buttons on larger screens
 - Bugfixes and performance improvements
 

@@ -72,4 +72,13 @@ describe("TripPeriodChrome", () => {
     expect(wide.marginTop).toBe(wideLayout.space(4));
     expect(wide.paddingHorizontal).toBe(wideLayout.space(3));
   });
+
+  it("keeps trip date header spacing non-overlapping on medium tablet landscape", () => {
+    const layout = layoutFor({ width: 736, height: 414 });
+    const screen = renderTripPeriodChrome(736, 414);
+    const dateHeader = flattenStyle(screen, "period-date-header");
+
+    expect(dateHeader.marginBottom).toBe(layout.space(1));
+    expect(Number(dateHeader.marginBottom)).toBeGreaterThanOrEqual(0);
+  });
 });

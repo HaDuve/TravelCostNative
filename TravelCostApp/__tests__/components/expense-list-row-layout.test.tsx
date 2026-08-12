@@ -99,4 +99,13 @@ describe("ExpenseListRow layout", () => {
     expect(ledger.height).toBeUndefined();
     expect(templatePicker.height).toBeUndefined();
   });
+
+  it("groups medium tablet landscape ledger rows without the height hack", () => {
+    const screen = renderExpenseListRow("ledger", 736, 414);
+    const row = flattenRow(screen);
+
+    expect(row.height).toBeUndefined();
+    expect(row.justifyContent).toBe("flex-start");
+    expect(row.minHeight).not.toBe(dynamicScale(100, true));
+  });
 });

@@ -29,7 +29,10 @@ import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { useLayoutProfile } from "../../store/layout-context";
-import { expenseListRowLayoutTokens } from "../../styles/expense-list-row-layout-tokens";
+import {
+  expenseListRowLayoutTokens,
+  type ExpenseListRowLayoutTokens,
+} from "../../styles/expense-list-row-layout-tokens";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -42,6 +45,7 @@ function ExpenseItem(props): JSX.Element {
     onPressOverride,
     disableLongPressSelection,
     layoutVariant = "ledger",
+    rowLayout: rowLayoutProp,
   } = props;
   const isTemplatePickerRow = layoutVariant === "templatePicker";
   const { setSelectable, selectItem } = props;
@@ -288,7 +292,8 @@ function ExpenseItem(props): JSX.Element {
   configureDateString();
 
   const layout = useLayoutProfile();
-  const rowLayout = expenseListRowLayoutTokens(layout, layoutVariant);
+  const rowLayout: ExpenseListRowLayoutTokens =
+    rowLayoutProp ?? expenseListRowLayoutTokens(layout, layoutVariant);
 
   // if (!id) return <></>;
   return (
@@ -454,6 +459,7 @@ ExpenseItem.propTypes = {
   onPressOverride: PropTypes.func,
   disableLongPressSelection: PropTypes.bool,
   layoutVariant: PropTypes.oneOf(["ledger", "templatePicker"]),
+  rowLayout: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

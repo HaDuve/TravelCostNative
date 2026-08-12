@@ -59,32 +59,14 @@ function TripPeriodChrome({
 
   return (
     <>
-      <View
-        testID="period-date-header"
-        style={[
-          styles.dateHeader,
-          tokens.periodDateHeader,
-          layout.breakpoint !== "wide" &&
-            layout.orientation === "landscape" &&
-            styles.landscapeDateHeader,
-        ]}
-      >
+      <View testID="period-date-header" style={tokens.periodDateHeader}>
         <View style={styles.dateHeaderContent}>
           <Text style={styles.dateString}>{tripLabel}</Text>
           {syncSlot}
         </View>
       </View>
 
-      <View
-        testID="period-header-row"
-        style={[
-          styles.header,
-          tokens.periodHeaderRow,
-          layout.breakpoint !== "wide" &&
-            layout.orientation === "landscape" &&
-            styles.landscapeHeader,
-        ]}
-      >
+      <View testID="period-header-row" style={tokens.periodHeaderRow}>
         <DropDownPicker
           open={periodOpen}
           value={periodValue}
@@ -126,41 +108,24 @@ function TripPeriodChrome({
         />
       </View>
 
-      <View style={[shadowRegressionStyles.overviewDividerBar, styles.dividerBar]} />
+      <View
+        style={[shadowRegressionStyles.overviewDividerBar, tokens.dividerBar]}
+      />
     </>
   );
 }
 
 function createStyles(periodHeaderLabelFontSize: number) {
   return StyleSheet.create({
-    dateHeader: {
-      ...shadowRegressionStyles.overviewPeriodDateHeader,
-    },
     dateHeaderContent: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
     },
-    landscapeDateHeader: {
-      marginTop: dynamicScale(4, true),
-      marginBottom: dynamicScale(-8, true),
-      alignSelf: "center",
-    },
     dateString: {
       fontSize: dynamicScale(12, false, 0.5),
       fontStyle: "italic",
       color: GlobalStyles.colors.gray700,
-    },
-    header: {
-      ...shadowRegressionStyles.overviewPeriodHeaderRow,
-    },
-    landscapeHeader: {
-      marginTop: dynamicScale(12, true),
-      marginBottom: dynamicScale(-12, true),
-      zIndex: 10,
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginHorizontal: dynamicScale(12),
     },
     dropdownContainer: {
       ...shadowRegressionStyles.overviewDropdownContainer,
@@ -178,10 +143,6 @@ function createStyles(periodHeaderLabelFontSize: number) {
           ? dynamicScale(20, false, 0.5)
           : periodHeaderLabelFontSize,
       fontWeight: "bold",
-    },
-    dividerBar: {
-      marginTop: dynamicScale(12, true),
-      marginBottom: dynamicScale(-12, true),
     },
   });
 }

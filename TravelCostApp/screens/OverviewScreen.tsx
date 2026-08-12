@@ -167,7 +167,11 @@ const OverviewScreen = ({ navigation }) => {
   const layout = useLayoutProfile();
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
-      <ContentFrame layout={layout} style={styles.contentFrame}>
+      <ContentFrame
+        layout={layout}
+        style={styles.contentFrame}
+        testID="overview-content-frame"
+      >
         <TripPeriodChrome
           tripLabel={`${truncateString(tripCtx.tripName, dynamicScale(23, false, 0.5))} - ${dateTimeString}${offlineString}`}
           periodValue={PeriodValue}

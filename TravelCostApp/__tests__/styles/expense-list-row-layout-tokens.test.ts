@@ -38,4 +38,22 @@ describe("expense-list-row-layout-tokens", () => {
     expect(tokens.rowShell.minHeight).toBe(constantScale(72, 0.5));
     expect(dynamicScale(100, true)).not.toBe(tokens.rowShell.minHeight);
   });
+
+  it("groups medium tablet landscape ledger rows with layout spacing", () => {
+    const layout = layoutFor({ width: 736, height: 414 });
+    const tokens = expenseListRowLayoutTokens(layout, "ledger");
+
+    expect(tokens.rowShell.height).toBeUndefined();
+    expect(tokens.rowShell.justifyContent).toBe("flex-start");
+    expect(tokens.rowShell.minHeight).toBe(layout.space(6));
+    expect(tokens.rowShell.gap).toBe(layout.space(2));
+    expect(tokens.amountColumn.marginLeft).toBe("auto");
+  });
+
+  it("uses layout spacing for template picker padding on medium breakpoints", () => {
+    const layout = layoutFor({ width: 736, height: 414 });
+    const tokens = expenseListRowLayoutTokens(layout, "templatePicker");
+
+    expect(tokens.rowShell.paddingVertical).toBe(layout.space(2));
+  });
 });

@@ -5,7 +5,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import DropDownPicker from "react-native-dropdown-picker";
 import { MemoizedExpensesOutput } from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";

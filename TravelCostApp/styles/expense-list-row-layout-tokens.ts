@@ -6,7 +6,10 @@ export type ExpenseListRowLayoutVariant = "ledger" | "templatePicker";
 function templatePickerRowShell(layout: LayoutProfile) {
   return {
     alignItems: "flex-start" as const,
-    paddingVertical: dynamicScale(10, true),
+    paddingVertical:
+      layout.breakpoint === "narrow"
+        ? dynamicScale(10, true)
+        : layout.space(2),
     width: "100%" as const,
     minHeight: constantScale(72, 0.5),
     height: undefined as number | undefined,
@@ -14,7 +17,7 @@ function templatePickerRowShell(layout: LayoutProfile) {
   };
 }
 
-function wideLedgerRowShell(layout: LayoutProfile) {
+function groupedLedgerRowShell(layout: LayoutProfile) {
   return {
     justifyContent: "flex-start" as const,
     alignItems: "center" as const,
@@ -30,6 +33,26 @@ function narrowLedgerRowShell() {
     justifyContent: "space-between" as const,
     minHeight: constantScale(55, 0.5),
     height: constantScale(55, 0.5),
+  };
+}
+
+function groupedAmountColumn() {
+  return {
+    flexShrink: 0,
+    width: constantScale(150, 0.5),
+    minHeight: constantScale(40, 0.5),
+    height: constantScale(40, 0.5),
+    marginLeft: "auto" as const,
+  };
+}
+
+function narrowAmountColumn() {
+  return {
+    flexShrink: 0,
+    width: constantScale(150, 0.5),
+    minHeight: constantScale(40, 0.5),
+    height: constantScale(40, 0.5),
+    marginLeft: undefined as "auto" | undefined,
   };
 }
 
@@ -50,28 +73,16 @@ export function expenseListRowLayoutTokens(
     };
   }
 
-  if (layout.breakpoint === "wide") {
+  if (layout.breakpoint !== "narrow") {
     return {
-      rowShell: wideLedgerRowShell(layout),
-      amountColumn: {
-        flexShrink: 0,
-        width: constantScale(150, 0.5),
-        minHeight: constantScale(40, 0.5),
-        height: constantScale(40, 0.5),
-        marginLeft: "auto" as const,
-      },
+      rowShell: groupedLedgerRowShell(layout),
+      amountColumn: groupedAmountColumn(),
     };
   }
 
   return {
     rowShell: narrowLedgerRowShell(),
-    amountColumn: {
-      flexShrink: 0,
-      width: constantScale(150, 0.5),
-      minHeight: constantScale(40, 0.5),
-      height: constantScale(40, 0.5),
-      marginLeft: undefined as "auto" | undefined,
-    },
+    amountColumn: narrowAmountColumn(),
   };
 }
 

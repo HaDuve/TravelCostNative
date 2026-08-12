@@ -2011,6 +2011,15 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     },
   ];
 
+  const expenseFormGrid = (
+    <ResponsiveGrid
+      testID="expense-form-grid"
+      layout={layout}
+      multiColumnWhen="landscape"
+      items={expenseFormGridItems}
+    />
+  );
+
   return (
     <>
       {datepickerJSX}
@@ -2045,20 +2054,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                   .delay(100)}
                 exiting={FadeOutUp.duration(50)}
               >
-                <ResponsiveGrid
-                  testID="expense-form-grid"
-                  layout={layout}
-                  multiColumnWhen="landscape"
-                  items={expenseFormGridItems}
-                />
+                {expenseFormGrid}
               </Animated.View>
             ) : (
-              <ResponsiveGrid
-                testID="expense-form-grid"
-                layout={layout}
-                multiColumnWhen="landscape"
-                items={expenseFormGridItems}
-              />
+              expenseFormGrid
             )}
             {formIsInvalid && !hideAdvanced && (
               <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
@@ -2071,16 +2070,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
             inputs.currency.value &&
             inputs.country.value && (
               <View style={styles.getLocalPriceContainer}>
-                <ActionRow
-                  testID="expense-form-get-local-price"
-                  tier="gradient"
-                  label={i18n.t("getLocalPriceTitle")}
-                  hint={getLocalPriceRowHint}
-                  imageIconSource={require("../../assets/chatgpt-logo.jpeg")}
-                  onPress={askChatGPTHandler}
-                  showChevron={false}
-                  style={styles.getLocalPriceButton}
-                />
+                <ControlFrame
+                  layout={layout}
+                  testID="expense-form-get-local-price-frame"
+                >
+                  <ActionRow
+                    testID="expense-form-get-local-price"
+                    tier="gradient"
+                    label={i18n.t("getLocalPriceTitle")}
+                    hint={getLocalPriceRowHint}
+                    imageIconSource={require("../../assets/chatgpt-logo.jpeg")}
+                    onPress={askChatGPTHandler}
+                    showChevron={false}
+                    style={styles.getLocalPriceButton}
+                  />
+                </ControlFrame>
               </View>
             )}
           <View style={styles.buttonContainer}>

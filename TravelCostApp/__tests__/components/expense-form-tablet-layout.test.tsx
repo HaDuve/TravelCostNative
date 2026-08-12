@@ -83,7 +83,11 @@ import { i18n } from "../../i18n/i18n";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 
-function renderExpenseFormAt(width: number, height: number) {
+function renderExpenseFormAt(
+  width: number,
+  height: number,
+  overrides: Parameters<typeof renderWithAppProviders>[1] = {}
+) {
   jest.spyOn(Dimensions, "get").mockReturnValue({
     width,
     height,
@@ -117,6 +121,12 @@ function renderExpenseFormAt(width: number, height: number) {
     </LayoutContextProvider>,
     {
       wrapNavigation: false,
+      settings: {
+        settings: {
+          askAiForGoodPrices: false,
+          ...overrides.settings?.settings,
+        },
+      },
       trip: {
         tripid: "t1",
         tripCurrency: "EUR",
@@ -125,12 +135,15 @@ function renderExpenseFormAt(width: number, height: number) {
           { uid: "u2", userName: "Bob" },
         ],
         fetchAndSetTravellers: jest.fn(async () => {}),
+        ...overrides.trip,
       },
       user: {
         userName: "Alice",
         lastCountry: "DE",
         lastCurrency: "EUR",
+        ...overrides.user,
       },
+      ...overrides,
     }
   );
 }
@@ -179,6 +192,35 @@ describe("ExpenseForm tablet layout", () => {
 
     const frameStyle = StyleSheet.flatten(
       screen.getByTestId("action-row-stack-frame").props.style
+    ) as Record<string, unknown>;
+
+    expect(frameStyle.maxWidth).toBe(480);
+    expect(frameStyle.alignSelf).toBe("center");
+  });
+
+  it("constrains get local price action on wide viewports", async () => {
+    const screen = renderExpenseFormAt(1024, 768, {
+      settings: {
+        settings: {
+          askAiForGoodPrices: true,
+        },
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(i18n.t("showMoreOptions"))).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+    fireEvent.changeText(screen.UNSAFE_getAllByType(TextInput)[0], "12");
+    fireEvent.changeText(screen.UNSAFE_getAllByType(TextInput)[1], "Coffee");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("expense-form-get-local-price-frame")).toBeTruthy();
+    });
+
+    const frameStyle = StyleSheet.flatten(
+      screen.getByTestId("expense-form-get-local-price-frame").props.style
     ) as Record<string, unknown>;
 
     expect(frameStyle.maxWidth).toBe(480);

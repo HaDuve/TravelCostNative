@@ -46,6 +46,7 @@ type ControlFrameProps = {
   testID?: string;
 };
 
+/** Constrains interactive controls on wide viewports. Use `mode="hug"` for back/navigation chrome. */
 export function ControlFrame({
   layout,
   children,

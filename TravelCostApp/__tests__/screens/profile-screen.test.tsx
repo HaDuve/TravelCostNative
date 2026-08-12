@@ -70,6 +70,8 @@ jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
 }));
 
+jest.mock("../../components/UI/DatePickerModal", () => () => null);
+
 jest.mock("../../components/FeedbackForm/FeedbackForm", () => () => null);
 
 import ProfileScreen from "../../screens/ProfileScreen";

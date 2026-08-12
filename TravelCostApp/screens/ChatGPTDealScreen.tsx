@@ -141,6 +141,7 @@ const GPTDealScreen = ({ route, navigation }) => {
             product: product,
             currency: currency,
             country: country,
+            inclusiveDayCount,
           };
 
           const response = await getChatGPT_Response(getPrice, setLoadingPhase);

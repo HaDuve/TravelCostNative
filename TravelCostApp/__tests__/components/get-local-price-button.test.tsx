@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Alert } from "react-native";
-import { fireEvent, within } from "@testing-library/react-native";
+import { fireEvent, render, within } from "@testing-library/react-native";
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -94,7 +94,7 @@ jest.mock("../../components/UI/DatePickerModal", () => {
 });
 
 import GetLocalPriceButton from "../../components/Settings/GetLocalPriceButton";
-import { renderWithAppProviders } from "../fixtures/app-providers";
+import { renderWithAppProviders, AppProviders } from "../fixtures/app-providers";
 
 const CHEVRON = "›";
 
@@ -252,6 +252,53 @@ describe("GetLocalPriceButton", () => {
       product: "Coffee",
       country: "Germany",
       currency: "EUR",
+      inclusiveDayCount: 1,
+      price: "",
+    });
+  });
+
+  it("syncs hydrated locale defaults when advanced options expand after context loads", () => {
+    let userOverrides: Record<string, unknown> = {
+      lastCountry: "",
+      lastCurrency: "",
+    };
+
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AppProviders
+        overrides={{
+          wrapNavigation: false,
+          network: { isConnected: true },
+          settings: { settings: { askAiForGoodPrices: true } },
+          user: userOverrides,
+          trip: { tripCurrency: "EUR" },
+        }}
+      >
+        {children}
+      </AppProviders>
+    );
+
+    const screen = render(
+      <GetLocalPriceButton navigation={navigation as any} />,
+      { wrapper: Wrapper },
+    );
+
+    userOverrides = { lastCountry: "Thailand", lastCurrency: "THB" };
+    screen.rerender(<GetLocalPriceButton navigation={navigation as any} />);
+
+    fireEvent.press(screen.getByTestId("profile-get-local-price"));
+    fireEvent.changeText(
+      screen.getByPlaceholderText(
+        "e.g., Coffee, Coworking space, Apartment rental...",
+      ),
+      "Coworking",
+    );
+    fireEvent.press(screen.getByTestId("get-local-price-advanced-toggle"));
+    fireEvent.press(screen.getByTestId("get-local-price-submit"));
+
+    expect(navigation.navigate).toHaveBeenCalledWith("GPTDeal", {
+      product: "Coworking",
+      country: "Thailand",
+      currency: "THB",
       inclusiveDayCount: 1,
       price: "",
     });

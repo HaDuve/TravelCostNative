@@ -58,14 +58,19 @@ const GetLocalPriceButton = ({ navigation, style }) => {
   const [endDate, setEndDate] = useState(today);
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
 
+  const syncAdvancedFieldsFromDefaults = (country, currency) => {
+    const todayDate = getFormattedDate(DateTime.now());
+    setCurrencyPickerValue(currency);
+    setCountryPickerValue(countryLabelForPicker(country));
+    setStartDate(todayDate);
+    setEndDate(todayDate);
+    setShowDatePickerRange(false);
+  };
+
   const resetModalState = () => {
     setProductInput("");
     setHideAdvanced(true);
-    setCurrencyPickerValue(defaultCurrency);
-    setCountryPickerValue(countryLabelForPicker(defaultCountry));
-    setStartDate(today);
-    setEndDate(today);
-    setShowDatePickerRange(false);
+    syncAdvancedFieldsFromDefaults(defaultCountry, defaultCurrency);
   };
 
   const handleGetLocalPrice = () => {
@@ -73,6 +78,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
     }
+    syncAdvancedFieldsFromDefaults(defaultCountry, defaultCurrency);
     setShowLocalPriceModal(true);
   };
 

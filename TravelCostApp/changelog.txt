@@ -8,6 +8,7 @@ __Newest Changes:
 - Improved ranged local-price deal prompts
 - Improved Overview and Recent Expenses on tablet and Mac
 - Improved expense forms and action buttons on larger screens
+- Improved Split Summary, Profile, and filtered lists on tablet and Mac
 - Bugfixes and performance improvements
 
 __Other Changes:

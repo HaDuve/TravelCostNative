@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
 import ExpensesList from "./ExpensesList";
+import FilteredExpensesGrid from "./FilteredExpensesGrid";
 import React from "react-native";
 import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
@@ -62,6 +63,9 @@ function ExpensesOutput({
   const memoizedContent = useMemo(() => {
     if (expenses?.length > 0) {
       if (fallback) setFallback(false);
+      if (isFiltered) {
+        return <FilteredExpensesGrid expenses={expenses} />;
+      }
       return (
         <ExpensesList
           expenses={expenses}

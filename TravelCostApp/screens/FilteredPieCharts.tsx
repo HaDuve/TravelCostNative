@@ -12,13 +12,15 @@ import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/Ex
 import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCountries";
 import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies";
 import ActionRowStack from "../components/UI/ActionRowStack";
+import ModalFrame from "../components/layout/ModalFrame";
 import { buildAddExpenseHereAction } from "../components/UI/AddExpensesHereButton";
 import FilteredExpenses from "./FilteredExpenses";
 import BackButton from "../components/UI/BackButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
-import { constantScale, dynamicScale } from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import { useLayoutProfile } from "../store/layout-context";
 import {
   expenseDateToIsoString,
   hydrateExpensesFromNavigationDtos,
@@ -32,7 +34,8 @@ const FilteredPieCharts = ({ navigation, route }) => {
   );
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
 
-  const { isPortrait, isTablet } = useContext(OrientationContext);
+  const { isPortrait } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
   // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [
     i18n.t("categories"),
@@ -122,12 +125,16 @@ const FilteredPieCharts = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          !isPortrait && styles.landscapeTitleContainer,
-          isTablet && styles.tabletContainer,
-        ]}
+      <ModalFrame
+        layout={layout}
+        testID="filtered-pie-charts-modal-frame"
+        style={styles.modalFrame}
       >
+        <View
+          style={[
+            !isPortrait && styles.landscapeTitleContainer,
+          ]}
+        >
         <View style={styles.firstTitleContainer}>
           <BackButton
             style={{ marginTop: dynamicScale(-16, false, 0.5) }}
@@ -154,7 +161,6 @@ const FilteredPieCharts = ({ navigation, route }) => {
               style={[
                 styles.titleText,
                 !isPortrait && styles.landScapetitleText,
-                isTablet && styles.tabletTitleText,
               ]}
             >
               {" "}
@@ -170,19 +176,20 @@ const FilteredPieCharts = ({ navigation, route }) => {
             ></IconButton>
           </View>
         </View>
-      </View>
-      <View style={styles.shadow}></View>
-      {contents[toggleGraphEnum]}
-      <View style={styles.footerContainer}>
-        <ActionRowStack
-          showChevron={false}
-          actions={
-            addExpenseAction
-              ? [addExpenseAction, backAction]
-              : [backAction]
-          }
-        />
-      </View>
+        </View>
+        <View style={styles.shadow}></View>
+        {contents[toggleGraphEnum]}
+        <View style={styles.footerContainer}>
+          <ActionRowStack
+            showChevron={false}
+            actions={
+              addExpenseAction
+                ? [addExpenseAction, backAction]
+                : [backAction]
+            }
+          />
+        </View>
+      </ModalFrame>
     </View>
   );
 };
@@ -195,6 +202,9 @@ FilteredPieCharts.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  modalFrame: {
     flex: 1,
   },
   firstTitleTextContainer: {
@@ -215,11 +225,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: dynamicScale(80, false, 0.5),
     marginTop: dynamicScale(-24, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  tabletContainer: {
-    marginTop: 0,
-    padding: constantScale(12, 0.5),
-    paddingHorizontal: constantScale(12, 0.5),
   },
   firstTitleContainer: {
     marginVertical: "4%",
@@ -260,9 +265,6 @@ const styles = StyleSheet.create({
   },
   landScapetitleText: {
     marginTop: dynamicScale(30, true),
-  },
-  tabletTitleText: {
-    marginTop: constantScale(16, 0.5),
   },
   chevronContainer: {
     justifyContent: "center",

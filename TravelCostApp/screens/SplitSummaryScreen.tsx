@@ -48,6 +48,8 @@ import { OrientationContext } from "../store/orientation-context";
 import safeLogError from "../util/error";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import ContentFrame from "../components/layout/ContentFrame";
+import { useLayoutProfile } from "../store/layout-context";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -63,6 +65,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
   const { isPortrait } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
 
   const [splits, setSplits] = useState<Split[]>([]);
   const hasOpenSplits = splits?.length > 0;
@@ -441,8 +444,9 @@ const SplitSummaryScreen = ({ navigation }) => {
 
         {isPortrait ? (
           <StaticList
+            testID="split-summary-balance-list"
             style={{
-              paddingHorizontal: dynamicScale(8, false, 0.5),
+              paddingHorizontal: layout.space(3),
               flex: 1,
             }}
             contentContainerStyle={{
@@ -477,8 +481,9 @@ const SplitSummaryScreen = ({ navigation }) => {
           />
         ) : (
           <FlatList
+            testID="split-summary-balance-list"
             style={{
-              paddingHorizontal: dynamicScale(8, false, 0.5),
+              paddingHorizontal: layout.space(3),
               flex: 1,
             }}
             contentContainerStyle={{
@@ -517,7 +522,17 @@ const SplitSummaryScreen = ({ navigation }) => {
     </Animated.View>
   );
 
-  return <View style={styles.container}>{splitSummaryContent}</View>;
+  return (
+    <View style={styles.container}>
+      <ContentFrame
+        layout={layout}
+        testID="split-summary-content-frame"
+        style={styles.contentFrame}
+      >
+        {splitSummaryContent}
+      </ContentFrame>
+    </View>
+  );
 };
 
 export default SplitSummaryScreen;
@@ -541,6 +556,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  contentFrame: {
+    flex: 1,
   },
   cardContainer: {
     flex: 1,

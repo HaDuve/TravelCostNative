@@ -2,14 +2,18 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.3.005l
+- Improved Ask AI local price on Profile with optional country, currency, and date range; added Settings info buttons and Ask AI toggle; improved ranged local-price deal prompts
+- Bugfixes and performance improvements
+
+__Other Changes:
+
 1.3.005k
 - Improved action buttons across Settings, forms, and summaries
 - Improved currency amounts in Overview, My Budgets, and trip history; updated Onboarding and Leave Trip/Budget; redesigned Profile screen and fixed logout after confirm
 - Fixed premium paywall overlay on custom categories; improved premium upsell with feature hints; fixed stale trip names and signup after cache clear
 - Fixed empty Recent Expenses state showing before sync completes
 - Bugfixes and performance improvements
-
-__Other Changes:
 
 1.3.005j
 - Updated Onboarding

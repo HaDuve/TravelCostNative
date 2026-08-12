@@ -1,5 +1,11 @@
 import * as React from "react";
+import { View } from "react-native";
 import type { LayoutProfile } from "../../util/layout";
+import {
+  isOverviewWideLayout,
+  OVERVIEW_BODY_COLUMN_WIDTHS,
+} from "../../styles/overview-layout-tokens";
+import { ChartContainerWidthProvider } from "../../store/chart-container-width-context";
 import ResponsiveGrid from "./ResponsiveGrid";
 
 type OverviewBodyProps = {
@@ -8,12 +14,29 @@ type OverviewBodyProps = {
   chart: React.ReactNode;
 };
 
+function OverviewChartColumn({ children }: { children: React.ReactNode }) {
+  const [chartColumnWidth, setChartColumnWidth] = React.useState<number>();
+
+  return (
+    <View
+      testID="overview-chart-column"
+      onLayout={(event) => {
+        setChartColumnWidth(event.nativeEvent.layout.width);
+      }}
+    >
+      <ChartContainerWidthProvider width={chartColumnWidth}>
+        {children}
+      </ChartContainerWidthProvider>
+    </View>
+  );
+}
+
 export default function OverviewBody({
   layout,
   summary,
   chart,
 }: OverviewBodyProps) {
-  if (layout.breakpoint === "narrow") {
+  if (!isOverviewWideLayout(layout)) {
     return <>{chart}</>;
   }
 
@@ -21,7 +44,7 @@ export default function OverviewBody({
     <ResponsiveGrid
       testID="overview-body-grid"
       layout={layout}
-      columnWidths={[3, 7]}
+      columnWidths={OVERVIEW_BODY_COLUMN_WIDTHS}
       items={[
         {
           key: "summary",
@@ -31,7 +54,9 @@ export default function OverviewBody({
         {
           key: "chart",
           column: "right",
-          render: () => chart,
+          render: () => (
+            <OverviewChartColumn>{chart}</OverviewChartColumn>
+          ),
         },
       ]}
     />

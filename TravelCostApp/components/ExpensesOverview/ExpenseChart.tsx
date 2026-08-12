@@ -8,7 +8,7 @@ import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import { SettingsContext } from "../../store/settings-context";
 import { useLayoutProfile } from "../../store/layout-context";
-import { useWindowSize } from "../Hooks/useWindowSize";
+import { useChartContainerWidth } from "../charts/useChartContainerWidth";
 
 import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
@@ -36,7 +36,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   onWebViewRef,
 }) => {
   const layout = useLayoutProfile();
-  const { width: windowWidth } = useWindowSize();
+  const containerWidth = useChartContainerWidth();
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
@@ -77,7 +77,6 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     tripCtx,
   ]);
 
-  const containerWidth = Math.min(windowWidth, layout.contentMaxWidth);
   const { width, height, paddingHorizontal } =
     ChartController.getChartDimensions({
       kind: "bar",

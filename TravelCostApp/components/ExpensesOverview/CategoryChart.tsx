@@ -4,7 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { getCatLocalized } from "../../util/category";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { useLayoutProfile } from "../../store/layout-context";
-import { useWindowSize } from "../Hooks/useWindowSize";
+import { useChartContainerWidth } from "../charts/useChartContainerWidth";
 
 import WebViewChart from "../charts/WebViewChart";
 import { ChartController, CategoryData } from "../charts/controller";
@@ -19,8 +19,7 @@ const CategoryChart = React.memo(
     tripCurrency: string;
   }) => {
     const layout = useLayoutProfile();
-    const { width: windowWidth } = useWindowSize();
-    const containerWidth = Math.min(windowWidth, layout.contentMaxWidth);
+    const containerWidth = useChartContainerWidth();
     const { width, height, paddingHorizontal } =
       ChartController.getChartDimensions({
         kind: "pie",

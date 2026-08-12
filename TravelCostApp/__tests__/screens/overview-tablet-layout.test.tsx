@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Dimensions, StyleSheet } from "react-native";
-import { within } from "@testing-library/react-native";
+import { fireEvent, within } from "@testing-library/react-native";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
@@ -59,7 +59,21 @@ const monthExpenses = [
   makeExpense({ id: "e1", calcAmount: 75, amount: 75, category: "Food" }),
 ];
 
-function renderOverviewWithLayout(width: number, height: number) {
+const graphExpensesContext = {
+  expenses: monthExpenses,
+  getRecentExpenses: () => monthExpenses,
+  getMonthlyExpenses: () => ({
+    firstDay: new Date("2026-05-01"),
+    lastDay: new Date("2026-05-31"),
+    monthlyExpenses: monthExpenses,
+  }),
+};
+
+function renderOverviewWithLayout(
+  width: number,
+  height: number,
+  options: { isShowingGraph?: boolean; expenses?: object } = {}
+) {
   jest.spyOn(Dimensions, "get").mockReturnValue({
     width,
     height,
@@ -76,11 +90,11 @@ function renderOverviewWithLayout(width: number, height: number) {
     {
       wrapNavigation: false,
       user: {
-        isShowingGraph: false,
+        isShowingGraph: options.isShowingGraph ?? false,
         setIsShowingGraph: jest.fn(),
         periodName: "month",
       },
-      expenses: {
+      expenses: options.expenses ?? {
         expenses: monthExpenses,
         getRecentExpenses: () => monthExpenses,
       },
@@ -97,6 +111,13 @@ describe("Overview tablet layout", () => {
     const screen = renderOverviewWithLayout(390, 844);
 
     expect(screen.getByTestId("mock-dropdown-picker")).toBeTruthy();
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.queryByTestId("overview-body-grid")).toBeNull();
+  });
+
+  it("keeps summary in the period chrome on medium widths", () => {
+    const screen = renderOverviewWithLayout(700, 900);
+
     expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
     expect(screen.queryByTestId("overview-body-grid")).toBeNull();
   });
@@ -126,6 +147,9 @@ describe("Overview tablet layout", () => {
 
   it("caps pie charts through ChartController on wide layouts", () => {
     const screen = renderOverviewWithLayout(1194, 834);
+    fireEvent(screen.getByTestId("overview-chart-column"), "layout", {
+      nativeEvent: { layout: { width: 520, height: 400, x: 0, y: 0 } },
+    });
     const chart = screen.getByTestId("mock-webview-chart");
     const chartStyle = StyleSheet.flatten(chart.props.style) as Record<
       string,
@@ -134,5 +158,26 @@ describe("Overview tablet layout", () => {
 
     expect(chartStyle.width).toBeLessThanOrEqual(400);
     expect(chartStyle.height).toBeLessThanOrEqual(400);
+    expect(chartStyle.width).toBeLessThanOrEqual(520);
+  });
+
+  it("sizes bar charts to the measured chart column width on wide layouts", () => {
+    const screen = renderOverviewWithLayout(1194, 834, {
+      isShowingGraph: true,
+      expenses: graphExpensesContext,
+    });
+
+    fireEvent(screen.getByTestId("overview-chart-column"), "layout", {
+      nativeEvent: { layout: { width: 520, height: 400, x: 0, y: 0 } },
+    });
+
+    const chart = screen.getByTestId("mock-webview-chart");
+    const chartStyle = StyleSheet.flatten(chart.props.style) as Record<
+      string,
+      unknown
+    >;
+
+    expect(chartStyle.width).toBeLessThanOrEqual(520);
+    expect(chartStyle.width).toBeLessThanOrEqual(600);
   });
 });

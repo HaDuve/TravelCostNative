@@ -10,7 +10,6 @@ describe("ChartController.getChartDimensions", () => {
     });
 
     expect(dimensions.width).toBe(600);
-    expect(dimensions.width).toBeLessThanOrEqual(600);
   });
 
   it("caps pie charts at 400 by 400", () => {

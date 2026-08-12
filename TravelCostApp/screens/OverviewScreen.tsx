@@ -41,6 +41,7 @@ import { showBanner } from "../components/UI/ToastComponent";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import { useLayoutProfile } from "../store/layout-context";
+import { isOverviewWideLayout } from "../styles/overview-layout-tokens";
 import { OnboardingFlags } from "../types/onboarding";
 import { refreshWithToast } from "../util/refreshWithToast";
 import { getOfflineQueue } from "../util/offline-queue";
@@ -167,7 +168,7 @@ const OverviewScreen = ({ navigation }) => {
   // );
   const { isTablet } = useContext(OrientationContext);
   const layout = useLayoutProfile();
-  const isWideLayout = layout.breakpoint !== "narrow";
+  const isWideLayout = isOverviewWideLayout(layout);
   const chartSection = (
     <MemoizedExpensesOverview
       navigation={navigation}

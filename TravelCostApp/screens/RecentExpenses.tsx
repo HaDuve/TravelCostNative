@@ -383,7 +383,10 @@ function RecentExpenses({ navigation }) {
   //   return <LoadingOverlay />;
   // }
   return (
-    <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
+    <View
+      testID="recent-expenses-screen"
+      style={[styles.container, isTablet && styles.tabletPaddingTop]}
+    >
       <View
         testID="period-date-header"
         style={[

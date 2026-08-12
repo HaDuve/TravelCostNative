@@ -1,9 +1,9 @@
 import React from "react";
 import { createContext } from "react";
 import PropTypes from "prop-types";
-import { useOrientation } from "../components/Hooks/useOrientation";
+
 import { useWindowSize } from "../components/Hooks/useWindowSize";
-import { isTablet as getIsTablet } from "../util/scalingUtil";
+import { useLayoutProfile } from "./layout-context";
 
 export const OrientationContext = createContext({
   orientation: "PORTRAIT",
@@ -15,15 +15,20 @@ export const OrientationContext = createContext({
 });
 
 const OrientationContextProvider = ({ children }) => {
-  const orientation = useOrientation();
+  const layout = useLayoutProfile();
   const { width, height } = useWindowSize();
-  const isPortrait = orientation === "PORTRAIT";
-  const isLandscape = orientation === "LANDSCAPE";
-  const isTablet = getIsTablet();
+  const orientation = layout.orientation === "portrait" ? "PORTRAIT" : "LANDSCAPE";
 
   return (
     <OrientationContext.Provider
-      value={{ orientation, isPortrait, isLandscape, isTablet, width, height }}
+      value={{
+        orientation,
+        isPortrait: layout.orientation === "portrait",
+        isLandscape: layout.orientation === "landscape",
+        isTablet: layout.breakpoint !== "narrow",
+        width,
+        height,
+      }}
     >
       {children}
     </OrientationContext.Provider>

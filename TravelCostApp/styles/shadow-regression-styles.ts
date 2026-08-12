@@ -3,16 +3,21 @@ import { Platform, StyleSheet } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import { actionRowCardShell } from "./action-row-tokens";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
+import { layoutFor } from "../util/layout";
+import { tripPeriodLayoutTokens } from "./trip-period-layout-tokens";
 
-export const periodHeaderLabelFontSize = dynamicScale(28, false, 0.5);
+const defaultLayout = layoutFor({ width: 390, height: 844 });
+const periodLayout = tripPeriodLayoutTokens(defaultLayout);
+
+export const periodHeaderLabelFontSize = periodLayout.periodHeaderLabelFontSize;
 
 const statisticsCardShadow = {
   backgroundColor: GlobalStyles.colors.backgroundColor,
-  borderRadius: dynamicScale(10, false, 0.5),
+  borderRadius: 10,
   borderWidth: 1,
   borderColor: GlobalStyles.colors.gray300,
-  marginHorizontal: dynamicScale(16),
-  marginBottom: dynamicScale(20, true),
+  marginHorizontal: periodLayout.periodHeaderRow.paddingHorizontal,
+  marginBottom: periodLayout.periodHeaderRow.marginBottom,
   ...Platform.select({
     ios: {
       shadowColor: "#000",
@@ -43,28 +48,23 @@ const overviewHeaderCardShadow = Platform.select({
 });
 
 const overviewHeaderCardBase = {
-  flex: 1,
-  maxWidth: "50%" as const,
-  minHeight: dynamicScale(52, true),
+  ...periodLayout.headerCard,
   backgroundColor: GlobalStyles.colors.backgroundColor,
-  borderRadius: 10,
-  borderWidth: 1,
   borderColor: GlobalStyles.colors.gray300,
-  paddingVertical: dynamicScale(4, true),
   ...overviewHeaderCardShadow,
 };
 
 export const shadowRegressionStyles = StyleSheet.create({
   statisticsPieCategoryCard: statisticsCardShadow,
   expenseGraphCategoryCard: {
-    height: dynamicScale(52, true),
-    minWidth: dynamicScale(200),
+    height: periodLayout.headerCard.minHeight,
+    minWidth: 200,
     justifyContent: "center",
     ...statisticsCardShadow,
   },
   overviewDropdownContainer: {
     ...overviewHeaderCardBase,
-    marginTop: dynamicScale(2, true),
+    marginTop: periodLayout.dropdownContainer.marginTop,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -73,21 +73,8 @@ export const shadowRegressionStyles = StyleSheet.create({
     borderWidth: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
-  overviewPeriodHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "stretch",
-    gap: dynamicScale(12, true),
-    zIndex: 10,
-    marginTop: dynamicScale(18, true),
-    paddingHorizontal: dynamicScale(12),
-    marginBottom: dynamicScale(12, true),
-  },
-  overviewPeriodDateHeader: {
-    marginTop: dynamicScale(12, true),
-    marginLeft: dynamicScale(18),
-    marginBottom: dynamicScale(-4, true),
-  },
+  overviewPeriodHeaderRow: periodLayout.periodHeaderRow,
+  overviewPeriodDateHeader: periodLayout.periodDateHeader,
   expensesSummaryContainer: {
     ...overviewHeaderCardBase,
     alignItems: "center",

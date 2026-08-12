@@ -9,6 +9,7 @@ import axios from "axios";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 import safeLogError from "./error";
 import { localPriceDealAmountPhrase } from "./expense-form-local-price-hint";
+import { localPriceLookupSpanPhrase } from "./profile-local-price-submit";
 
 // Function to get current date in a readable format
 function getCurrentDateString(): string {
@@ -149,6 +150,7 @@ export interface GPT_getPrice extends GPT_RequestBody {
   product: string;
   country: string;
   currency: string;
+  inclusiveDayCount?: number;
 }
 
 export interface GPT_getKeywords extends GPT_RequestBody {
@@ -228,7 +230,8 @@ async function chatGPTcontentPrice(
   product: string,
   country: string,
   currency: string,
-  onLoadingPhaseChange?: (phase: string) => void
+  onLoadingPhaseChange?: (phase: string) => void,
+  inclusiveDayCount = 1
 ): Promise<string> {
   const currentDate = getCurrentDateString();
   const { seasonalInfo, pricingInfo } = await performComprehensiveWebSearch(
@@ -237,8 +240,9 @@ async function chatGPTcontentPrice(
     currency,
     onLoadingPhaseChange
   );
+  const spanPhrase = localPriceLookupSpanPhrase(inclusiveDayCount);
 
-  return `Provide current local pricing information for "${product}" in ${country} as of ${currentDate}.
+  return `Provide current local pricing information for "${product}" in ${country}${spanPhrase} as of ${currentDate}.
 
 **Current Seasonal Context:** ${seasonalInfo}
 
@@ -292,7 +296,8 @@ async function getGPT_Content(
         (requestBody as GPT_getPrice).product,
         (requestBody as GPT_getPrice).country,
         (requestBody as GPT_getPrice).currency,
-        onLoadingPhaseChange
+        onLoadingPhaseChange,
+        (requestBody as GPT_getPrice).inclusiveDayCount
       );
   }
 }

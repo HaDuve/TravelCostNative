@@ -1,6 +1,15 @@
 ---
 name: update-budget-app
-description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — updates changelog.txt from git changes in the project's existing style (consolidates into the current OTA suffix if the last update on the target branch was under 24h ago), and commits/pushes changelog (and app version files for store bumps) before publishing. Bare invocation (no tier) defaults to production OTA. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
+description: >-
+  Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow —
+  OTA patch, native EAS build, store submit, or full release — updates
+  changelog.txt from git changes (consolidates into the current OTA suffix if the
+  last update on the target branch was under 24h ago), and commits/pushes before
+  publishing. Bare invocation defaults to production OTA. Use for
+  /update-budget-app or when the user asks to deploy, release, ship, hotfix,
+  OTA update, update changelog, push to production/alpha/staging, submit to App
+  Store or Play Store, or bump the app version.
+disable-model-invocation: true
 ---
 
 # Update Budget App

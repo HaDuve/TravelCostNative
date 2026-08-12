@@ -3,6 +3,8 @@ import React from "react";
 import { i18n } from "../../i18n/i18n";
 
 import ActionRow from "./ActionRow";
+import { ControlFrame } from "../layout/ContentFrame";
+import { useLayoutProfile } from "../../store/layout-context";
 import { useNavigation } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import PropTypes from "prop-types";
@@ -41,6 +43,7 @@ export function buildAddExpenseHereAction(
 
 const AddExpenseHereButton = ({ dayISO }) => {
   const navigation = useNavigation();
+  const layout = useLayoutProfile();
   const action = buildAddExpenseHereAction(dayISO, (screen, params) =>
     navigation.navigate(screen as never, params as never)
   );
@@ -50,15 +53,17 @@ const AddExpenseHereButton = ({ dayISO }) => {
   }
 
   return (
-    <ActionRow
-      testID={action.testID}
-      tier={action.tier}
-      label={action.label}
-      hint={action.hint}
-      icon={action.icon}
-      onPress={action.onPress}
-      showChevron={false}
-    />
+    <ControlFrame layout={layout} testID="add-expense-here-frame">
+      <ActionRow
+        testID={action.testID}
+        tier={action.tier}
+        label={action.label}
+        hint={action.hint}
+        icon={action.icon}
+        onPress={action.onPress}
+        showChevron={false}
+      />
+    </ControlFrame>
   );
 };
 

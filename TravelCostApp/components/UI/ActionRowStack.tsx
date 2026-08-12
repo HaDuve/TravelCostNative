@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 
 import ActionRow, { type ActionRowTier } from "./ActionRow";
 import { ActionRowTokens } from "../../styles/action-row-tokens";
+import { ControlFrame } from "../layout/ContentFrame";
+import { useLayoutProfile } from "../../store/layout-context";
 
 export type ActionRowAction = {
   testID?: string;
@@ -24,23 +26,27 @@ type ActionRowStackProps = {
 
 /** Vertical stack of ActionRows — modal footers, form actions, settings lists. */
 function ActionRowStack({ actions, showChevron = false }: ActionRowStackProps) {
+  const layout = useLayoutProfile();
+
   return (
-    <View testID="action-row-stack" style={styles.stack}>
-      {actions.map((action, index) => (
-        <ActionRow
-          key={action.testID ?? `${action.label}-${index}`}
-          testID={action.testID}
-          label={action.label}
-          hint={action.hint}
-          icon={action.icon}
-          tier={action.tier ?? "secondary"}
-          onPress={action.onPress}
-          showChevron={showChevron}
-          disabled={action.disabled}
-          style={styles.row}
-        />
-      ))}
-    </View>
+    <ControlFrame layout={layout} testID="action-row-stack-frame">
+      <View testID="action-row-stack" style={styles.stack}>
+        {actions.map((action, index) => (
+          <ActionRow
+            key={action.testID ?? `${action.label}-${index}`}
+            testID={action.testID}
+            label={action.label}
+            hint={action.hint}
+            icon={action.icon}
+            tier={action.tier ?? "secondary"}
+            onPress={action.onPress}
+            showChevron={showChevron}
+            disabled={action.disabled}
+            style={styles.row}
+          />
+        ))}
+      </View>
+    </ControlFrame>
   );
 }
 

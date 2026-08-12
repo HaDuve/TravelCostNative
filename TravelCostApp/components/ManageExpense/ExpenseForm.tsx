@@ -17,7 +17,6 @@ import {
   Pressable,
   FlatList,
   KeyboardAvoidingView,
-  InputAccessoryView,
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useFocusEffect } from "@react-navigation/native";
@@ -138,7 +137,9 @@ import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
+import { useLayoutProfile } from "../../store/layout-context";
+import ResponsiveGrid from "../layout/ResponsiveGrid";
+import { ControlFrame } from "../layout/ContentFrame";
 import { callDebounced } from "../Hooks/useDebounce";
 import { NavigationProp } from "@react-navigation/native";
 import { trackEvent } from "../../util/vexo-tracking";
@@ -190,7 +191,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
-  const { isPortrait, isTablet } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues = defaultValues;
@@ -1222,12 +1223,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   );
 
   const backButtonJsx = (
-    <BackButton
-      style={{
-        flex: 0,
-        paddingRight: dynamicScale(100, false, 0.5),
-      }}
-    />
+    <ControlFrame layout={layout} mode="hug" testID="expense-form-back-frame">
+      <BackButton
+        style={{
+          flex: 0,
+          paddingRight: dynamicScale(100, false, 0.5),
+        }}
+      />
+    </ControlFrame>
   );
   const confirmButtonJSX = (
     <Pressable
@@ -1364,29 +1367,659 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const headerHeight = useHeaderHeight();
   const hideBottomBorder = duplOrSplit == 1 || duplOrSplit == 2;
 
-  const onPressHandlerQuickSum = () => {
-    if (inputs.amount.value) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const _tempAmount = +tempAmount;
-      const newAmount = _tempAmount + Number(inputs.amount.value);
-      setTempAmount(newAmount.toFixed(2));
-      inputChangedHandler("amount", "");
-      trackEvent(VexoEvents.QUICK_SUM_PRESSED, {
-        action: "add",
-        amount: inputs.amount.value,
-        total: newAmount.toFixed(2),
-      });
-    } else if (tempAmount) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const _tempAmount = +tempAmount;
-      inputChangedHandler("amount", _tempAmount.toFixed(2));
-      setTempAmount("");
-      trackEvent(VexoEvents.QUICK_SUM_PRESSED, {
-        action: "restore",
-        amount: _tempAmount.toFixed(2),
-      });
-    }
+  const formLayoutStyle = {
+    margin: layout.space(3),
+    padding: layout.space(2),
+    paddingBottom: layout.space(3),
   };
+  const fieldLabelStyle = {
+    fontSize: layout.type(12),
+  };
+
+  const expenseFormGridItems = [
+    {
+      key: "left-fields",
+      column: "left" as const,
+      render: () => (
+        <>
+          <View testID="expense-form-field-amount" style={styles.inputsRow}>
+            <Input
+              inputStyle={styles.amountInput}
+              label={
+                i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
+              }
+              textInputConfig={{
+                keyboardType: "decimal-pad",
+                onChangeText: inputChangedHandler.bind(this, "amount"),
+                value: inputs.amount.value,
+              }}
+              invalid={!inputs.amount.isValid}
+              autoFocus={!isEditing ?? false}
+            />
+            {inputs.amount.value && isAndroid && (
+              <IconButton
+                buttonStyle={styles.quickSumButton}
+                icon={"add-outline"}
+                color={GlobalStyles.colors.textColor}
+                size={dynamicScale(24, false, 0.5)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  const _tempAmount = +tempAmount;
+                  const newAmount = _tempAmount + Number(inputs.amount.value);
+                  setTempAmount(newAmount.toFixed(2));
+                  inputChangedHandler("amount", "");
+                }}
+              />
+            )}
+            {!inputs.amount.value && tempAmount && (
+              <IconButton
+                buttonStyle={styles.quickSumButton}
+                icon={"return-down-back-outline"}
+                color={GlobalStyles.colors.textColor}
+                size={dynamicScale(24, false, 0.5)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  const _tempAmount = +tempAmount;
+                  inputChangedHandler("amount", _tempAmount.toFixed(2));
+                  setTempAmount("");
+                }}
+              />
+            )}
+            {tempAmount && (
+              <Text style={styles.tempAmount}>
+                +{" "}
+                {formatExpenseWithCurrency(tempAmount, inputs.currency.value)}
+              </Text>
+            )}
+            {hasCalcAmount && (
+              <Text
+                style={[!tempAmount ? styles.tempAmount : styles.calcAmount]}
+              >
+                ={" "}
+                {formatExpenseWithCurrency(calcAmount, tripCtx.tripCurrency)}
+              </Text>
+            )}
+            <IconButton
+              buttonStyle={styles.iconButton}
+              icon={icon}
+              color={GlobalStyles.colors.primary500}
+              size={layout.type(48)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const idCatData: IDCat = {
+                  expenseId: editedExpenseId,
+                  category: inputs.category.value,
+                };
+                setExpenseCat(editedExpenseId, idCatData);
+                saveDraftData();
+                navigation.navigate("CategoryPick", {
+                  expenseId: editedExpenseId,
+                  isUpdating: isEditing,
+                });
+              }}
+            />
+          </View>
+          <Autocomplete
+            value={inputs.description.value}
+            containerStyle={[
+              styles.descriptionContainer,
+              { marginTop: layout.space(2) },
+            ]}
+            onChange={inputChangedHandler.bind(this, "description")}
+            label={i18n.t("descriptionLabel")}
+            data={suggestionData}
+            style={styles.autoCompleteStyle}
+            menuStyle={styles.autoCompleteMenuStyle}
+            showOnEmpty={false}
+            placeholder=""
+          />
+          {!alwaysShowAdvancedSetting && (
+            <Pressable onPress={toggleAdvancedHandler}>
+              <Animated.View style={styles.advancedRow}>
+                <Ionicons
+                  name={
+                    hideAdvanced
+                      ? "arrow-down-circle-outline"
+                      : "arrow-forward-circle-outline"
+                  }
+                  size={layout.type(28)}
+                  color={GlobalStyles.colors.primary500}
+                />
+                {hideAdvanced && (
+                  <Text style={[styles.advancedText, fieldLabelStyle]}>
+                    {i18n.t("showMoreOptions")}
+                  </Text>
+                )}
+                {!hideAdvanced && (
+                  <Text style={[styles.advancedText, fieldLabelStyle]}>
+                    {i18n.t("showLessOptions")}
+                  </Text>
+                )}
+              </Animated.View>
+            </Pressable>
+          )}
+          {!hideAdvanced && (
+            <>
+              <View style={styles.currencyContainer}>
+                <Text style={[styles.currencyLabel, fieldLabelStyle]}>
+                  {i18n.t("currencyLabel")}
+                </Text>
+                <CurrencyPicker
+                  countryValue={currencyPickerValue}
+                  setCountryValue={setCurrencyPickerValue}
+                  onChangeValue={updateCurrency}
+                  placeholder={currencyPlaceholder}
+                  inputCurrencyCode={inputs.currency.value}
+                ></CurrencyPicker>
+              </View>
+              <View testID="expense-form-field-date" style={styles.dateLabel}>
+                <Text style={[styles.dateLabelText, fieldLabelStyle]}>
+                  {i18n.t("dateLabel")}
+                </Text>
+              </View>
+              {DatePickerContainer({
+                openDatePickerRange,
+                startDate,
+                endDate,
+                dateIsRanged,
+                hideBottomBorder,
+              })}
+              <View
+                style={
+                  duplOrSplit !== 0 && {
+                    paddingBottom: layout.space(1),
+                    marginHorizontal: "5%",
+                    borderBottomColor: GlobalStyles.colors.textColor,
+                    borderBottomWidth: 1,
+                  }
+                }
+              >
+                {duplOrSplit !== 0 && (
+                  <View style={styles.duplOrSplitContainer}>
+                    <Text style={[styles.dateLabelDuplSplitText, fieldLabelStyle]}>
+                      {duplOrSplitString(duplOrSplit)}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </>
+          )}
+        </>
+      ),
+    },
+    {
+      key: "right-fields",
+      column: "right" as const,
+      render: () =>
+        !hideAdvanced ? (
+          <>
+            <View style={[styles.inputsRowSecond]}>
+              <View
+                testID="expense-form-field-country"
+                style={styles.countryContainer}
+              >
+                <Text style={[styles.currencyLabel, fieldLabelStyle]}>
+                  {i18n.t("countryLabel")}
+                </Text>
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={[
+                      {
+                        minWidth: "77%",
+                        maxWidth: "77%",
+                      },
+                    ]}
+                  >
+                    <CountryPicker
+                      countryValue={countryPickerValue}
+                      setCountryValue={setCountryPickerValue}
+                      onChangeValue={updateCountry}
+                      placeholder={countryPlaceholder}
+                    ></CountryPicker>
+                  </View>
+                  <ExpenseCountryFlag
+                    countryName={inputs.country.value?.split("- ")[0].trim()}
+                    style={styles.countryFlag}
+                    containerStyle={styles.countryFlagContainer}
+                  ></ExpenseCountryFlag>
+                </View>
+              </View>
+            </View>
+            <View style={styles.inputsRowSecond}>
+              {showWhoPaid && (
+                <View
+                  testID="expense-form-field-who-paid"
+                  style={styles.whoPaidContainer}
+                >
+                  <Text
+                    style={[
+                      styles.whoPaidLabel,
+                      fieldLabelStyle,
+                      !inputs.whoPaid.isValid && styles.invalidLabel,
+                    ]}
+                  >
+                    {i18n.t("whoPaid")}
+                  </Text>
+                  {loadingTravellers && (
+                    <ActivityIndicator
+                      size={"large"}
+                      color={GlobalStyles.colors.backgroundColor}
+                    ></ActivityIndicator>
+                  )}
+                  {!loadingTravellers && (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginLeft: layout.space(3),
+                        marginTop: layout.space(1),
+                      }}
+                    >
+                      {!IsSoloTraveller && (
+                        <IconButton
+                          icon="people-circle-outline"
+                          size={constantScale(28, 0.5)}
+                          buttonStyle={styles.whoPaidSplitButton}
+                          color={GlobalStyles.colors.primary500}
+                          onPress={() => {
+                            Haptics.impactAsync(
+                              Haptics.ImpactFeedbackStyle.Light
+                            );
+                            const tempSplitType: splitType = splitTypes.EXACT;
+                            const userNames =
+                              travellerUserNames(currentTravellers);
+                            const listSplits = calcSplitList(
+                              tempSplitType,
+                              +amountValue,
+                              userCtx.userName,
+                              userNames
+                            );
+                            if (listSplits) {
+                              setSplitType(tempSplitType);
+                              const splitsWithoutOrder =
+                                resetEditOrder(listSplits);
+                              setSplitList(splitsWithoutOrder);
+                              setSplitListValid(
+                                validateSplitList(
+                                  splitsWithoutOrder,
+                                  tempSplitType,
+                                  +amountValue
+                                )
+                              );
+                            }
+                          }}
+                        ></IconButton>
+                      )}
+                      <DropDownPicker
+                        containerStyle={styles.dropdownContainer}
+                        open={modalFlow === MODAL_FLOW_STATE.WHO_PAID}
+                        value={whoPaid}
+                        items={items}
+                        setOpen={(open) => {
+                          setModalFlow(
+                            open
+                              ? MODAL_FLOW_STATE.WHO_PAID
+                              : MODAL_FLOW_STATE.CLOSED
+                          );
+                        }}
+                        setValue={handleWhoPaidChange}
+                        setItems={setItems}
+                        onClose={() => {
+                          if (modalFlow === MODAL_FLOW_STATE.WHO_PAID) {
+                            setModalFlow(MODAL_FLOW_STATE.CLOSED);
+                          }
+                        }}
+                        onOpen={() => {
+                          setModalFlow(MODAL_FLOW_STATE.WHO_PAID);
+                          Haptics.impactAsync(
+                            Haptics.ImpactFeedbackStyle.Light
+                          );
+                        }}
+                        onSelectItem={(item) => {
+                          Haptics.impactAsync(
+                            Haptics.ImpactFeedbackStyle.Light
+                          );
+
+                          if (item.value === MODAL_FLOW_ADD_TRAVELLER) {
+                            setWhoPaidWithLogging(userCtx.userName);
+                            setSplitType(splitTypes.SELF);
+                          } else {
+                            setWhoPaidWithLogging(item.value);
+                          }
+
+                          nextModal(item.value);
+                        }}
+                        listMode="MODAL"
+                        modalProps={{
+                          animationType: "slide",
+                          presentationStyle: "pageSheet",
+                        }}
+                        searchable={false}
+                        modalTitle={i18n.t("whoPaid")}
+                        modalContentContainerStyle={{
+                          backgroundColor:
+                            GlobalStyles.colors.backgroundColor,
+                          marginTop: "2%",
+                          elevation: 2,
+                          shadowColor: GlobalStyles.colors.textColor,
+                          shadowOffset: { width: 1, height: 1 },
+                          shadowOpacity: 0.35,
+                          shadowRadius: 4,
+                        }}
+                        placeholder={userCtx.userName}
+                        style={
+                          !inputs.whoPaid.isValid
+                            ? [
+                                styles.whoPaidDropdownContainer,
+                                styles.invalidInput,
+                              ]
+                            : styles.whoPaidDropdownContainer
+                        }
+                        textStyle={styles.dropdownTextStyle}
+                      />
+                    </View>
+                  )}
+                </View>
+              )}
+              {whoPaidValid && !IsSoloTraveller && (
+                <DropDownPicker
+                  open={modalFlow === MODAL_FLOW_STATE.HOW_SHARED}
+                  value={splitType}
+                  items={splitItems}
+                  setOpen={(open) => {
+                    setModalFlow(
+                      open
+                        ? MODAL_FLOW_STATE.HOW_SHARED
+                        : MODAL_FLOW_STATE.CLOSED
+                    );
+                  }}
+                  setValue={setSplitType}
+                  setItems={setSplitTypeItems}
+                  onSelectItem={(item) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    if (item.value === splitTypes.EXACT) {
+                      setSplitType(item.value);
+                    }
+                    nextModal(item.value);
+                  }}
+                  onClose={() => {
+                    if (modalFlow === MODAL_FLOW_STATE.HOW_SHARED) {
+                      setModalFlow(MODAL_FLOW_STATE.CLOSED);
+                    }
+                  }}
+                  onOpen={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  listMode="MODAL"
+                  modalProps={{
+                    animationType: "slide",
+                    presentationStyle: "pageSheet",
+                  }}
+                  searchable={false}
+                  modalTitle={i18n.t("howShared")}
+                  modalContentContainerStyle={{
+                    backgroundColor: GlobalStyles.colors.backgroundColor,
+                  }}
+                  placeholder={i18n.t("placeholderSharedExpense")}
+                  containerStyle={[
+                    styles.dropdownContainer,
+                    hidePickers && styles.hidePickersStyle,
+                  ]}
+                  style={[
+                    styles.whoPaidDropdownContainer,
+                    hidePickers && styles.hidePickersStyle,
+                  ]}
+                  textStyle={styles.dropdownTextStyle}
+                />
+              )}
+            </View>
+            {!loadingTravellers && !splitTypeSelf && !IsSoloTraveller && (
+              <DropDownPicker
+                open={
+                  modalFlow === MODAL_FLOW_STATE.EXACT_SHARING || openEQUAL
+                }
+                value={splitTravellersList}
+                items={splitItemsEQUAL}
+                setOpen={(open) => {
+                  if (open) {
+                    setModalFlow(MODAL_FLOW_STATE.EXACT_SHARING);
+                  } else {
+                    setModalFlow(MODAL_FLOW_STATE.CLOSED);
+                    setOpenEQUAL(false);
+                  }
+                }}
+                onOpen={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                onSelectItem={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                setValue={setSplitTravellersList}
+                setItems={setSplitItemsEQUAL}
+                onClose={() => {
+                  setModalFlow(MODAL_FLOW_STATE.CLOSED);
+                  splitHandler(splitType);
+                }}
+                listMode="MODAL"
+                multiple={true}
+                CloseIconComponent={() => (
+                  <Text
+                    style={{
+                      color: GlobalStyles.colors.textColor,
+                      fontSize: layout.type(24),
+                      fontWeight: "bold",
+                      padding: layout.space(1),
+                    }}
+                  >
+                    {i18n.t("confirm2")}
+                  </Text>
+                )}
+                min={1}
+                max={99}
+                labelProps={{ style: { padding: layout.space(1) } }}
+                modalProps={{
+                  animationType: "slide",
+                  presentationStyle: "pageSheet",
+                }}
+                searchable={false}
+                modalTitle={i18n.t("whoShared")}
+                modalContentContainerStyle={{
+                  backgroundColor: GlobalStyles.colors.backgroundColor,
+                }}
+                placeholder={i18n.t("placeholderSharedBetween")}
+                containerStyle={[
+                  styles.dropdownContainer,
+                  hidePickers && styles.hidePickersStyle,
+                ]}
+                style={[
+                  styles.whoPaidDropdownContainer,
+                  hidePickers && styles.hidePickersStyle,
+                ]}
+                textStyle={styles.dropdownTextStyle}
+              />
+            )}
+            <View
+              style={[
+                styles.advancedRowSplit,
+                {
+                  marginTop: layout.space(2),
+                  marginLeft: layout.space(2),
+                },
+              ]}
+            >
+              {!splitTypeSelf &&
+                whoPaidValid &&
+                !IsSoloTraveller &&
+                splitListHasNonZeroEntries && (
+                  <Text style={[styles.whoSharedLabel, fieldLabelStyle]}>
+                    {i18n.t("whoShared")}
+                  </Text>
+                )}
+            </View>
+            {!splitTypeSelf && (
+              <KeyboardAvoidingView
+                behavior={Platform.select({
+                  android: undefined,
+                  ios: "position",
+                })}
+                keyboardVerticalOffset={Platform.select({
+                  android: headerHeight,
+                  ios: 0,
+                })}
+                contentContainerStyle={{
+                  flex: 1,
+                  justifyContent: "flex-start",
+                  alignItems: "flex-start",
+                  overflow: "visible",
+                  backgroundColor: GlobalStyles.colors.gray500,
+                }}
+              >
+                <FlatList
+                  data={splitList}
+                  horizontal={true}
+                  contentContainerStyle={{
+                    flex: 1,
+                    minWidth: splitList?.length
+                      ? splitList?.length * dynamicScale(100, false, 0.5) +
+                        dynamicScale(200, false, 0.5)
+                      : 0,
+                    marginLeft: layout.space(1),
+                    marginRight: layout.space(1),
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                  }}
+                  ListHeaderComponent={null}
+                  ListFooterComponent={
+                    <View
+                      style={{ width: dynamicScale(300, false, 0.5) }}
+                    ></View>
+                  }
+                  renderItem={(itemData) => {
+                    const splitValue = splitAmountDisplayValue(itemData.item);
+                    return (
+                      <View style={styles.splitEditorCard}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            paddingHorizontal: layout.space(1),
+                            justifyContent: "space-between",
+                            flex: 1,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: splitListValid
+                                ? GlobalStyles.colors.textColor
+                                : GlobalStyles.colors.error500,
+                              textAlign: "left",
+                              marginLeft: layout.space(1),
+                              paddingTop: dynamicScale(2, true),
+                              fontSize: layout.type(14),
+                            }}
+                          >
+                            {truncateString(itemData.item.userName, 10)}
+                          </Text>
+                          <Pressable
+                            style={{
+                              paddingLeft: layout.space(3),
+                              paddingBottom: layout.space(3),
+                            }}
+                            onPress={() => {
+                              removeUserFromSplit(itemData.item.userName);
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: layout.type(14),
+                                color: GlobalStyles.colors.accent500,
+                                textAlign: "left",
+                                fontWeight: "600",
+                              }}
+                            >
+                              x
+                            </Text>
+                          </Pressable>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "flex-start",
+                            alignItems: "flex-end",
+                            overflow: "visible",
+                            marginLeft: dynamicScale(-16),
+                            marginRight: dynamicScale(-8),
+                          }}
+                        >
+                          <Input
+                            hasCurrency={!!inputs.currency}
+                            inputStyle={[
+                              splitTypeEqual && {
+                                color: GlobalStyles.colors.textColor,
+                              },
+                              {
+                                paddingBottom: dynamicScale(4, true),
+                                marginTop: dynamicScale(-26, true),
+                              },
+                              {
+                                backgroundColor:
+                                  GlobalStyles.colors.backgroundColor,
+                              },
+                            ]}
+                            textInputConfig={{
+                              onFocus: () => {
+                                if (splitType === splitTypes.EQUAL) {
+                                  setSplitType(splitTypes.EXACT);
+                                }
+                              },
+                              keyboardType: "decimal-pad",
+                              onChangeText: inputSplitListHandler.bind(
+                                this,
+                                itemData.index,
+                                itemData.item
+                              ),
+                              value: splitValue,
+                            }}
+                          ></Input>
+                          <Text
+                            style={{
+                              paddingBottom: dynamicScale(11, true),
+                              marginLeft: dynamicScale(-18, false, 1.3),
+                              marginRight: layout.space(1),
+                            }}
+                          >
+                            {getCurrencySymbol(inputs.currency.value)}
+                          </Text>
+                        </View>
+                        {splitListCalcAmounts[itemData.index] && (
+                          <Text style={styles.splitListCalcAmount}>
+                            {"= "}
+                            {formatExpenseWithCurrency(
+                              splitListCalcAmounts[itemData.index],
+                              tripCtx.tripCurrency
+                            )}
+                          </Text>
+                        )}
+                      </View>
+                    );
+                  }}
+                ></FlatList>
+              </KeyboardAvoidingView>
+            )}
+            {!splitTypeSelf && splitListHasNonZeroEntries && paidBackJSX}
+            {isSpecialExpenseJSX}
+          </>
+        ) : null,
+    },
+  ];
+
+  const expenseFormGrid = (
+    <ResponsiveGrid
+      testID="expense-form-grid"
+      layout={layout}
+      multiColumnWhen="landscape"
+      items={expenseFormGridItems}
+    />
+  );
+
   return (
     <>
       {datepickerJSX}
@@ -1410,648 +2043,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
             {backButtonJsx}
             {Platform.OS == "ios" && confirmButtonJSX}
           </View>
-          <Animated.View layout={LinearTransition} style={styles.form}>
-            <View style={styles.inputsRow}>
-              <Input
-                inputStyle={styles.amountInput}
-                label={
-                  i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
-                }
-                textInputConfig={{
-                  keyboardType: "decimal-pad",
-                  onChangeText: inputChangedHandler.bind(this, "amount"),
-                  value: inputs.amount.value,
-                }}
-                // inputAccessoryViewID="amountID"
-                invalid={!inputs.amount.isValid}
-                autoFocus={!isEditing ?? false}
-              />
-              {inputs.amount.value && isAndroid && (
-                <IconButton
-                  buttonStyle={styles.quickSumButton}
-                  icon={"add-outline"}
-                  color={GlobalStyles.colors.textColor}
-                  size={dynamicScale(24, false, 0.5)}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    const _tempAmount = +tempAmount;
-                    const newAmount = _tempAmount + Number(inputs.amount.value);
-                    setTempAmount(newAmount.toFixed(2));
-                    inputChangedHandler("amount", "");
-                  }}
-                />
-              )}
-              {!inputs.amount.value && tempAmount && (
-                <IconButton
-                  buttonStyle={styles.quickSumButton}
-                  icon={"return-down-back-outline"}
-                  color={GlobalStyles.colors.textColor}
-                  size={dynamicScale(24, false, 0.5)}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    const _tempAmount = +tempAmount;
-                    inputChangedHandler("amount", _tempAmount.toFixed(2));
-                    setTempAmount("");
-                  }}
-                />
-              )}
-              {tempAmount && (
-                <Text style={styles.tempAmount}>
-                  +{" "}
-                  {formatExpenseWithCurrency(tempAmount, inputs.currency.value)}
-                </Text>
-              )}
-              {hasCalcAmount && (
-                <Text
-                  style={[!tempAmount ? styles.tempAmount : styles.calcAmount]}
-                >
-                  ={" "}
-                  {formatExpenseWithCurrency(calcAmount, tripCtx.tripCurrency)}
-                </Text>
-              )}
-              <IconButton
-                buttonStyle={styles.iconButton}
-                icon={icon}
-                color={GlobalStyles.colors.primary500}
-                size={dynamicScale(48, false, 0.4)}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  // Store current form state in MMKV before navigation
-                  const idCatData: IDCat = {
-                    expenseId: editedExpenseId,
-                    category: inputs.category.value,
-                  };
-                  setExpenseCat(editedExpenseId, idCatData);
-                  // Also save to draft storage
-                  saveDraftData();
-                  // Navigate with minimal params
-                  navigation.navigate("CategoryPick", {
-                    expenseId: editedExpenseId,
-                    isUpdating: isEditing,
-                  });
-                }}
-              />
-            </View>
-
-            {/* Description field - moved from advanced options for better UX */}
-            <Autocomplete
-              value={inputs.description.value}
-              containerStyle={styles.descriptionContainer}
-              onChange={inputChangedHandler.bind(this, "description")}
-              label={i18n.t("descriptionLabel")}
-              data={suggestionData}
-              style={styles.autoCompleteStyle}
-              menuStyle={styles.autoCompleteMenuStyle}
-              showOnEmpty={false}
-              placeholder=""
-            />
-
-            {/* always show more options when editing */}
-            {!alwaysShowAdvancedSetting && (
-              <Pressable onPress={toggleAdvancedHandler}>
-                <Animated.View style={styles.advancedRow}>
-                  <Ionicons
-                    name={
-                      hideAdvanced
-                        ? "arrow-down-circle-outline"
-                        : "arrow-forward-circle-outline"
-                    }
-                    size={dynamicScale(28, false, 0.5)}
-                    color={GlobalStyles.colors.primary500}
-                  />
-                  {hideAdvanced && (
-                    <Text style={styles.advancedText}>
-                      {i18n.t("showMoreOptions")}
-                    </Text>
-                  )}
-                  {!hideAdvanced && (
-                    <Text style={styles.advancedText}>
-                      {i18n.t("showLessOptions")}
-                    </Text>
-                  )}
-                </Animated.View>
-              </Pressable>
-            )}
-            {/* toggleable content */}
-            {!hideAdvanced && (
+          <Animated.View
+            layout={LinearTransition}
+            style={[styles.form, formLayoutStyle]}
+          >
+            {!hideAdvanced ? (
               <Animated.View
                 entering={FadeInUp.duration(1000)
                   .easing(Easing.out(Easing.exp))
                   .delay(100)}
                 exiting={FadeOutUp.duration(50)}
               >
-                <View style={styles.currencyContainer}>
-                  <Text style={styles.currencyLabel}>
-                    {i18n.t("currencyLabel")}
-                  </Text>
-                  <CurrencyPicker
-                    countryValue={currencyPickerValue}
-                    setCountryValue={setCurrencyPickerValue}
-                    onChangeValue={updateCurrency}
-                    placeholder={currencyPlaceholder}
-                    inputCurrencyCode={inputs.currency.value}
-                  ></CurrencyPicker>
-                </View>
-                <View style={[styles.inputsRowSecond]}>
-                  <View style={styles.countryContainer}>
-                    <Text style={styles.currencyLabel}>
-                      {i18n.t("countryLabel")}
-                    </Text>
-                    <View style={{ flexDirection: "row" }}>
-                      <View
-                        style={[
-                          {
-                            minWidth: "77%",
-                            maxWidth: "77%",
-                          },
-                        ]}
-                      >
-                        <CountryPicker
-                          countryValue={countryPickerValue}
-                          setCountryValue={setCountryPickerValue}
-                          onChangeValue={updateCountry}
-                          placeholder={countryPlaceholder}
-                        ></CountryPicker>
-                      </View>
-                      <ExpenseCountryFlag
-                        countryName={inputs.country.value
-                          ?.split("- ")[0]
-                          .trim()}
-                        style={styles.countryFlag}
-                        containerStyle={styles.countryFlagContainer}
-                      ></ExpenseCountryFlag>
-                    </View>
-                  </View>
-                </View>
-                <View style={styles.dateLabel}>
-                  <Text style={styles.dateLabelText}>
-                    {i18n.t("dateLabel")}
-                  </Text>
-                </View>
-
-                {DatePickerContainer({
-                  openDatePickerRange,
-                  startDate,
-                  endDate,
-                  dateIsRanged,
-                  hideBottomBorder,
-                })}
-
-                <View
-                  style={
-                    duplOrSplit !== 0 && {
-                      paddingBottom: dynamicScale(5, true),
-                      marginHorizontal: "5%",
-                      borderBottomColor: GlobalStyles.colors.textColor,
-                      borderBottomWidth: 1,
-                    }
-                  }
-                >
-                  {duplOrSplit !== 0 && (
-                    <View style={styles.duplOrSplitContainer}>
-                      <Text style={styles.dateLabelDuplSplitText}>
-                        {duplOrSplitString(duplOrSplit)}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                <View style={styles.inputsRowSecond}>
-                  {/* !IsSoloTraveller && */}
-                  {showWhoPaid && (
-                    <View style={styles.whoPaidContainer}>
-                      <Text
-                        style={[
-                          styles.whoPaidLabel,
-                          !inputs.whoPaid.isValid && styles.invalidLabel,
-                        ]}
-                      >
-                        {i18n.t("whoPaid")}
-                      </Text>
-                      {loadingTravellers && (
-                        <ActivityIndicator
-                          size={"large"}
-                          color={GlobalStyles.colors.backgroundColor}
-                        ></ActivityIndicator>
-                      )}
-                      {!loadingTravellers && (
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            marginLeft: dynamicScale(16),
-                            marginTop: dynamicScale(4),
-                          }}
-                        >
-                          {/* equal share equal pay button scale waage */}
-                          {/* share-social-outline */}
-                          {/* checkmark-done-outline */}
-                          {/* "expand-outline" */}
-                          {!IsSoloTraveller && (
-                            <IconButton
-                              icon="people-circle-outline"
-                              size={constantScale(28, 0.5)}
-                              buttonStyle={styles.whoPaidSplitButton}
-                              color={GlobalStyles.colors.primary500}
-                              onPress={() => {
-                                Haptics.impactAsync(
-                                  Haptics.ImpactFeedbackStyle.Light
-                                );
-                                const tempSplitType: splitType =
-                                  splitTypes.EXACT;
-                                const userNames =
-                                  travellerUserNames(currentTravellers);
-                                const listSplits = calcSplitList(
-                                  tempSplitType,
-                                  +amountValue,
-                                  userCtx.userName,
-                                  userNames
-                                );
-                                if (listSplits) {
-                                  setSplitType(tempSplitType);
-                                  // Reset edit order when split type changes
-                                  const splitsWithoutOrder =
-                                    resetEditOrder(listSplits);
-                                  setSplitList(splitsWithoutOrder);
-                                  setSplitListValid(
-                                    validateSplitList(
-                                      splitsWithoutOrder,
-                                      tempSplitType,
-                                      +amountValue
-                                    )
-                                  );
-                                }
-                              }}
-                            ></IconButton>
-                          )}
-                          <DropDownPicker
-                            // renderListItem={(props) =>
-                            //   renderDropDownList(props)
-                            // }
-                            containerStyle={styles.dropdownContainer}
-                            open={modalFlow === MODAL_FLOW_STATE.WHO_PAID}
-                            value={whoPaid}
-                            items={items}
-                            setOpen={(open) => {
-                              setModalFlow(
-                                open ? MODAL_FLOW_STATE.WHO_PAID : MODAL_FLOW_STATE.CLOSED
-                              );
-                            }}
-                            setValue={handleWhoPaidChange}
-                            setItems={setItems}
-                            onClose={() => {
-                              // Only reset modal flow if we're not transitioning to another modal
-                              if (modalFlow === MODAL_FLOW_STATE.WHO_PAID) {
-                                setModalFlow(MODAL_FLOW_STATE.CLOSED);
-                              }
-                            }}
-                            onOpen={() => {
-                              setModalFlow(MODAL_FLOW_STATE.WHO_PAID);
-                              Haptics.impactAsync(
-                                Haptics.ImpactFeedbackStyle.Light
-                              );
-                            }}
-                            onSelectItem={(item) => {
-                              Haptics.impactAsync(
-                                Haptics.ImpactFeedbackStyle.Light
-                              );
-
-                              // Set whoPaid value first
-                              if (item.value === MODAL_FLOW_ADD_TRAVELLER) {
-                                setWhoPaidWithLogging(userCtx.userName);
-                                setSplitType(splitTypes.SELF);
-                              } else {
-                                setWhoPaidWithLogging(item.value);
-                              }
-
-                              // Use state machine to handle modal flow
-                              nextModal(item.value);
-                            }}
-                            listMode="MODAL"
-                            modalProps={{
-                              animationType: "slide",
-                              presentationStyle: "pageSheet",
-                            }}
-                            searchable={false}
-                            modalTitle={i18n.t("whoPaid")}
-                            modalContentContainerStyle={{
-                              backgroundColor:
-                                GlobalStyles.colors.backgroundColor,
-                              marginTop: "2%",
-                              elevation: 2,
-                              shadowColor: GlobalStyles.colors.textColor,
-                              shadowOffset: { width: 1, height: 1 },
-                              shadowOpacity: 0.35,
-                              shadowRadius: 4,
-                            }}
-                            placeholder={userCtx.userName}
-                            style={
-                              !inputs.whoPaid.isValid
-                                ? [
-                                    styles.whoPaidDropdownContainer,
-                                    styles.invalidInput,
-                                  ]
-                                : styles.whoPaidDropdownContainer
-                            }
-                            textStyle={styles.dropdownTextStyle}
-                          />
-                        </View>
-                      )}
-                    </View>
-                  )}
-                  {whoPaidValid && !IsSoloTraveller && (
-                    <DropDownPicker
-                      // renderListItem={(props) => renderDropDownList(props)}
-                      open={modalFlow === MODAL_FLOW_STATE.HOW_SHARED}
-                      value={splitType}
-                      items={splitItems}
-                      setOpen={(open) => {
-                        setModalFlow(
-                          open ? MODAL_FLOW_STATE.HOW_SHARED : MODAL_FLOW_STATE.CLOSED
-                        );
-                      }}
-                      setValue={setSplitType}
-                      setItems={setSplitTypeItems}
-                      onSelectItem={(item) => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        if (item.value === splitTypes.EXACT) {
-                          setSplitType(item.value);
-                        }
-                        nextModal(item.value);
-                      }}
-                      onClose={() => {
-                        // Only reset modal flow if we're not transitioning to another modal
-                        // Don't reset if we're about to go to EXACT_SHARING
-                        if (modalFlow === MODAL_FLOW_STATE.HOW_SHARED) {
-                          setModalFlow(MODAL_FLOW_STATE.CLOSED);
-                        }
-                      }}
-                      onOpen={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      }}
-                      listMode="MODAL"
-                      modalProps={{
-                        animationType: "slide",
-                        presentationStyle: "pageSheet",
-                      }}
-                      searchable={false}
-                      modalTitle={i18n.t("howShared")}
-                      modalContentContainerStyle={{
-                        backgroundColor: GlobalStyles.colors.backgroundColor,
-                      }}
-                      placeholder={i18n.t("placeholderSharedExpense")}
-                      containerStyle={[
-                        styles.dropdownContainer,
-                        hidePickers && styles.hidePickersStyle,
-                      ]}
-                      style={[
-                        styles.whoPaidDropdownContainer,
-                        hidePickers && styles.hidePickersStyle,
-                      ]}
-                      textStyle={styles.dropdownTextStyle}
-                    />
-                  )}
-                </View>
-                {!loadingTravellers && !splitTypeSelf && !IsSoloTraveller && (
-                  <DropDownPicker
-                    // renderListItem={(props) => renderDropDownList(props)}
-                    open={modalFlow === MODAL_FLOW_STATE.EXACT_SHARING || openEQUAL}
-                    value={splitTravellersList}
-                    items={splitItemsEQUAL}
-                    setOpen={(open) => {
-                      if (open) {
-                        setModalFlow(MODAL_FLOW_STATE.EXACT_SHARING);
-                      } else {
-                        setModalFlow(MODAL_FLOW_STATE.CLOSED);
-                        setOpenEQUAL(false);
-                      }
-                    }}
-                    onOpen={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    onSelectItem={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    setValue={setSplitTravellersList}
-                    setItems={setSplitItemsEQUAL}
-                    onClose={() => {
-                      setModalFlow(MODAL_FLOW_STATE.CLOSED);
-                      splitHandler(splitType);
-                    }}
-                    listMode="MODAL"
-                    multiple={true}
-                    CloseIconComponent={() => (
-                      <Text
-                        style={{
-                          color: GlobalStyles.colors.textColor,
-                          fontSize: dynamicScale(24, false, 0.3),
-                          fontWeight: "bold",
-                          padding: dynamicScale(4),
-                        }}
-                      >
-                        {i18n.t("confirm2")}
-                      </Text>
-                    )}
-                    min={1}
-                    max={99}
-                    labelProps={{ style: { padding: dynamicScale(4) } }}
-                    modalProps={{
-                      animationType: "slide",
-                      presentationStyle: "pageSheet",
-                    }}
-                    searchable={false}
-                    modalTitle={i18n.t("whoShared")}
-                    modalContentContainerStyle={{
-                      backgroundColor: GlobalStyles.colors.backgroundColor,
-                    }}
-                    placeholder={i18n.t("placeholderSharedBetween")}
-                    containerStyle={[
-                      styles.dropdownContainer,
-                      hidePickers && styles.hidePickersStyle,
-                    ]}
-                    style={[
-                      styles.whoPaidDropdownContainer,
-                      hidePickers && styles.hidePickersStyle,
-                    ]}
-                    textStyle={styles.dropdownTextStyle}
-                  />
-                )}
-                <View
-                  style={[
-                    styles.advancedRowSplit,
-                    {
-                      marginTop: dynamicScale(12, false, 0.5),
-                      marginLeft: dynamicScale(12, false, 0.5),
-                    },
-                  ]}
-                >
-                  {!splitTypeSelf &&
-                    whoPaidValid &&
-                    !IsSoloTraveller &&
-                    splitListHasNonZeroEntries && (
-                      <Text style={[styles.whoSharedLabel]}>
-                        {i18n.t("whoShared")}
-                      </Text>
-                    )}
-                </View>
-
-                {!splitTypeSelf && (
-                  <KeyboardAvoidingView
-                    behavior={Platform.select({
-                      android: undefined,
-                      ios: "position",
-                    })}
-                    keyboardVerticalOffset={Platform.select({
-                      android: headerHeight,
-                      ios: 0,
-                    })}
-                    contentContainerStyle={{
-                      flex: 1,
-                      justifyContent: "flex-start",
-                      alignItems: "flex-start",
-                      overflow: "visible",
-                      backgroundColor: GlobalStyles.colors.gray500,
-                    }}
-                  >
-                    <FlatList
-                      // numColumns={2}
-                      data={splitList}
-                      horizontal={true}
-                      contentContainerStyle={{
-                        flex: 1,
-                        minWidth: splitList?.length
-                          ? splitList?.length * dynamicScale(100, false, 0.5) +
-                            dynamicScale(200, false, 0.5)
-                          : 0,
-                        marginLeft: dynamicScale(8, false, 0.5),
-                        marginRight: dynamicScale(8, false, 0.5),
-                        justifyContent: "flex-start",
-                        alignItems: "flex-start",
-                      }}
-                      ListHeaderComponent={null}
-                      ListFooterComponent={
-                        <View
-                          style={{ width: dynamicScale(300, false, 0.5) }}
-                        ></View>
-                      }
-                      renderItem={(itemData) => {
-                        const splitValue = splitAmountDisplayValue(itemData.item);
-                        return (
-                          <View style={styles.splitEditorCard}>
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                paddingHorizontal: dynamicScale(4, false, 0.5),
-                                // space out
-                                justifyContent: "space-between",
-                                flex: 1,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  color: splitListValid
-                                    ? GlobalStyles.colors.textColor
-                                    : GlobalStyles.colors.error500,
-                                  textAlign: "left",
-                                  marginLeft: dynamicScale(4),
-                                  paddingTop: dynamicScale(2, true),
-                                  fontSize: dynamicScale(14, false, 0.3),
-                                }}
-                              >
-                                {truncateString(itemData.item.userName, 10)}
-                              </Text>
-                              <Pressable
-                                style={{
-                                  paddingLeft: dynamicScale(16),
-                                  paddingBottom: dynamicScale(16, true),
-                                }}
-                                onPress={() => {
-                                  removeUserFromSplit(
-                                    itemData.item.userName
-                                  );
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    fontSize: dynamicScale(14, false, 0.3),
-                                    color: GlobalStyles.colors.accent500,
-                                    textAlign: "left",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  x
-                                </Text>
-                              </Pressable>
-                            </View>
-                            {/* Horizontal container  */}
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                justifyContent: "flex-start",
-                                alignItems: "flex-end",
-                                overflow: "visible",
-                                // borderWidth: 1,
-                                marginLeft: dynamicScale(-16),
-                                marginRight: dynamicScale(-8),
-                              }}
-                            >
-                              <Input
-                                hasCurrency={!!inputs.currency}
-                                inputStyle={[
-                                  splitTypeEqual && {
-                                    color: GlobalStyles.colors.textColor,
-                                  },
-                                  {
-                                    paddingBottom: dynamicScale(4, true),
-                                    marginTop: dynamicScale(-26, true),
-                                  },
-                                  {
-                                    backgroundColor:
-                                      GlobalStyles.colors.backgroundColor,
-                                  },
-                                ]}
-                                textInputConfig={{
-                                  onFocus: () => {
-                                    if (splitType === splitTypes.EQUAL) {
-                                      setSplitType(splitTypes.EXACT);
-                                    }
-                                  },
-                                  keyboardType: "decimal-pad",
-                                  onChangeText: inputSplitListHandler.bind(
-                                    this,
-                                    itemData.index,
-                                    itemData.item
-                                  ),
-                                  value: splitValue,
-                                }}
-                              ></Input>
-                              <Text
-                                style={{
-                                  paddingBottom: dynamicScale(11, true),
-                                  marginLeft: dynamicScale(-18, false, 1.3),
-                                  marginRight: dynamicScale(8),
-                                }}
-                              >
-                                {getCurrencySymbol(inputs.currency.value)}
-                              </Text>
-                            </View>
-                            {splitListCalcAmounts[itemData.index] && (
-                              <Text style={styles.splitListCalcAmount}>
-                                {"= "}
-                                {formatExpenseWithCurrency(
-                                  splitListCalcAmounts[itemData.index],
-                                  tripCtx.tripCurrency
-                                )}
-                              </Text>
-                            )}
-                          </View>
-                        );
-                      }}
-                    ></FlatList>
-                  </KeyboardAvoidingView>
-                )}
-                {!splitTypeSelf && splitListHasNonZeroEntries && paidBackJSX}
-                {isSpecialExpenseJSX}
+                {expenseFormGrid}
               </Animated.View>
+            ) : (
+              expenseFormGrid
             )}
             {formIsInvalid && !hideAdvanced && (
               <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
@@ -2064,16 +2070,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
             inputs.currency.value &&
             inputs.country.value && (
               <View style={styles.getLocalPriceContainer}>
-                <ActionRow
-                  testID="expense-form-get-local-price"
-                  tier="gradient"
-                  label={i18n.t("getLocalPriceTitle")}
-                  hint={getLocalPriceRowHint}
-                  imageIconSource={require("../../assets/chatgpt-logo.jpeg")}
-                  onPress={askChatGPTHandler}
-                  showChevron={false}
-                  style={styles.getLocalPriceButton}
-                />
+                <ControlFrame
+                  layout={layout}
+                  testID="expense-form-get-local-price-frame"
+                >
+                  <ActionRow
+                    testID="expense-form-get-local-price"
+                    tier="gradient"
+                    label={i18n.t("getLocalPriceTitle")}
+                    hint={getLocalPriceRowHint}
+                    imageIconSource={require("../../assets/chatgpt-logo.jpeg")}
+                    onPress={askChatGPTHandler}
+                    showChevron={false}
+                    style={styles.getLocalPriceButton}
+                  />
+                </ControlFrame>
               </View>
             )}
           <View style={styles.buttonContainer}>
@@ -2098,68 +2109,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           </View>
         </Animated.View>
       </Animated.View>
-      {false && ( //Platform.OS == "ios" && ( // comment this out for now, it's not working (not pressable)
-        // QuickSum Button on ios
-        <InputAccessoryView nativeID="amountID">
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingLeft: "44%",
-              paddingRight: "4%",
-              alignContent: "center",
-              alignItems: "center",
-              backgroundColor: GlobalStyles.colors.backgroundColorLight,
-              borderTopWidth: 1,
-              borderColor: GlobalStyles.colors.gray700,
-              minWidth: isTablet ? (isPortrait ? "90%" : "135%") : "100%",
-            }}
-          >
-            <Pressable
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "center",
-                alignItems: "center",
-                // backgroundColor: "white",
-                // borderWidth: 1,
-                // borderColor: "black",
-              }}
-              onPress={onPressHandlerQuickSum}
-            >
-              {/* <Text style={{ borderWidth: 1, borderColor: "blue" }}>Test</Text> */}
-              {inputs.amount.value && (
-                <IconButton
-                  buttonStyle={styles.taskBarButtons}
-                  icon={"add-outline"}
-                  color={GlobalStyles.colors.textColor}
-                  size={dynamicScale(24, false, 0.5)}
-                  onPress={onPressHandlerQuickSum}
-                />
-              )}
-              {!inputs.amount.value && tempAmount && (
-                <IconButton
-                  buttonStyle={styles.taskBarButtons}
-                  icon={"return-down-back-outline"}
-                  color={GlobalStyles.colors.textColor}
-                  size={dynamicScale(24, false, 0.5)}
-                  onPress={() => {}}
-                />
-              )}
-            </Pressable>
-            {!inputs.amount.value ||
-              (!tempAmount && (
-                <Pressable>
-                  <Text style={{ color: GlobalStyles.colors.primary700 }}>
-                    {i18n.t("confirm2")}
-                  </Text>
-                </Pressable>
-              ))}
-          </View>
-        </InputAccessoryView>
-      )}
     </>
   );
 };

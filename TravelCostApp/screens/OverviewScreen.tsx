@@ -5,20 +5,18 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import DropDownPicker from "react-native-dropdown-picker";
 import { ExpensesContext } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
 import {
-  Platform,
   StyleSheet,
-  Text,
   View,
   RefreshControl,
   Pressable,
 } from "react-native";
-import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../styles/shadow-regression-styles";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
+import TripPeriodChrome from "../components/layout/TripPeriodChrome";
+import ContentFrame from "../components/layout/ContentFrame";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 
@@ -40,6 +38,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import { useLayoutProfile } from "../store/layout-context";
 import { OnboardingFlags } from "../types/onboarding";
 import { refreshWithToast } from "../util/refreshWithToast";
 import { getOfflineQueue } from "../util/offline-queue";
@@ -164,105 +163,68 @@ const OverviewScreen = ({ navigation }) => {
   //   expensesSum,
   //   tripCtx.tripCurrency
   // );
-  const { isPortrait, isTablet } = useContext(OrientationContext);
+  const { isTablet } = useContext(OrientationContext);
+  const layout = useLayoutProfile();
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
-      <View
-        testID="period-date-header"
-        style={[
-          styles.dateHeader,
-          !isPortrait && styles.landscapeDateHeader,
-          isTablet && styles.tabletDateHeader,
-        ]}
+      <ContentFrame
+        layout={layout}
+        style={styles.contentFrame}
+        testID="overview-content-frame"
       >
-        <Text style={styles.dateString}>
-          {truncateString(tripCtx.tripName, dynamicScale(23, false, 0.5))} -{" "}
-          {dateTimeString}
-          {offlineString}
-        </Text>
-      </View>
-      <View
-        testID="period-header-row"
-        style={[styles.header, !isPortrait && styles.landscapeHeader]}
-      >
-        <DropDownPicker
-          open={open}
-          value={PeriodValue}
-          items={items}
-          showTickIcon={false}
-          placeholder={""}
-          modalProps={{
-            animationType: "slide",
-          }}
-          setOpen={() => {
+        <TripPeriodChrome
+          tripLabel={`${truncateString(tripCtx.tripName, dynamicScale(23, false, 0.5))} - ${dateTimeString}${offlineString}`}
+          periodValue={PeriodValue}
+          periodItems={items}
+          periodOpen={open}
+          onPeriodOpenChange={(nextOpen) => {
             requestAnimationFrame(() => {
-              setOpen(!open);
+              setOpen(nextOpen);
               Toast.hide();
             });
           }}
-          onOpen={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-          onClose={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-          onSelectItem={(item) => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            trackEvent(VexoEvents.PERIOD_SELECTOR_CHANGED, {
-              period: item.value,
-            });
-          }}
-          setValue={(callback) => {
+          onPeriodValueChange={(callback) => {
             userCtx.setPeriodString(callback(PeriodValue));
           }}
-          setItems={setItems}
-          containerStyle={styles.dropdownContainer}
-          dropDownContainerStyle={styles.dropdownContainerDropdown}
-          itemProps={{
-            style: {
-              height: dynamicScale(50, false, 0.5),
-              padding: dynamicScale(4, false, 0.5),
-              marginLeft: dynamicScale(4),
-            },
+          onPeriodItemsChange={setItems}
+          periodModalProps={{
+            animationType: "slide",
           }}
-          // customItemLabelStyle={styles.dropdownItemLabel}
-          style={styles.dropdown}
-          textStyle={styles.dropdownTextStyle}
-        />
-        <ExpensesSummary
+          onPeriodOpen={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onPeriodClose={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onPeriodSelectItem={(item) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            trackEvent(VexoEvents.PERIOD_SELECTOR_CHANGED, {
+              period: item?.value,
+            });
+          }}
           expenses={recentExpenses}
-          periodName={PeriodValue}
-          style={styles.customSummaryStyle}
+          summaryStyle={styles.customSummaryStyle}
         />
-      </View>
-      {
-        <View
-          style={[
-            shadowRegressionStyles.overviewDividerBar,
-            !isPortrait && styles.landscapeBar,
-            !isPortrait && isTablet && styles.landscapeBarTablet,
-          ]}
-        ></View>
-      }
 
-      <View style={{ flex: 1 }}>
-        <MemoizedExpensesOverview
-          navigation={navigation}
-          expenses={recentExpenses}
-          periodName={PeriodValue}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing || isFetching}
-              onRefresh={onRefresh}
-              tintColor={GlobalStyles.colors.textColor}
-              colors={[GlobalStyles.colors.textColor]}
-              style={{
-                backgroundColor: "transparent",
-              }}
-            />
-          }
-        />
-      </View>
+        <View style={{ flex: 1 }}>
+          <MemoizedExpensesOverview
+            navigation={navigation}
+            expenses={recentExpenses}
+            periodName={PeriodValue}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing || isFetching}
+                onRefresh={onRefresh}
+                tintColor={GlobalStyles.colors.textColor}
+                colors={[GlobalStyles.colors.textColor]}
+                style={{
+                  backgroundColor: "transparent",
+                }}
+              />
+            }
+          />
+        </View>
+      </ContentFrame>
 
       {/* FAB Toggle Button */}
       <Pressable
@@ -292,67 +254,12 @@ const styles = StyleSheet.create({
   tabletPaddingTop: {
     paddingTop: constantScale(12, 0.5),
   },
-  dateHeader: {
-    ...shadowRegressionStyles.overviewPeriodDateHeader,
+  contentFrame: {
+    flex: 1,
   },
-  landscapeDateHeader: {
-    marginTop: dynamicScale(4, true),
-    marginBottom: dynamicScale(-24, true),
-    alignSelf: "center",
+  customSummaryStyle: {
+    marginTop: dynamicScale(2, true),
   },
-  tabletDateHeader: {
-    marginTop: dynamicScale(4, true),
-    marginBottom: dynamicScale(-8, true),
-    alignSelf: "center",
-  },
-  dateString: {
-    fontSize: dynamicScale(12, false, 0.5),
-    fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
-  },
-  header: {
-    ...shadowRegressionStyles.overviewPeriodHeaderRow,
-  },
-  landscapeHeader: {
-    marginTop: dynamicScale(12, true),
-    marginBottom: dynamicScale(-12, true),
-    zIndex: 10,
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: dynamicScale(12),
-  },
-  dropdownContainer: {
-    ...shadowRegressionStyles.overviewDropdownContainer,
-  },
-  dropdownContainerDropdown: {
-    maxHeight: dynamicScale(600, true),
-    ...shadowRegressionStyles.dropdownListContainer,
-  },
-  dropdown: {
-    ...shadowRegressionStyles.overviewDropdownInner,
-  },
-  dropdownTextStyle: {
-    fontSize:
-      i18n.locale == "fr"
-        ? dynamicScale(20, false, 0.5)
-        : periodHeaderLabelFontSize,
-    fontWeight: "bold",
-  },
-  scaledUpTextStyle: {
-    fontSize: dynamicScale(24, false, 0.5),
-  },
-  zBehind: {
-    zIndex: 10,
-  },
-  landscapeBar: {
-    marginTop: dynamicScale(12, true),
-    marginBottom: dynamicScale(-12, true),
-  },
-  landscapeBarTablet: {
-    marginTop: dynamicScale(52, true, 1),
-    marginBottom: dynamicScale(4, true),
-  },
-  customSummaryStyle: {},
   fabToggleButton: {
     ...shadowRegressionStyles.overviewFabToggleButton,
   },

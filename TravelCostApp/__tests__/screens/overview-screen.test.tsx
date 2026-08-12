@@ -49,9 +49,11 @@ jest.mock("../../components/ExpensesOutput/ExpensesOverview", () => {
 });
 
 import OverviewScreen from "../../screens/OverviewScreen";
+import LayoutContextProvider from "../../store/layout-context";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { makeExpense } from "../fixtures/expense";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
+import { Dimensions, StyleSheet } from "react-native";
 
 const graphExpensesContext = {
   expenses: [makeExpense({ category: "Food", calcAmount: 42 })],
@@ -187,5 +189,34 @@ describe("Overview screen", () => {
 
     expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
     expect(Toast.show).not.toHaveBeenCalled();
+  });
+
+  it("wraps overview content in an 800px ContentFrame on wide layouts", () => {
+    jest.spyOn(Dimensions, "get").mockReturnValue({
+      width: 1194,
+      height: 834,
+      scale: 2,
+      fontScale: 1,
+    });
+
+    const screen = renderWithAppProviders(
+      <LayoutContextProvider>
+        <OverviewScreen navigation={{ navigate: jest.fn() } as any} />
+      </LayoutContextProvider>,
+      {
+        user: {
+          isShowingGraph: false,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: { expenses: [], getRecentExpenses: () => [] },
+      }
+    );
+
+    const frame = StyleSheet.flatten(
+      screen.getByTestId("overview-content-frame").props.style
+    ) as Record<string, unknown>;
+
+    expect(frame.maxWidth).toBe(800);
+    expect(frame.alignSelf).toBe("center");
   });
 });

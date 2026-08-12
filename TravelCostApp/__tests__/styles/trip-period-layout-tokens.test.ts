@@ -44,4 +44,14 @@ describe("trip-period-layout-tokens", () => {
     expect(tokens.periodHeaderRow.gap).toBe(20);
     expect(tokens.headerCard.minHeight).toBe(40);
   });
+
+  it("uses non-overlapping layout spacing on medium tablet landscape", () => {
+    const mediumLandscape = layoutFor({ width: 736, height: 414 });
+    const tokens = tripPeriodLayoutTokens(mediumLandscape);
+
+    expect(tokens.periodDateHeader.marginBottom).toBe(mediumLandscape.space(1));
+    expect(Number(tokens.periodDateHeader.marginBottom)).toBeGreaterThanOrEqual(0);
+    expect(tokens.periodHeaderRow.gap).toBe(mediumLandscape.space(2));
+    expect(tokens.dividerBar.marginTop).toBe(mediumLandscape.space(3));
+  });
 });

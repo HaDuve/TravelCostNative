@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     // Offset TripPeriodChrome divider's negative marginBottom (-12) plus shadow space
     marginTop: dynamicScale(24, true, 0.3),
+    paddingTop: dynamicScale(8, true, 0.3),
     // backgroundColor: GlobalStyles.colors.backgroundColor,
     // borderWidth: 1,
   },

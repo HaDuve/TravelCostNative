@@ -180,9 +180,9 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   fallbackContainer: {
-    position: "absolute",
+    flex: 1,
     marginHorizontal: "10%",
-    height: Dimensions.get("window").height,
+    minHeight: Dimensions.get("window").height * 0.5,
   },
   fallbackScrollView: {
     flex: 1,

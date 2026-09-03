@@ -76,6 +76,9 @@ function TripPeriodChrome({
           showTickIcon={false}
           placeholder=""
           modalProps={periodModalProps}
+          numberOfLines={1}
+          adjustsFontSizeToFit={true}
+          minimumFontScale={0.7}
           setOpen={(callback) => {
             const nextOpen =
               typeof callback === "function" ? callback(periodOpen) : callback;

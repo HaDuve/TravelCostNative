@@ -257,6 +257,8 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           borderRadius={dynamicScale(6)}
           progress={budgetProgress}
           height={constantScale(6, 0.5)}
+          width={null}
+          style={{ alignSelf: "stretch" }}
         />
       )}
     </Pressable>

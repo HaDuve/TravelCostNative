@@ -171,6 +171,10 @@ ExpensesOutput.propTypes = {
   awaitingTripFetch: PropTypes.bool,
 };
 
+// Minimum height for empty state container as fraction of screen height
+// Ensures empty state is visible without excessive whitespace
+const EMPTY_STATE_MIN_HEIGHT_RATIO = 0.5;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -180,9 +184,9 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   fallbackContainer: {
-    position: "absolute",
+    flex: 1,
     marginHorizontal: "10%",
-    height: Dimensions.get("window").height,
+    minHeight: Dimensions.get("window").height * EMPTY_STATE_MIN_HEIGHT_RATIO,
   },
   fallbackScrollView: {
     flex: 1,

@@ -77,46 +77,14 @@ function ExpensesOutput({
       );
     }
     return (
-      <Animated.View 
-        exiting={SlideOutLeft} 
-        style={[
-          styles.fallbackContainer,
-          __DEV__ && { borderWidth: 2, borderColor: 'red' }
-        ]}
-        onLayout={(event) => {
-          if (__DEV__) {
-            console.log('[DEBUG-emptystate] fallbackContainer layout:', event.nativeEvent.layout);
-          }
-        }}
-      >
+      <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
         <ScrollView
-          style={[
-            styles.fallbackScrollView,
-            __DEV__ && { borderWidth: 2, borderColor: 'blue' }
-          ]}
-          contentContainerStyle={[
-            styles.fallbackScrollContent,
-            __DEV__ && { borderWidth: 2, borderColor: 'green' }
-          ]}
+          style={styles.fallbackScrollView}
+          contentContainerStyle={styles.fallbackScrollContent}
           refreshControl={refreshControl}
           showsVerticalScrollIndicator={false}
-          onLayout={(event) => {
-            if (__DEV__) {
-              console.log('[DEBUG-emptystate] ScrollView layout:', event.nativeEvent.layout);
-            }
-          }}
         >
-          <View 
-            style={[
-              styles.fallbackInnerContainer,
-              __DEV__ && { borderWidth: 2, borderColor: 'yellow' }
-            ]}
-            onLayout={(event) => {
-              if (__DEV__) {
-                console.log('[DEBUG-emptystate] fallbackInnerContainer layout:', event.nativeEvent.layout);
-              }
-            }}
-          >
+          <View style={styles.fallbackInnerContainer}>
             {deferEmptyState && <LoadingOverlay></LoadingOverlay>}
             {!deferEmptyState && (
               <Text style={styles.infoText}>{fallbackText}</Text>

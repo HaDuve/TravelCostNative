@@ -5,6 +5,7 @@ __Newest Changes:
 1.3.005m
 - New Premium Nomad status screen with perks, renewal dates, and manage subscription
 - Fixed new expense form resetting when selecting trip home currency
+- Fixed layout issues on devices with larger font sizes
 - Bugfixes and performance improvements
 
 __Other Changes:

@@ -28,23 +28,18 @@ describe("ScreenHeaderBar", () => {
   it("should apply consistent shadow styles matching ProfileToolbar", () => {
     const result = render(<ScreenHeaderBar title="Test" />);
     const header = result.getByTestId("screen-header-bar");
-    const shadowSeparator = result.getByTestId("screen-header-bar-shadow");
-    
     const headerStyle = StyleSheet.flatten(header.props.style) as Record<string, unknown>;
-    const shadowStyle = StyleSheet.flatten(shadowSeparator.props.style) as Record<string, unknown>;
 
-    // Header should have background and z-index
     expect(headerStyle.backgroundColor).toBe(GlobalStyles.colors.backgroundColor);
     expect(headerStyle.zIndex).toBe(1);
 
-    // Shadow separator should have the shadow styles
     if (Platform.OS === "ios") {
-      expect(shadowStyle.shadowColor).toBe(GlobalStyles.colors.textColor);
-      expect(shadowStyle.shadowOffset).toEqual({ width: 0, height: 2 });
-      expect(shadowStyle.shadowOpacity).toBe(0.12);
-      expect(shadowStyle.shadowRadius).toBe(4);
+      expect(headerStyle.shadowColor).toBe(GlobalStyles.colors.textColor);
+      expect(headerStyle.shadowOffset).toEqual({ width: 0, height: 2 });
+      expect(headerStyle.shadowOpacity).toBe(0.12);
+      expect(headerStyle.shadowRadius).toBe(4);
     } else if (Platform.OS === "android") {
-      expect(shadowStyle.elevation).toBe(4);
+      expect(headerStyle.elevation).toBe(4);
     }
   });
 

@@ -997,7 +997,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [baseInputChangedHandler, debouncedAutoCategory, scheduleDraftSave]
   );
 
+  const currencyChosenByUserRef = useRef(false);
+  const countryChosenByUserRef = useRef(false);
+
   useEffect(() => {
+    if (currencyChosenByUserRef.current) {
+      return;
+    }
     const preferred = resolveLoadedLastCurrencyIfStale({
       isEditing,
       lastCurrency: userCtx.lastCurrency,
@@ -1019,6 +1025,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   ]);
 
   useEffect(() => {
+    if (countryChosenByUserRef.current) {
+      return;
+    }
     const preferred = resolveLoadedLastCountryIfStale({
       isEditing,
       lastCountry: userCtx.lastCountry,
@@ -1332,11 +1341,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // split the countryValue into country and currency
     const currency = currencyPickerValue?.split("- ")[0]?.split(" ")[0]?.trim();
     // const country = currencyPickerValue?.split("- ")[1].trim();
+    currencyChosenByUserRef.current = true;
     inputChangedHandler("currency", currency);
   }
 
   function updateCountry() {
     const country_EN = countryPickerValue?.split("- ")[0].trim();
+    countryChosenByUserRef.current = true;
     inputChangedHandler("country", country_EN);
   }
 

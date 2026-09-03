@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   headerBar: {
     minHeight: ProfileToolbarTokens.chromeHeight,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    paddingBottom: ProfileToolbarTokens.paddingVertical,
+    paddingBottom: dynamicScale(12, true),
     paddingHorizontal: dynamicScale(16, false, 0.5),
     justifyContent: "center",
     alignItems: "center",

@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Platform, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import PropTypes from "prop-types";
 
@@ -60,11 +67,11 @@ function TripPeriodChrome({
   const tokens = tripPeriodLayoutTokens(layout);
   const styles = React.useMemo(
     () => createStyles(tokens.periodHeaderLabelFontSize),
-    [tokens.periodHeaderLabelFontSize]
+    [tokens.periodHeaderLabelFontSize],
   );
 
   return (
-    <>
+    <View style={styles.container}>
       <View testID="period-date-header" style={tokens.periodDateHeader}>
         <View style={styles.dateHeaderContent}>
           <Text style={styles.dateString}>{tripLabel}</Text>
@@ -118,16 +125,18 @@ function TripPeriodChrome({
           />
         ) : null}
       </View>
-
-      <View
-        style={[shadowRegressionStyles.overviewDividerBar, tokens.dividerBar]}
-      />
-    </>
+    </View>
   );
 }
 
 function createStyles(periodHeaderLabelFontSize: number) {
   return StyleSheet.create({
+    container: {
+      backgroundColor: GlobalStyles.colors.backgroundColorLight,
+      width: "100%",
+      zIndex: 1000,
+      ...shadowRegressionStyles.headerBarShadow,
+    },
     dateHeaderContent: {
       flexDirection: "row",
       alignItems: "center",

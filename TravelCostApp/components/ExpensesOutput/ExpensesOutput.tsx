@@ -184,7 +184,8 @@ const styles = StyleSheet.create({
   fallbackContainer: {
     // Removed flex: 1 - was causing container to escape bounds and overlap separator
     // minHeight alone is sufficient to ensure visibility
-    marginHorizontal: "10%",
+    marginHorizontal: dynamicScale(48, false, 0.3),
+    paddingTop: dynamicScale(48, false, 0.3),
     minHeight: Dimensions.get("window").height * EMPTY_STATE_MIN_HEIGHT_RATIO,
   },
   fallbackScrollView: {

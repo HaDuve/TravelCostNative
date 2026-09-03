@@ -255,10 +255,11 @@ describe("Layout regression fixes", () => {
       const fallbackText = screen.getByText(/Noch keine Ausgaben/);
       expect(fallbackText).toBeTruthy();
       
-      // Container should be positioned in document flow (flex: 1), not absolutely
-      // Verify by checking the container doesn't have absolute positioning style
+      // Container should stay within ContentFrame bounds, not escape using flex:1.
+      // Previously: flex:1 caused container to overlap separator bar.
+      // Fixed: removed flex:1, relying on minHeight for proper document flow positioning.
       // Note: React Native Testing Library doesn't expose parent container styles easily,
-      // so we verify the component renders and trust the unit change (absolute → flex)
+      // so we verify the component renders and trust the unit change (absolute → no flex:1)
       // Visual regression or E2E would be needed for full z-order verification
       expect(screen.getByText(/Noch keine Ausgaben/)).toBeTruthy();
     });

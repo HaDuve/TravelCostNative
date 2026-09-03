@@ -184,7 +184,8 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   fallbackContainer: {
-    flex: 1,
+    // Removed flex: 1 - was causing container to escape bounds and overlap separator
+    // minHeight alone is sufficient to ensure visibility
     marginHorizontal: "10%",
     minHeight: Dimensions.get("window").height * EMPTY_STATE_MIN_HEIGHT_RATIO,
   },

@@ -8,6 +8,7 @@
 import * as React from "react";
 import { Dimensions, Platform, StyleSheet, Text } from "react-native";
 import { waitFor } from "@testing-library/react-native";
+import { dynamicScale } from "../../util/scalingUtil";
 
 // Mock vexo-analytics
 jest.mock("../../util/vexo-tracking", () => ({
@@ -179,6 +180,35 @@ describe("Layout regression fixes", () => {
       // The width should be undefined or a percentage, not a fixed large number
       expect(progressProps.width).toBeUndefined();
     });
+
+    it("should have at least 4px horizontal padding around the progress bar", () => {
+      const expenses = [makeExpense({ calcAmount: 75, amount: 75 })];
+
+      const screen = renderWithAppProviders(
+        <ExpensesSummary expenses={expenses} periodName="month" />,
+        {
+          wrapNavigation: false,
+          expenses: {
+            expenses,
+            getRecentExpenses: () => expenses,
+          },
+        }
+      );
+
+      // Find the progress bar
+      const progressBar = screen.getByTestId("expenses-summary-progress");
+      expect(progressBar).toBeTruthy();
+
+      // Progress bar container should have horizontal padding
+      const progressBarStyle = StyleSheet.flatten(progressBar.props.style) as Record<string, unknown>;
+      
+      // Check that horizontal padding/margin exists and is at least 4
+      const hasHorizontalPadding = 
+        (typeof progressBarStyle.paddingHorizontal === 'number' && progressBarStyle.paddingHorizontal >= 4) ||
+        (typeof progressBarStyle.marginHorizontal === 'number' && progressBarStyle.marginHorizontal >= 4);
+      
+      expect(hasHorizontalPadding).toBe(true);
+    });
   });
 
   describe("Empty state centering", () => {
@@ -255,12 +285,54 @@ describe("Layout regression fixes", () => {
       const fallbackText = screen.getByText(/Noch keine Ausgaben/);
       expect(fallbackText).toBeTruthy();
       
-      // Container should be positioned in document flow (flex: 1), not absolutely
-      // Verify by checking the container doesn't have absolute positioning style
+      // Container should stay within ContentFrame bounds, not escape using flex:1.
+      // Previously: flex:1 caused container to overlap separator bar.
+      // Fixed: removed flex:1, relying on minHeight for proper document flow positioning.
       // Note: React Native Testing Library doesn't expose parent container styles easily,
-      // so we verify the component renders and trust the unit change (absolute → flex)
+      // so we verify the component renders and trust the unit change (absolute → no flex:1)
       // Visual regression or E2E would be needed for full z-order verification
       expect(screen.getByText(/Noch keine Ausgaben/)).toBeTruthy();
+    });
+
+    it("should not use hardcoded offsets to compensate for TripPeriodChrome negative margins", async () => {
+      const screen = renderWithAppProviders(
+        <MemoizedExpensesOutput
+          expenses={[]}
+          fallbackText="Test"
+          refreshing={false}
+          isFiltered={false}
+          awaitingTripFetch={false}
+        />,
+        {
+          wrapNavigation: true,
+          trip: {
+            tripid: "t1",
+            tripName: "Test Trip",
+          },
+          expenses: {
+            expenses: [],
+            getRecentExpenses: () => [],
+            getDailyExpenses: () => [],
+          },
+        }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/Test/)).toBeTruthy();
+      });
+
+      // ExpensesOutput container should use semantic spacing without fragile compensation
+      // for TripPeriodChrome's internal negative margin.
+      // The specific pattern marginTop:24 + paddingTop:8 was compensation for marginBottom:-12
+      const container = screen.getByTestId("expenses-output-container");
+      const containerStyle = StyleSheet.flatten(container.props.style) as Record<string, unknown>;
+      
+      // Verify no brittle compensation pattern exists
+      const hasBrittlePattern = 
+        containerStyle.marginTop === dynamicScale(24, true, 0.3) &&
+        containerStyle.paddingTop === dynamicScale(8, true, 0.3);
+      
+      expect(hasBrittlePattern).toBe(false);
     });
   });
 });

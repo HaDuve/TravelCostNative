@@ -8,6 +8,7 @@ import {
   Alert,
   Pressable,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useCallback, useContext, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -51,9 +52,10 @@ import * as Progress from "react-native-progress";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
-import { Platform } from "react-native";
 import { safelyParseJSON } from "../util/jsonParse";
 import * as Haptics from "expo-haptics";
+import { ProfileToolbarTokens } from "../styles/profile-toolbar-tokens";
+import { ScreenHeaderBar } from "../components/UI/ScreenHeaderBar";
 
 export type TripAsObject = TripSummaryListItem;
 export type TravellerAndCost = {
@@ -326,13 +328,13 @@ const TripSummaryScreen = ({ navigation }) => {
   }
   if (isFetching) return <LoadingBarOverlay></LoadingBarOverlay>;
   return (
-    <ScrollView
-      style={{
-        marginTop: dynamicScale(12, false, 0.5),
-        paddingBottom: dynamicScale(48, false, 0.5),
-      }}
-    >
-      {tripSummary && (
+    <View style={styles.container}>
+      <ScreenHeaderBar title={i18n.t("summary")} />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {tripSummary && (
         <>
           <Pressable
             onPress={() => {
@@ -650,7 +652,8 @@ const TripSummaryScreen = ({ navigation }) => {
           ]}
         />
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -661,6 +664,16 @@ TripSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: dynamicScale(48, false, 0.5),
+  },
   titleText: {
     fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "700",

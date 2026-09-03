@@ -46,7 +46,7 @@ function narrowPortraitPeriodChrome(_layout: LayoutProfile) {
     },
     dividerBar: {
       marginTop: dynamicScale(12, true),
-      marginBottom: dynamicScale(-12, true),
+      marginBottom: dynamicScale(12, true),
     },
   };
 }

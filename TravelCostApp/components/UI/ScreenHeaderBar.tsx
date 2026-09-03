@@ -25,10 +25,14 @@ export const ScreenHeaderBar = ({
   testID = "screen-header-bar",
 }: ScreenHeaderBarProps) => {
   return (
-    <View style={[styles.headerBar, style]} testID={testID}>
-      {title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
-      {children}
-    </View>
+    <>
+      <View style={[styles.headerBar, style]} testID={testID}>
+        {title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
+        {children}
+      </View>
+      {/* Shadow separator - creates the visible shadow line below header */}
+      <View style={styles.shadowSeparator} testID={`${testID}-shadow`} />
+    </>
   );
 };
 
@@ -36,10 +40,15 @@ const styles = StyleSheet.create({
   headerBar: {
     minHeight: ProfileToolbarTokens.chromeHeight,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    paddingBottom: dynamicScale(12, true),
+    paddingBottom: ProfileToolbarTokens.paddingVertical,
     paddingHorizontal: dynamicScale(16, false, 0.5),
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
+  },
+  shadowSeparator: {
+    height: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -51,7 +60,6 @@ const styles = StyleSheet.create({
         elevation: 4,
       },
     }),
-    zIndex: 1,
   },
   title: {
     fontSize: dynamicScale(18, false, 0.5),

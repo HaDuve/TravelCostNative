@@ -118,6 +118,9 @@ function TripPeriodChrome({
           />
         ) : null}
       </View>
+      
+      {/* Shadow separator - creates the visible shadow line below header */}
+      <View style={styles.shadowSeparator} />
     </View>
   );
 }
@@ -126,7 +129,11 @@ function createStyles(periodHeaderLabelFontSize: number) {
   return StyleSheet.create({
     chromeContainer: {
       backgroundColor: GlobalStyles.colors.backgroundColor,
-      paddingBottom: dynamicScale(12, true),
+    },
+    shadowSeparator: {
+      height: 1,
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+      marginTop: dynamicScale(12, true),
       ...Platform.select({
         ios: {
           shadowColor: GlobalStyles.colors.textColor,

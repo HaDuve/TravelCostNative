@@ -8,6 +8,7 @@
 import * as React from "react";
 import { Dimensions, Platform, StyleSheet, Text } from "react-native";
 import { waitFor } from "@testing-library/react-native";
+import { dynamicScale } from "../../util/scalingUtil";
 
 // Mock vexo-analytics
 jest.mock("../../util/vexo-tracking", () => ({
@@ -291,6 +292,47 @@ describe("Layout regression fixes", () => {
       // so we verify the component renders and trust the unit change (absolute → no flex:1)
       // Visual regression or E2E would be needed for full z-order verification
       expect(screen.getByText(/Noch keine Ausgaben/)).toBeTruthy();
+    });
+
+    it("should not use hardcoded offsets to compensate for TripPeriodChrome negative margins", async () => {
+      const screen = renderWithAppProviders(
+        <MemoizedExpensesOutput
+          expenses={[]}
+          fallbackText="Test"
+          refreshing={false}
+          isFiltered={false}
+          awaitingTripFetch={false}
+        />,
+        {
+          wrapNavigation: true,
+          trip: {
+            tripid: "t1",
+            tripName: "Test Trip",
+          },
+          expenses: {
+            expenses: [],
+            getRecentExpenses: () => [],
+            getDailyExpenses: () => [],
+          },
+        }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/Test/)).toBeTruthy();
+      });
+
+      // ExpensesOutput container should use semantic spacing without fragile compensation
+      // for TripPeriodChrome's internal negative margin.
+      // The specific pattern marginTop:24 + paddingTop:8 was compensation for marginBottom:-12
+      const container = screen.getByTestId("expenses-output-container");
+      const containerStyle = StyleSheet.flatten(container.props.style) as Record<string, unknown>;
+      
+      // Verify no brittle compensation pattern exists
+      const hasBrittlePattern = 
+        containerStyle.marginTop === dynamicScale(24, true, 0.3) &&
+        containerStyle.paddingTop === dynamicScale(8, true, 0.3);
+      
+      expect(hasBrittlePattern).toBe(false);
     });
   });
 });

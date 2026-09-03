@@ -149,7 +149,7 @@ function ExpensesOutput({
   ]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="expenses-output-container">
       {memoizedContent}
     </View>
   );
@@ -180,11 +180,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
     paddingBottom: 0,
-    // Offset TripPeriodChrome divider's negative marginBottom (-12) plus shadow space
-    marginTop: dynamicScale(24, true, 0.3),
-    paddingTop: dynamicScale(8, true, 0.3),
-    // backgroundColor: GlobalStyles.colors.backgroundColor,
-    // borderWidth: 1,
   },
   fallbackContainer: {
     // Removed flex: 1 - was causing container to escape bounds and overlap separator

@@ -30,15 +30,18 @@ const HANNES_PHOTO = require("../assets/hannes-premium.jpg");
 const CustomerScreen = () => {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     async function getCustomerInfo() {
       try {
         const info = await Purchases.getCustomerInfo();
         setCustomerInfo(info);
+        setLoadFailed(false);
         trackEvent(VexoEvents.CUSTOMER_SCREEN_PRESSED);
       } catch (e) {
-        // Error fetching customer info
+        setCustomerInfo(null);
+        setLoadFailed(true);
       } finally {
         setIsLoading(false);
       }
@@ -50,8 +53,15 @@ const CustomerScreen = () => {
 
   const openManageSubscription = () => {
     if (!status.managementURL) return;
-    Linking.openURL(status.managementURL);
+    Linking.openURL(status.managementURL).catch(() => {});
   };
+
+  const periodLabelKey =
+    status.periodKind === "lifetime"
+      ? "premiumStatusNeverExpires"
+      : status.periodKind === "expiring"
+        ? "premiumStatusExpiresOn"
+        : "premiumStatusRenewsOn";
 
   return (
     <BackgroundGradient style={styles.gradient}>
@@ -59,19 +69,29 @@ const CustomerScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerBlock}>
-          <Text style={styles.title}>{i18n.t("premiumStatusTitle")}</Text>
-          <Text style={styles.subtitle}>{i18n.t("premiumStatusSubtitle")}</Text>
-        </View>
-
         {isLoading ? (
           <ActivityIndicator
             size="large"
             color={GlobalStyles.colors.primary700}
             style={styles.loader}
           />
+        ) : loadFailed ? (
+          <View style={styles.headerBlock}>
+            <Text style={styles.subtitle}>{i18n.t("premiumStatusLoadError")}</Text>
+          </View>
+        ) : !status.isPremium ? (
+          <View style={styles.headerBlock}>
+            <Text style={styles.title}>{i18n.t("premiumNomadInactive")}</Text>
+          </View>
         ) : (
           <>
+            <View style={styles.headerBlock}>
+              <Text style={styles.title}>{i18n.t("premiumStatusTitle")}</Text>
+              <Text style={styles.subtitle}>
+                {i18n.t("premiumStatusSubtitle")}
+              </Text>
+            </View>
+
             <View style={styles.personalCard}>
               <Image
                 source={HANNES_PHOTO}
@@ -114,7 +134,7 @@ const CustomerScreen = () => {
                 </View>
               ) : null}
 
-              {status.renewalNeverExpires ? (
+              {status.periodKind === "lifetime" ? (
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>
                     {i18n.t("premiumStatusRenewsOn")}
@@ -123,12 +143,10 @@ const CustomerScreen = () => {
                     {i18n.t("premiumStatusNeverExpires")}
                   </Text>
                 </View>
-              ) : status.renewalLabel ? (
+              ) : status.periodDateLabel ? (
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>
-                    {i18n.t("premiumStatusRenewsOn")}
-                  </Text>
-                  <Text style={styles.detailValue}>{status.renewalLabel}</Text>
+                  <Text style={styles.detailLabel}>{i18n.t(periodLabelKey)}</Text>
+                  <Text style={styles.detailValue}>{status.periodDateLabel}</Text>
                 </View>
               ) : null}
             </View>
@@ -162,7 +180,10 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: dynamicScale(20, false, 0.5),
-    paddingTop: Platform.OS === "ios" ? dynamicScale(24, true, 0.5) : dynamicScale(40, true, 0.5),
+    paddingTop:
+      Platform.OS === "ios"
+        ? dynamicScale(24, true, 0.5)
+        : dynamicScale(40, true, 0.5),
     paddingBottom: dynamicScale(32, true, 0.5),
   },
   headerBlock: {

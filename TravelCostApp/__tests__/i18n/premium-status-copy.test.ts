@@ -1,4 +1,9 @@
 import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+
+jest.mock("../../components/Premium/PremiumConstants", () => ({
+  ENTITLEMENT_ID: "Premium",
+}));
+
 import { PREMIUM_STATUS_FEATURE_KEYS } from "../../util/premium-status";
 
 const PREMIUM_STATUS_COPY_KEYS = [
@@ -9,9 +14,11 @@ const PREMIUM_STATUS_COPY_KEYS = [
   "premiumStatusFeaturesTitle",
   "premiumStatusMemberSince",
   "premiumStatusRenewsOn",
+  "premiumStatusExpiresOn",
   "premiumStatusNeverExpires",
   "premiumStatusManageSubscription",
   "premiumStatusManageHint",
+  "premiumStatusLoadError",
   ...PREMIUM_STATUS_FEATURE_KEYS,
 ] as const;
 

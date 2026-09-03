@@ -150,7 +150,7 @@ function ExpensesOutput({
 
   return (
     <View style={styles.container}>
-      <View>{memoizedContent}</View>
+      {memoizedContent}
     </View>
   );
 }
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   fallbackInnerContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    paddingTop: dynamicScale(64, true, 0.5),
+    paddingTop: dynamicScale(16, true, 0.3),
   },
   header: {
     flexDirection: "row",
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(16, false, 0.5),
     textAlign: "center",
-    marginVertical: dynamicScale(32, false, 0.5),
+    marginVertical: dynamicScale(12, false, 0.3),
   },
   emptyCta: {
     marginTop: dynamicScale(8, true),

@@ -55,6 +55,7 @@ import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
 import { safelyParseJSON } from "../util/jsonParse";
 import * as Haptics from "expo-haptics";
 import { ProfileToolbarTokens } from "../styles/profile-toolbar-tokens";
+import { ScreenHeaderBar } from "../components/UI/ScreenHeaderBar";
 
 export type TripAsObject = TripSummaryListItem;
 export type TravellerAndCost = {
@@ -328,10 +329,7 @@ const TripSummaryScreen = ({ navigation }) => {
   if (isFetching) return <LoadingBarOverlay></LoadingBarOverlay>;
   return (
     <View style={styles.container}>
-      <View style={styles.headerBar}>
-        <Text style={styles.screenTitle}>{i18n.t("summary")}</Text>
-      </View>
-      <View style={styles.shadowSeparator} />
+      <ScreenHeaderBar title={i18n.t("summary")} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -668,36 +666,6 @@ TripSummaryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  headerBar: {
-    minHeight: ProfileToolbarTokens.chromeHeight,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    paddingBottom: ProfileToolbarTokens.paddingVertical,
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    justifyContent: "center",
-    alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.12,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-    zIndex: 1,
-  },
-  screenTitle: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "700",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
-  },
-  shadowSeparator: {
-    height: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   scrollView: {

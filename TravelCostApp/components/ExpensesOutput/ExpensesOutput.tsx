@@ -77,14 +77,46 @@ function ExpensesOutput({
       );
     }
     return (
-      <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
+      <Animated.View 
+        exiting={SlideOutLeft} 
+        style={[
+          styles.fallbackContainer,
+          __DEV__ && { borderWidth: 2, borderColor: 'red' }
+        ]}
+        onLayout={(event) => {
+          if (__DEV__) {
+            console.log('[DEBUG-emptystate] fallbackContainer layout:', event.nativeEvent.layout);
+          }
+        }}
+      >
         <ScrollView
-          style={styles.fallbackScrollView}
-          contentContainerStyle={styles.fallbackScrollContent}
+          style={[
+            styles.fallbackScrollView,
+            __DEV__ && { borderWidth: 2, borderColor: 'blue' }
+          ]}
+          contentContainerStyle={[
+            styles.fallbackScrollContent,
+            __DEV__ && { borderWidth: 2, borderColor: 'green' }
+          ]}
           refreshControl={refreshControl}
           showsVerticalScrollIndicator={false}
+          onLayout={(event) => {
+            if (__DEV__) {
+              console.log('[DEBUG-emptystate] ScrollView layout:', event.nativeEvent.layout);
+            }
+          }}
         >
-          <View style={styles.fallbackInnerContainer}>
+          <View 
+            style={[
+              styles.fallbackInnerContainer,
+              __DEV__ && { borderWidth: 2, borderColor: 'yellow' }
+            ]}
+            onLayout={(event) => {
+              if (__DEV__) {
+                console.log('[DEBUG-emptystate] fallbackInnerContainer layout:', event.nativeEvent.layout);
+              }
+            }}
+          >
             {deferEmptyState && <LoadingOverlay></LoadingOverlay>}
             {!deferEmptyState && (
               <Text style={styles.infoText}>{fallbackText}</Text>
@@ -180,6 +212,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
     paddingBottom: 0,
+    // Offset TripPeriodChrome divider's negative marginBottom (-12) plus shadow space
+    marginTop: dynamicScale(24, true, 0.3),
     // backgroundColor: GlobalStyles.colors.backgroundColor,
     // borderWidth: 1,
   },
@@ -195,8 +229,6 @@ const styles = StyleSheet.create({
   fallbackScrollContent: {
     flexGrow: 1,
     justifyContent: "flex-start",
-    // Offset the divider bar's negative marginBottom (-12) plus shadow space
-    paddingTop: dynamicScale(20, true, 0.3),
   },
   fallbackInnerContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,

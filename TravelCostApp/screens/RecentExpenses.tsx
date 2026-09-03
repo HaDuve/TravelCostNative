@@ -80,7 +80,7 @@ function RecentExpenses({ navigation }) {
       setRefreshing: (isRefreshing: boolean) => void,
       expensesCtx: ExpenseContextType,
       tripid: string,
-      uid: string
+      uid: string,
     ) => {
       await fetchAndSetExpenses(
         showRefIndicator,
@@ -89,16 +89,16 @@ function RecentExpenses({ navigation }) {
         setRefreshing,
         expensesCtx,
         tripid,
-        uid
+        uid,
       );
     },
-    []
+    [],
   );
   const getExpenses = useCallback(
     async (
       showRefIndicator = false,
       showAnyIndicator = false,
-      ignoreTouched = false
+      ignoreTouched = false,
     ) => {
       // if (ignoreTouched)
       // check offlinemode
@@ -119,7 +119,7 @@ function RecentExpenses({ navigation }) {
         await sendOfflineQueue(
           userCtx.isSendingOfflineQueueMutex,
           userCtx.setIsSendingOfflineQueueMutex,
-          { updateExpenseId: expensesCtx.updateExpenseId }
+          { updateExpenseId: expensesCtx.updateExpenseId },
         );
         const queueAfterSync = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE) || [];
         if (queueAfterSync.length > 0) {
@@ -143,7 +143,7 @@ function RecentExpenses({ navigation }) {
         setRefreshing,
         expensesCtx,
         tripid,
-        uid
+        uid,
       );
     },
     [
@@ -155,7 +155,7 @@ function RecentExpenses({ navigation }) {
       tripid,
       uid,
       userCtx.isSendingOfflineQueueMutex,
-    ]
+    ],
   );
 
   const [isFetching, setIsFetching] = useState(false);
@@ -219,7 +219,7 @@ function RecentExpenses({ navigation }) {
   const [loadedOnce, setLoadedOnce] = useState(false);
   const tripExpenseCount = expensesCtx.expenses?.length ?? 0;
   const [namingBannerDismissed, setNamingBannerDismissed] = useState(() =>
-    isNamingBannerDismissed(tripid)
+    isNamingBannerDismissed(tripid),
   );
 
   useEffect(() => {
@@ -232,7 +232,7 @@ function RecentExpenses({ navigation }) {
     dismissNamingBannerAfterFirstExpense(
       tripid,
       tripExpenseCount,
-      tripCtx.isImplicitDefault
+      tripCtx.isImplicitDefault,
     );
     setNamingBannerDismissed(true);
   }, [tripExpenseCount, tripCtx.isImplicitDefault, tripid]);
@@ -293,8 +293,7 @@ function RecentExpenses({ navigation }) {
         if (tripCtx.travellers && tripCtx.travellers?.length > 1) return;
         try {
           await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
-        } catch (error) {
-        }
+        } catch (error) {}
       } else {
         await tripCtx.loadTravellersFromStorage();
       }
@@ -313,7 +312,7 @@ function RecentExpenses({ navigation }) {
       }
     },
     DEBUG_POLLING_INTERVAL,
-    true
+    true,
   );
 
   const [items, setItems] = useState([
@@ -331,7 +330,7 @@ function RecentExpenses({ navigation }) {
 
   const getRecentExpenses = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [expensesCtx.expenses?.length, PeriodValue, today]
+    [expensesCtx.expenses?.length, PeriodValue, today],
   );
   const recentExpenses = getRecentExpenses;
 
@@ -341,7 +340,7 @@ function RecentExpenses({ navigation }) {
         if (isNaN(Number(expense.calcAmount))) return sum;
         return sum + Number(expense.calcAmount);
       }, 0),
-    [recentExpenses?.length]
+    [recentExpenses?.length],
   );
   // const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
   // const expensesSumString = formatExpenseWithCurrency(
@@ -457,5 +456,6 @@ const styles = StyleSheet.create({
   },
   contentFrame: {
     flex: 1,
+    paddingHorizontal: 0,
   },
 });

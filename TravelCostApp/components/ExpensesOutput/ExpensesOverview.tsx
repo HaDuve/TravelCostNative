@@ -23,6 +23,7 @@ import { TripContext } from "../../store/trip-context";
 import { dynamicScale } from "../../util/scalingUtil";
 import { useSwipe } from "../Hooks/useSwipe";
 import IconButton from "../UI/IconButton";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 
 const PIE_CHART_TYPE_COUNT = 4;
 
@@ -53,21 +54,21 @@ const ExpensesOverview = ({
   const nextPieChartType = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraphEnum((current) =>
-      current === contentsMaxIndex ? 0 : current + 1
+      current === contentsMaxIndex ? 0 : current + 1,
     );
   }, [contentsMaxIndex]);
 
   const previousPieChartType = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraphEnum((current) =>
-      current === 0 ? contentsMaxIndex : current - 1
+      current === 0 ? contentsMaxIndex : current - 1,
     );
   }, [contentsMaxIndex]);
 
   const { onTouchStart, onTouchEnd } = useSwipe(
     nextPieChartType,
     previousPieChartType,
-    6
+    6,
   );
 
   let titleString = "";
@@ -107,9 +108,7 @@ const ExpensesOverview = ({
         />
       </Animated.View>
       <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-        <Text style={styles.titleText}>
-          {pieChartTitles[toggleGraphEnum]}
-        </Text>
+        <Text style={styles.titleText}>{pieChartTitles[toggleGraphEnum]}</Text>
       </Animated.View>
       <Animated.View
         entering={FadeInRight}
@@ -214,6 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     paddingTop: dynamicScale(4, true),
     paddingBottom: dynamicScale(4, true),
+    ...shadowRegressionStyles.headerBarShadow,
   },
   chartBody: {
     flex: 1,

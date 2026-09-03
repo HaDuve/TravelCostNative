@@ -245,4 +245,17 @@ export const shadowRegressionStyles = StyleSheet.create({
   dropdownListContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
+  headerBarShadow: {
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
 });

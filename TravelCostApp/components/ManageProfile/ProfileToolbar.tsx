@@ -19,6 +19,7 @@ import { dynamicScale } from "../../util/scalingUtil";
 import { ProfileToolbarTokens } from "../../styles/profile-toolbar-tokens";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 
 type ProfileToolbarProps = {
   navigation: { navigate: (screen: string, params?: object) => void };
@@ -138,17 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     paddingBottom: ProfileToolbarTokens.paddingVertical,
     paddingHorizontal: ProfileToolbarTokens.paddingHorizontal,
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.12,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    ...shadowRegressionStyles.headerBarShadow,
   },
   toolbarButtons: {
     flexDirection: "row",

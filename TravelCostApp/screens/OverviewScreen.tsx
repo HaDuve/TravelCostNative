@@ -7,12 +7,7 @@ import React, {
 } from "react";
 import { ExpensesContext } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
-import {
-  StyleSheet,
-  View,
-  RefreshControl,
-  Pressable,
-} from "react-native";
+import { StyleSheet, View, RefreshControl, Pressable } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import TripPeriodChrome from "../components/layout/TripPeriodChrome";
@@ -90,7 +85,7 @@ const OverviewScreen = ({ navigation }) => {
         freshlyCreated: userCtx.freshlyCreated,
       };
       showBanner(navigation, onboardingFlags);
-    }, [navigation, userCtx.freshlyCreated])
+    }, [navigation, userCtx.freshlyCreated]),
   );
 
   useEffect(() => {
@@ -113,7 +108,7 @@ const OverviewScreen = ({ navigation }) => {
       setDateTimeString(_toShortFormat(DateTime.now()));
     }, []),
     DEBUG_POLLING_INTERVAL * 13,
-    true
+    true,
   );
 
   const [items, setItems] = useState([
@@ -153,7 +148,7 @@ const OverviewScreen = ({ navigation }) => {
 
   const recentExpenses: Array<ExpenseData> = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [PeriodValue, expensesCtx.expenses, dateTimeString]
+    [PeriodValue, expensesCtx.expenses, dateTimeString],
   );
   // const expensesSum = recentExpenses.reduce((sum, expense) => {
   //   if (isNaN(Number(expense.calcAmount))) return sum;
@@ -253,13 +248,13 @@ OverviewScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   tabletPaddingTop: {
     paddingTop: constantScale(12, 0.5),
   },
   contentFrame: {
     flex: 1,
+    paddingHorizontal: 0,
   },
   customSummaryStyle: {
     marginTop: dynamicScale(2, true),
@@ -272,4 +267,3 @@ const styles = StyleSheet.create({
     bottom: constantScale(16, 0.5),
   },
 });
-

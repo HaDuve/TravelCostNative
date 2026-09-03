@@ -165,6 +165,44 @@ jest.mock("../../components/Currency/CurrencyPicker", () => {
   };
 });
 
+jest.mock("../../components/Currency/CountryPicker", () => {
+  const React = require("react");
+  const { Pressable, Text, View } = require("react-native");
+  return function MockCountryPicker({
+    countryValue,
+    setCountryValue,
+    onChangeValue,
+  }: {
+    countryValue?: string;
+    setCountryValue?: (value: string) => void;
+    onChangeValue?: (value: string | null) => void;
+  }) {
+    const initializedRef = React.useRef(false);
+    React.useEffect(() => {
+      if (initializedRef.current) {
+        onChangeValue?.(countryValue ?? null);
+      } else {
+        initializedRef.current = true;
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [countryValue]);
+
+    return React.createElement(
+      View,
+      null,
+      React.createElement(
+        Text,
+        { testID: "expense-form-country-picker-value" },
+        countryValue ?? ""
+      ),
+      React.createElement(Pressable, {
+        testID: "expense-form-country-pick-de",
+        onPress: () => setCountryValue?.("Germany"),
+      })
+    );
+  };
+});
+
 import ExpenseForm from "../../components/ManageExpense/ExpenseForm";
 import { i18n } from "../../i18n/i18n";
 import { makeExpense } from "../fixtures/expense";
@@ -266,7 +304,8 @@ function renderNewExpenseForm(
 }
 
 function renderNewExpenseWithDeferredLastLocale(
-  onSubmit: jest.Mock = jest.fn(async () => {})
+  onSubmit: jest.Mock = jest.fn(async () => {}),
+  { hydrateOnMount = true }: { hydrateOnMount?: boolean } = {}
 ) {
   const navigation = {
     navigate: jest.fn(),
@@ -283,11 +322,13 @@ function renderNewExpenseWithDeferredLastLocale(
   function Host() {
     const [lastCountry, setLastCountry] = React.useState("");
     const [lastCurrency, setLastCurrency] = React.useState("");
+    const [hydrate, setHydrate] = React.useState(hydrateOnMount);
 
     React.useEffect(() => {
+      if (!hydrate) return;
       setLastCountry("US");
       setLastCurrency("USD");
-    }, []);
+    }, [hydrate]);
 
     return (
       <AppProviders
@@ -336,6 +377,10 @@ function renderNewExpenseWithDeferredLastLocale(
           iconName="food"
           dateISO=""
         />
+        {React.createElement(require("react-native").Pressable, {
+          testID: "hydrate-last-locale",
+          onPress: () => setHydrate(true),
+        })}
       </AppProviders>
     );
   }
@@ -488,6 +533,64 @@ describe("ExpenseForm", () => {
     fireEvent.press(screen.getByTestId("expense-form-currency-pick-gbp"));
 
     await expectExpenseFormCurrencyInput(screen, "GBP");
+  });
+
+  it("keeps trip home currency when the user selects it before lastCurrency loads", async () => {
+    const screen = renderNewExpenseWithDeferredLastLocale(jest.fn(async () => {}), {
+      hydrateOnMount: false,
+    });
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+    fireEvent.press(screen.getByTestId("expense-form-currency-pick-eur"));
+    fireEvent.press(screen.getByTestId("hydrate-last-locale"));
+
+    await expectExpenseFormCurrencyInput(screen, "EUR");
+  });
+
+  it("keeps trip country when the user selects it after latest-used country applied", async () => {
+    const screen = renderNewExpenseForm({
+      user: {
+        userName: "Alice",
+        lastCountry: "US",
+        lastCurrency: "USD",
+      },
+      expenses: {
+        expenses: [
+          makeExpense({
+            id: "e1",
+            currency: "EUR",
+            country: "DE",
+            calcAmount: 75,
+          }),
+        ],
+        isSyncing: false,
+        updateExpenseId: undefined,
+        getRecentExpenses: () => [
+          makeExpense({
+            id: "e1",
+            currency: "EUR",
+            country: "DE",
+            calcAmount: 75,
+          }),
+        ],
+        loadExpensesFromStorage: jest.fn(async () => {}),
+      },
+    });
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+    await waitFor(() => {
+      expect(screen.getByTestId("expense-form-country-flag")).toHaveTextContent(
+        "US"
+      );
+    });
+
+    fireEvent.press(screen.getByTestId("expense-form-country-pick-de"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("expense-form-country-flag")).toHaveTextContent(
+        "Germany"
+      );
+    });
   });
 
   it("applies latest-used country after secure storage loads on a new expense", async () => {

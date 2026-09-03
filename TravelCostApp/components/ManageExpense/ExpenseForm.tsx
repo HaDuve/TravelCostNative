@@ -997,15 +997,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [baseInputChangedHandler, debouncedAutoCategory, scheduleDraftSave]
   );
 
-  const currencyIsEmpty = !inputs.currency.value?.trim();
-  const countryIsEmpty = !inputs.country.value?.trim();
-  // One-shot guards: lastCurrency/lastCountry sync must not re-fire after the user
-  // picks the trip default (looks identical to "still stale" to the resolver).
-  const didApplyLastCurrencySyncRef = useRef(false);
-  const didApplyLastCountrySyncRef = useRef(false);
+  const currencyChosenByUserRef = useRef(false);
+  const countryChosenByUserRef = useRef(false);
 
   useEffect(() => {
-    if (didApplyLastCurrencySyncRef.current && !currencyIsEmpty) {
+    if (currencyChosenByUserRef.current) {
       return;
     }
     const preferred = resolveLoadedLastCurrencyIfStale({
@@ -1016,20 +1012,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       mostRecentExpenseCurrency: mostRecentExpense?.currency,
     });
     if (preferred) {
-      didApplyLastCurrencySyncRef.current = true;
       inputChangedHandler("currency", preferred);
       setCurrencyPickerValue(preferred);
-      return;
-    }
-    // Initial state already matched lastCurrency — still count as synced so a later
-    // trip-home pick (e.g. EUR) is not treated as a stale default.
-    if (userCtx.lastCurrency?.trim() && !currencyIsEmpty) {
-      didApplyLastCurrencySyncRef.current = true;
     }
   }, [
     isEditing,
     inputChangedHandler,
-    currencyIsEmpty,
     inputs.currency.value,
     mostRecentExpense?.currency,
     tripCtx.tripCurrency,
@@ -1037,7 +1025,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   ]);
 
   useEffect(() => {
-    if (didApplyLastCountrySyncRef.current && !countryIsEmpty) {
+    if (countryChosenByUserRef.current) {
       return;
     }
     const preferred = resolveLoadedLastCountryIfStale({
@@ -1047,18 +1035,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       mostRecentExpenseCountry: mostRecentExpense?.country,
     });
     if (preferred) {
-      didApplyLastCountrySyncRef.current = true;
       inputChangedHandler("country", preferred);
       setCountryPickerValue(countryLabelForPicker(preferred));
-      return;
-    }
-    if (userCtx.lastCountry?.trim() && !countryIsEmpty) {
-      didApplyLastCountrySyncRef.current = true;
     }
   }, [
     isEditing,
     inputChangedHandler,
-    countryIsEmpty,
     inputs.country.value,
     mostRecentExpense?.country,
     userCtx.lastCountry,
@@ -1359,11 +1341,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // split the countryValue into country and currency
     const currency = currencyPickerValue?.split("- ")[0]?.split(" ")[0]?.trim();
     // const country = currencyPickerValue?.split("- ")[1].trim();
+    currencyChosenByUserRef.current = true;
     inputChangedHandler("currency", currency);
   }
 
   function updateCountry() {
     const country_EN = countryPickerValue?.split("- ")[0].trim();
+    countryChosenByUserRef.current = true;
     inputChangedHandler("country", country_EN);
   }
 

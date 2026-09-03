@@ -8,6 +8,7 @@ import {
   Alert,
   Pressable,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useCallback, useContext, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -51,9 +52,9 @@ import * as Progress from "react-native-progress";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
-import { Platform } from "react-native";
 import { safelyParseJSON } from "../util/jsonParse";
 import * as Haptics from "expo-haptics";
+import { ProfileToolbarTokens } from "../styles/profile-toolbar-tokens";
 
 export type TripAsObject = TripSummaryListItem;
 export type TravellerAndCost = {
@@ -326,13 +327,16 @@ const TripSummaryScreen = ({ navigation }) => {
   }
   if (isFetching) return <LoadingBarOverlay></LoadingBarOverlay>;
   return (
-    <ScrollView
-      style={{
-        marginTop: dynamicScale(12, false, 0.5),
-        paddingBottom: dynamicScale(48, false, 0.5),
-      }}
-    >
-      {tripSummary && (
+    <View style={styles.container}>
+      <View style={styles.headerBar}>
+        <Text style={styles.screenTitle}>{i18n.t("summary")}</Text>
+      </View>
+      <View style={styles.shadowSeparator} />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {tripSummary && (
         <>
           <Pressable
             onPress={() => {
@@ -650,7 +654,8 @@ const TripSummaryScreen = ({ navigation }) => {
           ]}
         />
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -661,6 +666,46 @@ TripSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  headerBar: {
+    minHeight: ProfileToolbarTokens.chromeHeight,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    paddingBottom: ProfileToolbarTokens.paddingVertical,
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    justifyContent: "center",
+    alignItems: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+    zIndex: 1,
+  },
+  screenTitle: {
+    fontSize: dynamicScale(18, false, 0.5),
+    fontWeight: "700",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray700,
+  },
+  shadowSeparator: {
+    height: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: dynamicScale(48, false, 0.5),
+  },
   titleText: {
     fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "700",

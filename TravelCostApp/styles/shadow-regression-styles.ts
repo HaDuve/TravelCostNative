@@ -116,17 +116,19 @@ export const shadowRegressionStyles = StyleSheet.create({
     ...GlobalStyles.strongShadow,
   },
   overviewDividerBar: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
     minHeight: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
     zIndex: 0,
   },
   tripTravellerAvatar: {

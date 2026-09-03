@@ -997,7 +997,17 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [baseInputChangedHandler, debouncedAutoCategory, scheduleDraftSave]
   );
 
+  const currencyIsEmpty = !inputs.currency.value?.trim();
+  const countryIsEmpty = !inputs.country.value?.trim();
+  // One-shot guards: lastCurrency/lastCountry sync must not re-fire after the user
+  // picks the trip default (looks identical to "still stale" to the resolver).
+  const didApplyLastCurrencySyncRef = useRef(false);
+  const didApplyLastCountrySyncRef = useRef(false);
+
   useEffect(() => {
+    if (didApplyLastCurrencySyncRef.current && !currencyIsEmpty) {
+      return;
+    }
     const preferred = resolveLoadedLastCurrencyIfStale({
       isEditing,
       lastCurrency: userCtx.lastCurrency,
@@ -1006,12 +1016,20 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       mostRecentExpenseCurrency: mostRecentExpense?.currency,
     });
     if (preferred) {
+      didApplyLastCurrencySyncRef.current = true;
       inputChangedHandler("currency", preferred);
       setCurrencyPickerValue(preferred);
+      return;
+    }
+    // Initial state already matched lastCurrency — still count as synced so a later
+    // trip-home pick (e.g. EUR) is not treated as a stale default.
+    if (userCtx.lastCurrency?.trim() && !currencyIsEmpty) {
+      didApplyLastCurrencySyncRef.current = true;
     }
   }, [
     isEditing,
     inputChangedHandler,
+    currencyIsEmpty,
     inputs.currency.value,
     mostRecentExpense?.currency,
     tripCtx.tripCurrency,
@@ -1019,6 +1037,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   ]);
 
   useEffect(() => {
+    if (didApplyLastCountrySyncRef.current && !countryIsEmpty) {
+      return;
+    }
     const preferred = resolveLoadedLastCountryIfStale({
       isEditing,
       lastCountry: userCtx.lastCountry,
@@ -1026,12 +1047,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       mostRecentExpenseCountry: mostRecentExpense?.country,
     });
     if (preferred) {
+      didApplyLastCountrySyncRef.current = true;
       inputChangedHandler("country", preferred);
       setCountryPickerValue(countryLabelForPicker(preferred));
+      return;
+    }
+    if (userCtx.lastCountry?.trim() && !countryIsEmpty) {
+      didApplyLastCountrySyncRef.current = true;
     }
   }, [
     isEditing,
     inputChangedHandler,
+    countryIsEmpty,
     inputs.country.value,
     mostRecentExpense?.country,
     userCtx.lastCountry,

@@ -114,18 +114,34 @@ jest.mock("../../components/ExpensesOutput/ExpenseCountryFlag", () => {
 
 jest.mock("../../components/Currency/CurrencyPicker", () => {
   const React = require("react");
-  const { Text } = require("react-native");
+  const { Pressable, Text, View } = require("react-native");
   return function MockCurrencyPicker({
     countryValue,
+    setCountryValue,
+    onChangeValue,
     inputCurrencyCode,
     placeholder,
   }: {
     countryValue?: string;
+    setCountryValue?: (value: string) => void;
+    onChangeValue?: (value: string | null) => void;
     inputCurrencyCode?: string;
     placeholder?: string;
   }) {
+    // Mirror react-native-dropdown-picker: onChangeValue after value changes (not on mount).
+    const initializedRef = React.useRef(false);
+    React.useEffect(() => {
+      if (initializedRef.current) {
+        onChangeValue?.(countryValue ?? null);
+      } else {
+        initializedRef.current = true;
+      }
+      // Intentionally omit onChangeValue — same as DropDownPicker's [value, items] deps.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [countryValue]);
+
     return React.createElement(
-      React.Fragment,
+      View,
       null,
       React.createElement(
         Text,
@@ -136,7 +152,15 @@ jest.mock("../../components/Currency/CurrencyPicker", () => {
         Text,
         { testID: "expense-form-currency-input" },
         inputCurrencyCode ?? ""
-      )
+      ),
+      React.createElement(Pressable, {
+        testID: "expense-form-currency-pick-eur",
+        onPress: () => setCountryValue?.("EUR | €"),
+      }),
+      React.createElement(Pressable, {
+        testID: "expense-form-currency-pick-gbp",
+        onPress: () => setCountryValue?.("GBP | £"),
+      })
     );
   };
 });
@@ -411,6 +435,59 @@ describe("ExpenseForm", () => {
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
     await expectExpenseFormCurrencyInput(screen, "USD");
+  });
+
+  it("keeps trip home currency when the user selects it after latest-used currency applied", async () => {
+    // Bug: resolveLoadedLastCurrencyIfStale re-runs on currency change and treats
+    // selecting EUR (trip default) as still-stale, snapping back to lastCurrency.
+    const screen = renderNewExpenseForm({
+      trip: {
+        tripid: "t1",
+        tripCurrency: "EUR",
+        travellers: [
+          { uid: "u1", userName: "Alice" },
+          { uid: "u2", userName: "Bob" },
+        ],
+        fetchAndSetTravellers: jest.fn(async () => {}),
+      },
+      user: {
+        userName: "Alice",
+        lastCountry: "US",
+        lastCurrency: "USD",
+      },
+      expenses: {
+        expenses: [
+          makeExpense({
+            id: "e1",
+            currency: "EUR",
+            country: "DE",
+            calcAmount: 75,
+          }),
+        ],
+        isSyncing: false,
+        updateExpenseId: undefined,
+        getRecentExpenses: () => [
+          makeExpense({
+            id: "e1",
+            currency: "EUR",
+            country: "DE",
+            calcAmount: 75,
+          }),
+        ],
+        loadExpensesFromStorage: jest.fn(async () => {}),
+      },
+    });
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+    await expectExpenseFormCurrencyInput(screen, "USD");
+
+    fireEvent.press(screen.getByTestId("expense-form-currency-pick-eur"));
+
+    await expectExpenseFormCurrencyInput(screen, "EUR");
+
+    fireEvent.press(screen.getByTestId("expense-form-currency-pick-gbp"));
+
+    await expectExpenseFormCurrencyInput(screen, "GBP");
   });
 
   it("applies latest-used country after secure storage loads on a new expense", async () => {

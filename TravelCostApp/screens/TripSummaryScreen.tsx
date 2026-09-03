@@ -666,7 +666,7 @@ TripSummaryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
   },
   scrollView: {
     flex: 1,

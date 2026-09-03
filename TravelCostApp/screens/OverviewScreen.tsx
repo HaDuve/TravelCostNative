@@ -253,7 +253,7 @@ OverviewScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
   },
   tabletPaddingTop: {
     paddingTop: constantScale(12, 0.5),

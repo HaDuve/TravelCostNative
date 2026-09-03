@@ -64,7 +64,7 @@ function TripPeriodChrome({
   );
 
   return (
-    <>
+    <View style={styles.chromeCard}>
       <View testID="period-date-header" style={tokens.periodDateHeader}>
         <View style={styles.dateHeaderContent}>
           <Text style={styles.dateString}>{tripLabel}</Text>
@@ -118,16 +118,30 @@ function TripPeriodChrome({
           />
         ) : null}
       </View>
-
-      <View
-        style={[shadowRegressionStyles.overviewDividerBar, tokens.dividerBar]}
-      />
-    </>
+    </View>
   );
 }
 
 function createStyles(periodHeaderLabelFontSize: number) {
   return StyleSheet.create({
+    chromeCard: {
+      width: "100%",
+      maxWidth: 1024,
+      alignSelf: "center",
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+      paddingBottom: dynamicScale(12, true),
+      ...Platform.select({
+        ios: {
+          shadowColor: GlobalStyles.colors.textColor,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.12,
+          shadowRadius: 4,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+    },
     dateHeaderContent: {
       flexDirection: "row",
       alignItems: "center",

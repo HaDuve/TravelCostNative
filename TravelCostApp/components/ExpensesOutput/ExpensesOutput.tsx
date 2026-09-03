@@ -195,10 +195,12 @@ const styles = StyleSheet.create({
   fallbackScrollContent: {
     flexGrow: 1,
     justifyContent: "flex-start",
+    // Offset the divider bar's negative marginBottom (-12) plus shadow space
+    paddingTop: dynamicScale(20, true, 0.3),
   },
   fallbackInnerContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    paddingTop: dynamicScale(16, true, 0.3),
+    // Removed paddingTop - now handled by fallbackScrollContent
   },
   header: {
     flexDirection: "row",

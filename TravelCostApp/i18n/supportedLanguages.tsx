@@ -381,6 +381,20 @@ const en = {
   becomePremium: "Become a Premium Nomad!",
   premiumNomadInactive: "You are not a premium Nomad yet!",
   premiumNomadError: "Something went wrong, could not activate premium nomad!",
+  premiumStatusTitle: "You're a Premium Nomad!",
+  premiumStatusSubtitle:
+    "Thanks for supporting Budget for Nomads — every perk below is yours.",
+  premiumStatusPersonalNote:
+    "Hey! Hannes here. Thanks for going Premium — you're helping me keep building the app nomads actually want. Enjoy every perk below. Safe travels!",
+  premiumStatusPersonalSignature: "Hannes",
+  premiumStatusFeaturesTitle: "Your premium perks",
+  premiumStatusMemberSince: "Member since",
+  premiumStatusRenewsOn: "Renews on",
+  premiumStatusExpiresOn: "Expires on",
+  premiumStatusNeverExpires: "Never expires",
+  premiumStatusManageSubscription: "Manage subscription",
+  premiumStatusManageHint: "Change or cancel in your store account",
+  premiumStatusLoadError: "Could not load your premium status. Try again later.",
   settingsTitle: "Settings",
   restorePurchases: "Restore Purchases",
   deleteAccount: "Delete Account",
@@ -1052,6 +1066,21 @@ const de = {
   premiumNomadInactive: "Du bist noch kein Premium-Nomade!",
   premiumNomadError:
     "Etwas ist schiefgegangen. Premium konnte nicht aktiviert werden!",
+  premiumStatusTitle: "Du bist ein Premium-Nomade!",
+  premiumStatusSubtitle:
+    "Danke, dass du Budget for Nomads unterstützt — alle Vorteile unten gehören dir.",
+  premiumStatusPersonalNote:
+    "Hey! Hannes hier. Danke, dass du Premium geworden bist — du hilfst mir, die App weiterzubauen, die Nomaden wirklich wollen. Genieß alle Vorteile unten. Gute Reise!",
+  premiumStatusPersonalSignature: "Hannes",
+  premiumStatusFeaturesTitle: "Deine Premium-Vorteile",
+  premiumStatusMemberSince: "Mitglied seit",
+  premiumStatusRenewsOn: "Verlängert sich am",
+  premiumStatusExpiresOn: "Läuft ab am",
+  premiumStatusNeverExpires: "Läuft nie ab",
+  premiumStatusManageSubscription: "Abo verwalten",
+  premiumStatusManageHint: "Im Store-Konto ändern oder kündigen",
+  premiumStatusLoadError:
+    "Premium-Status konnte nicht geladen werden. Versuche es später erneut.",
   settingsTitle: "Einstellungen",
   restorePurchases: "Käufe wiederherstellen",
   deleteAccount: "Account löschen",
@@ -1737,6 +1766,21 @@ const fr = {
   premiumNomadInactive: "Vous n'êtes pas encore un nomade Premium !",
   premiumNomadError:
     "Une erreur s'est produite, impossible d'activer le nomade premium !",
+  premiumStatusTitle: "Vous êtes un Nomade Premium !",
+  premiumStatusSubtitle:
+    "Merci de soutenir Budget for Nomads — tous les avantages ci-dessous sont à vous.",
+  premiumStatusPersonalNote:
+    "Salut ! Hannes ici. Merci d'être passé Premium — vous m'aidez à continuer à construire l'app que les nomades veulent vraiment. Profitez de tous les avantages ci-dessous. Bon voyage !",
+  premiumStatusPersonalSignature: "Hannes",
+  premiumStatusFeaturesTitle: "Vos avantages premium",
+  premiumStatusMemberSince: "Membre depuis",
+  premiumStatusRenewsOn: "Renouvellement le",
+  premiumStatusExpiresOn: "Expire le",
+  premiumStatusNeverExpires: "N'expire jamais",
+  premiumStatusManageSubscription: "Gérer l'abonnement",
+  premiumStatusManageHint: "Modifier ou annuler dans votre compte store",
+  premiumStatusLoadError:
+    "Impossible de charger votre statut premium. Réessayez plus tard.",
   settingsTitle: "Paramètres",
   restorePurchases: "Restaurer les achats",
   deleteAccount: "Supprimer le compte",
@@ -2411,6 +2455,21 @@ const ru = {
   premiumNomadInactive: "Вы еще не являетесь премиум-намбадом!",
   premiumNomadError:
     "Что-то пошло не так, не удалось активировать премиум-намбад!",
+  premiumStatusTitle: "Вы — премиум-намбад!",
+  premiumStatusSubtitle:
+    "Спасибо, что поддерживаете Budget for Nomads — все привилегии ниже ваши.",
+  premiumStatusPersonalNote:
+    "Привет! Это Hannes. Спасибо, что стали Premium — вы помогаете мне развивать приложение, которое действительно нужно намбедам. Наслаждайтесь всеми привилегиями ниже. Счастливого пути!",
+  premiumStatusPersonalSignature: "Hannes",
+  premiumStatusFeaturesTitle: "Ваши премиум-привилегии",
+  premiumStatusMemberSince: "Участник с",
+  premiumStatusRenewsOn: "Продлевается",
+  premiumStatusExpiresOn: "Истекает",
+  premiumStatusNeverExpires: "Бессрочно",
+  premiumStatusManageSubscription: "Управлять подпиской",
+  premiumStatusManageHint: "Изменить или отменить в аккаунте магазина",
+  premiumStatusLoadError:
+    "Не удалось загрузить премиум-статус. Попробуйте позже.",
   settingsTitle: "Настройки",
   restorePurchases: "Восстановить покупки",
   deleteAccount: "Удалить аккаунт",

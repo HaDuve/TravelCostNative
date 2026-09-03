@@ -8,6 +8,9 @@ import { i18n } from "../../i18n/i18n";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { constantScale, dynamicScale, scale } from "../../util/scalingUtil";
 
+// Accessibility constants for text sizing on devices with large font scales
+const TEXT_MIN_FONT_SCALE = 0.7; // Allow text to shrink to 70% of scaled size while staying legible
+
 export interface BudgetOverviewContentProps {
   travellerList: string[];
   travellerBudgets: number;

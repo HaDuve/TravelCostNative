@@ -7,10 +7,17 @@
 
 import * as React from "react";
 import { Dimensions, Platform, StyleSheet, Text } from "react-native";
+import { waitFor } from "@testing-library/react-native";
 
 // Mock vexo-analytics
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
+}));
+
+// Mock the load timeout to speed up tests
+jest.mock("../../confAppConstants", () => ({
+  ...jest.requireActual("../../confAppConstants"),
+  EXPENSES_LOAD_TIMEOUT: 100,
 }));
 
 // Mock DropDownPicker to test text sizing
@@ -198,8 +205,10 @@ describe("Layout regression fixes", () => {
         }
       );
 
-      // Wait for loading to complete
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait for loading overlay to disappear (EXPENSES_LOAD_TIMEOUT)
+      await waitFor(() => {
+        expect(screen.getByText(/Noch keine Ausgaben/)).toBeTruthy();
+      });
 
       // Should render the fallback text
       const fallbackText = screen.getByText(/Noch keine Ausgaben/);
@@ -237,15 +246,21 @@ describe("Layout regression fixes", () => {
         }
       );
 
-      // Wait for loading to complete
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait for loading overlay to disappear (EXPENSES_LOAD_TIMEOUT)
+      await waitFor(() => {
+        expect(screen.getByText(/Noch keine Ausgaben/)).toBeTruthy();
+      });
 
       // The fallback container should use proper z-index and positioning
       const fallbackText = screen.getByText(/Noch keine Ausgaben/);
       expect(fallbackText).toBeTruthy();
       
-      // Container should be positioned in document flow, not absolutely
-      // (We'll verify this through the parent container styling after fixes)
+      // Container should be positioned in document flow (flex: 1), not absolutely
+      // Verify by checking the container doesn't have absolute positioning style
+      // Note: React Native Testing Library doesn't expose parent container styles easily,
+      // so we verify the component renders and trust the unit change (absolute → flex)
+      // Visual regression or E2E would be needed for full z-order verification
+      expect(screen.getByText(/Noch keine Ausgaben/)).toBeTruthy();
     });
   });
 });

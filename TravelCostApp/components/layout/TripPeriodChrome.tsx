@@ -12,6 +12,10 @@ import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { dynamicScale } from "../../util/scalingUtil";
 import type { ExpenseData } from "../../util/expense";
 
+// Accessibility constant: Allow period selector text to shrink to 70% of scaled size
+// on devices with large font settings while maintaining legibility
+const TEXT_MIN_FONT_SCALE = 0.7;
+
 type PeriodItem = {
   label: string;
   value: string;
@@ -78,7 +82,7 @@ function TripPeriodChrome({
           modalProps={periodModalProps}
           numberOfLines={1}
           adjustsFontSizeToFit={true}
-          minimumFontScale={0.7}
+          minimumFontScale={TEXT_MIN_FONT_SCALE}
           setOpen={(callback) => {
             const nextOpen =
               typeof callback === "function" ? callback(periodOpen) : callback;

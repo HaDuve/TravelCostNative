@@ -257,6 +257,9 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           borderRadius={dynamicScale(6)}
           progress={budgetProgress}
           height={constantScale(6, 0.5)}
+          // Use flex layout (width=null + alignSelf=stretch) instead of fixed scale()
+          // to prevent overflow on varying container widths (50% maxWidth from headerCard).
+          // Other Progress.Bar instances use scale() because they're in fixed-width contexts.
           width={null}
           style={{ alignSelf: "stretch" }}
         />

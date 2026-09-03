@@ -260,8 +260,9 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           // Use flex layout (width=null + alignSelf=stretch) instead of fixed scale()
           // to prevent overflow on varying container widths (50% maxWidth from headerCard).
           // Other Progress.Bar instances use scale() because they're in fixed-width contexts.
+          // Add 4px horizontal margin to ensure the bar never touches container edges.
           width={null}
-          style={{ alignSelf: "stretch" }}
+          style={{ alignSelf: "stretch", marginHorizontal: 4 }}
         />
       )}
     </Pressable>

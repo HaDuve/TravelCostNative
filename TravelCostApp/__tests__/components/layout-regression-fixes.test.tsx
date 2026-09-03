@@ -179,6 +179,35 @@ describe("Layout regression fixes", () => {
       // The width should be undefined or a percentage, not a fixed large number
       expect(progressProps.width).toBeUndefined();
     });
+
+    it("should have at least 4px horizontal padding around the progress bar", () => {
+      const expenses = [makeExpense({ calcAmount: 75, amount: 75 })];
+
+      const screen = renderWithAppProviders(
+        <ExpensesSummary expenses={expenses} periodName="month" />,
+        {
+          wrapNavigation: false,
+          expenses: {
+            expenses,
+            getRecentExpenses: () => expenses,
+          },
+        }
+      );
+
+      // Find the progress bar
+      const progressBar = screen.getByTestId("expenses-summary-progress");
+      expect(progressBar).toBeTruthy();
+
+      // Progress bar container should have horizontal padding
+      const progressBarStyle = StyleSheet.flatten(progressBar.props.style) as Record<string, unknown>;
+      
+      // Check that horizontal padding/margin exists and is at least 4
+      const hasHorizontalPadding = 
+        (typeof progressBarStyle.paddingHorizontal === 'number' && progressBarStyle.paddingHorizontal >= 4) ||
+        (typeof progressBarStyle.marginHorizontal === 'number' && progressBarStyle.marginHorizontal >= 4);
+      
+      expect(hasHorizontalPadding).toBe(true);
+    });
   });
 
   describe("Empty state centering", () => {

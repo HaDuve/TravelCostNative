@@ -94,6 +94,53 @@ describe("fetchTrip metadata (no Expenses download)", () => {
     expect((trip as Record<string, unknown>).travellers).not.toBe(true);
   });
 
+  it("returns null when the trip node is missing so callers can treat it as not found", async () => {
+    mockedAxios.get.mockImplementation(async (url: string) => {
+      if (url.includes("shallow=true") && url.includes(`/trips/missing-trip.json`)) {
+        return { data: null };
+      }
+      if (url.includes(`/trips/missing-trip/travellers.json`)) {
+        return { data: null };
+      }
+      throw new Error(`Unexpected GET ${url}`);
+    });
+
+    await expect(fetchTrip("missing-trip")).resolves.toBeNull();
+  });
+
+  it("loads categories from the categories leaf when shallow truncates them to true", async () => {
+    const categories = [{ cat: "food", catString: "Food", icon: "food", color: "#000" }];
+    mockedAxios.get.mockImplementation(async (url: string) => {
+      if (url.includes("shallow=true") && url.includes(`/trips/trip-cats.json`)) {
+        return {
+          data: {
+            tripName: "Bali",
+            tripCurrency: "EUR",
+            totalBudget: "100",
+            dailyBudget: "10",
+            categories: true,
+            travellers: true,
+          },
+        };
+      }
+      if (url.includes(`/trips/trip-cats/travellers.json`)) {
+        return { data: {} };
+      }
+      if (url.includes(`/trips/trip-cats/categories.json`)) {
+        return { data: JSON.stringify(categories) };
+      }
+      throw new Error(`Unexpected GET ${url}`);
+    });
+
+    const trip = await fetchTrip("trip-cats");
+    expect(trip.categories).toEqual(categories);
+    expect(
+      mockedAxios.get.mock.calls.some((c) =>
+        String(c[0]).includes(`/trips/trip-cats/categories.json`)
+      )
+    ).toBe(true);
+  });
+
   it("fetchTripName reads the tripName leaf and caches it so a second call skips the network", async () => {
     mockedAxios.get.mockResolvedValueOnce({ data: "Japan 2026" });
 

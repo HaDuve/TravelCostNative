@@ -57,7 +57,6 @@ export type BuildTripFormSubmitInput = {
   startDate?: string | null;
   endDate?: string | null;
   tripid?: string;
-  travellers?: TripData["travellers"];
   /** When true, naming graduates an implicit default trip even if mode resolved as edit. */
   wasImplicitDefault?: boolean;
 };
@@ -98,13 +97,13 @@ export function buildTripFormSubmitData(
   if (!totalBudget) totalBudget = "0";
   if (!dailyBudget) dailyBudget = "0";
 
+  // Roster writes go through putTravelerInTrip — never via trip metadata PATCH.
   const tripData: TripData = {
     tripName: input.tripName,
     tripCurrency: input.tripCurrency,
     totalBudget,
     dailyBudget,
     isDynamicDailyBudget: input.isDynamicDailyBudget,
-    travellers: input.travellers,
   };
 
   if (startDate) tripData.startDate = startDate;

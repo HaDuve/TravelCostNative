@@ -659,7 +659,15 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
       ),
       getTravellers(tripid),
     ]);
+    if (shallowResponse.data == null) return null;
     const trip = tripMetadataFromShallow(shallowResponse.data, travellers);
+    if (
+      shallowResponse.data.categories === true &&
+      trip.categories === undefined
+    ) {
+      const categories = await fetchCategories(tripid);
+      if (categories) trip.categories = categories;
+    }
     if (typeof trip.tripName === "string" && trip.tripName.length > 0) {
       setMMKVString(MMKV_KEY_PATTERNS.TRIP_NAME(tripid), trip.tripName);
     }

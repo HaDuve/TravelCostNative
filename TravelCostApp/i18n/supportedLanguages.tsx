@@ -403,6 +403,7 @@ const en = {
   settingsLatestVersionLine: "Latest version available at: %{createdAt}",
   settingsUpdatesDisabledLabel: "Updates disabled on this build",
   settingsApplyUpdate: "Reload to update",
+  settingsApplyUpdateError: "Could not apply the update. Please try again.",
   criticalUpdateOverlayTitle: "Required update",
   criticalUpdateOverlayBody:
     "A required update is ready. Reload now to keep Budget for Nomads working correctly.",
@@ -1094,6 +1095,8 @@ const de = {
   settingsLatestVersionLine: "Neueste Version verfügbar ab: %{createdAt}",
   settingsUpdatesDisabledLabel: "Updates sind in diesem Build deaktiviert",
   settingsApplyUpdate: "Neu laden zum Aktualisieren",
+  settingsApplyUpdateError:
+    "Update konnte nicht angewendet werden. Bitte erneut versuchen.",
   criticalUpdateOverlayTitle: "Erforderliches Update",
   criticalUpdateOverlayBody:
     "Ein erforderliches Update ist bereit. Bitte jetzt neu laden, damit Budget for Nomads weiter korrekt funktioniert.",
@@ -1799,6 +1802,8 @@ const fr = {
   settingsLatestVersionLine: "Dernière version disponible le : %{createdAt}",
   settingsUpdatesDisabledLabel: "Mises à jour désactivées sur ce build",
   settingsApplyUpdate: "Recharger pour mettre à jour",
+  settingsApplyUpdateError:
+    "Impossible d'appliquer la mise à jour. Réessayez.",
   criticalUpdateOverlayTitle: "Mise à jour requise",
   criticalUpdateOverlayBody:
     "Une mise à jour requise est prête. Rechargez maintenant pour que Budget for Nomads continue de fonctionner correctement.",
@@ -2493,6 +2498,8 @@ const ru = {
   settingsLatestVersionLine: "Последняя версия доступна: %{createdAt}",
   settingsUpdatesDisabledLabel: "Обновления отключены в этом билде",
   settingsApplyUpdate: "Перезагрузить для обновления",
+  settingsApplyUpdateError:
+    "Не удалось применить обновление. Попробуйте ещё раз.",
   criticalUpdateOverlayTitle: "Требуется обновление",
   criticalUpdateOverlayBody:
     "Требуемое обновление готово. Перезагрузите сейчас, чтобы Budget for Nomads продолжал работать корректно.",

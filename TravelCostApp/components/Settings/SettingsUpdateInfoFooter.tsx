@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 import { i18n } from "../../i18n/i18n";
 import { GlobalStyles } from "../../constants/styles";
@@ -10,13 +11,16 @@ import { useCriticalOta } from "../../store/critical-ota-context";
 import { dynamicScale } from "../../util/scalingUtil";
 import { EasUpdateInfo, getEasUpdateInfo } from "../../util/easUpdateInfo";
 import { buildVersionDisplayLines } from "../../util/settings-version-display";
-import { checkAndFetchOtaUpdate } from "../../util/check-and-fetch-ota-update";
-import { createExpoOtaApplyClient } from "../../util/ota-apply-client";
 import ActionRow from "../UI/ActionRow";
 
 const SettingsUpdateInfoFooter = () => {
   const netCtx = useContext(NetworkContext);
-  const { noteUpdateReady } = useCriticalOta();
+  const {
+    updateReady,
+    isCritical,
+    requestCheckAndFetch,
+    applyReload,
+  } = useCriticalOta();
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
   const [info, setInfo] = useState<EasUpdateInfo | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -40,21 +44,35 @@ const SettingsUpdateInfoFooter = () => {
     if (applying) return;
     setApplying(true);
     try {
-      const client = createExpoOtaApplyClient();
-      const result = await checkAndFetchOtaUpdate(client);
-      noteUpdateReady(result);
+      if (updateReady && !isCritical) {
+        await applyReload();
+        return;
+      }
+
+      const result = await requestCheckAndFetch();
       if (result.updateReady && !result.isCritical) {
-        await client.reload();
+        await applyReload();
       }
       // Critical: App-level overlay hard-blocks; Settings is a safe route.
+    } catch {
+      Toast.show({
+        type: "error",
+        text1: i18n.t("settingsApplyUpdateError"),
+      });
     } finally {
       setApplying(false);
     }
-  }, [applying, noteUpdateReady]);
+  }, [
+    applying,
+    updateReady,
+    isCritical,
+    applyReload,
+    requestCheckAndFetch,
+  ]);
 
   const lines = buildVersionDisplayLines(info);
   const versionHeaderLabel = i18n.t("settingsVersionHeader");
-  const showApplyCta = Boolean(lines.latestLine);
+  const showApplyCta = Boolean(lines.latestLine) || updateReady;
 
   return (
     <View style={styles.section}>

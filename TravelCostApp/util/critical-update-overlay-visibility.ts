@@ -5,7 +5,6 @@ const SAFE_ROUTES = new Set([
   "Profile",
   "Settings",
   "Finder",
-  "Home",
 ]);
 
 export function isSafeRouteForCriticalUpdateOverlay(

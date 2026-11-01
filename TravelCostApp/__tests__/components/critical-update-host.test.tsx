@@ -109,6 +109,27 @@ describe("CriticalUpdateHost", () => {
     ).toBeNull();
   });
 
+  it("shows the overlay after leaving a form for a safe tab", async () => {
+    mockUpdateReady = true;
+    mockIsCritical = true;
+    mockRouteName = "ManageExpense";
+
+    const screen = renderWithAppProviders(<CriticalUpdateHost />, {
+      wrapNavigation: false,
+    });
+
+    expect(
+      screen.queryByText(i18n.t("criticalUpdateOverlayTitle"))
+    ).toBeNull();
+
+    mockRouteName = "Overview";
+    screen.rerender(<CriticalUpdateHost />);
+
+    expect(
+      await screen.findByText(i18n.t("criticalUpdateOverlayTitle"))
+    ).toBeTruthy();
+  });
+
   it("checks again when returning to the foreground", async () => {
     renderWithAppProviders(<CriticalUpdateHost />, {
       wrapNavigation: false,

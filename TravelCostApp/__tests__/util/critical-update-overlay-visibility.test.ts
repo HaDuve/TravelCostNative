@@ -11,6 +11,7 @@ describe("isSafeRouteForCriticalUpdateOverlay", () => {
     expect(isSafeRouteForCriticalUpdateOverlay("Profile")).toBe(true);
     expect(isSafeRouteForCriticalUpdateOverlay("Settings")).toBe(true);
     expect(isSafeRouteForCriticalUpdateOverlay("Finder")).toBe(true);
+    expect(isSafeRouteForCriticalUpdateOverlay("Home")).toBe(false);
   });
 
   it("blocks modal and data-entry stack routes", () => {

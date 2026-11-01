@@ -6,7 +6,6 @@ const mockRequestCheckAndFetch = jest.fn();
 const mockApplyReload = jest.fn();
 let mockUpdateReady = false;
 let mockIsCritical = false;
-let mockRouteName: string | undefined = "RecentExpenses";
 
 jest.mock("../../store/critical-ota-context", () => ({
   useCriticalOta: () => ({
@@ -18,18 +17,6 @@ jest.mock("../../store/critical-ota-context", () => ({
     applyReload: (...args: unknown[]) => mockApplyReload(...args),
   }),
 }));
-
-jest.mock("@react-navigation/native", () => {
-  const actual = jest.requireActual("@react-navigation/native");
-  return {
-    ...actual,
-    useNavigationState: (selector: (state: unknown) => unknown) =>
-      selector({
-        routes: [{ name: "Home", state: { routes: [{ name: mockRouteName }], index: 0 } }],
-        index: 0,
-      }),
-  };
-});
 
 import CriticalUpdateHost from "../../components/UI/CriticalUpdateHost";
 import { renderWithAppProviders } from "../fixtures/app-providers";
@@ -48,7 +35,6 @@ describe("CriticalUpdateHost", () => {
     });
     mockUpdateReady = false;
     mockIsCritical = false;
-    mockRouteName = "RecentExpenses";
     appStateSpy = jest
       .spyOn(AppState, "addEventListener")
       .mockReturnValue({ remove: jest.fn() } as never);
@@ -59,9 +45,10 @@ describe("CriticalUpdateHost", () => {
   });
 
   it("checks for updates on mount without showing an overlay when none is ready", async () => {
-    const screen = renderWithAppProviders(<CriticalUpdateHost />, {
-      wrapNavigation: false,
-    });
+    const screen = renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="RecentExpenses" />,
+      { wrapNavigation: false }
+    );
 
     await waitFor(() => {
       expect(mockRequestCheckAndFetch).toHaveBeenCalled();
@@ -74,11 +61,11 @@ describe("CriticalUpdateHost", () => {
   it("shows the overlay on a safe tab when a critical update is ready", async () => {
     mockUpdateReady = true;
     mockIsCritical = true;
-    mockRouteName = "Overview";
 
-    const screen = renderWithAppProviders(<CriticalUpdateHost />, {
-      wrapNavigation: false,
-    });
+    const screen = renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="Overview" />,
+      { wrapNavigation: false }
+    );
 
     expect(
       await screen.findByText(i18n.t("criticalUpdateOverlayTitle"))
@@ -95,11 +82,11 @@ describe("CriticalUpdateHost", () => {
   it("defers the overlay while Manage Expense is focused", async () => {
     mockUpdateReady = true;
     mockIsCritical = true;
-    mockRouteName = "ManageExpense";
 
-    const screen = renderWithAppProviders(<CriticalUpdateHost />, {
-      wrapNavigation: false,
-    });
+    const screen = renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="ManageExpense" />,
+      { wrapNavigation: false }
+    );
 
     await waitFor(() => {
       expect(mockRequestCheckAndFetch).toHaveBeenCalled();
@@ -112,18 +99,17 @@ describe("CriticalUpdateHost", () => {
   it("shows the overlay after leaving a form for a safe tab", async () => {
     mockUpdateReady = true;
     mockIsCritical = true;
-    mockRouteName = "ManageExpense";
 
-    const screen = renderWithAppProviders(<CriticalUpdateHost />, {
-      wrapNavigation: false,
-    });
+    const screen = renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="ManageExpense" />,
+      { wrapNavigation: false }
+    );
 
     expect(
       screen.queryByText(i18n.t("criticalUpdateOverlayTitle"))
     ).toBeNull();
 
-    mockRouteName = "Overview";
-    screen.rerender(<CriticalUpdateHost />);
+    screen.rerender(<CriticalUpdateHost focusedRouteName="Overview" />);
 
     expect(
       await screen.findByText(i18n.t("criticalUpdateOverlayTitle"))
@@ -131,9 +117,10 @@ describe("CriticalUpdateHost", () => {
   });
 
   it("checks again when returning to the foreground", async () => {
-    renderWithAppProviders(<CriticalUpdateHost />, {
-      wrapNavigation: false,
-    });
+    renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="RecentExpenses" />,
+      { wrapNavigation: false }
+    );
 
     await waitFor(() => {
       expect(mockRequestCheckAndFetch).toHaveBeenCalledTimes(1);

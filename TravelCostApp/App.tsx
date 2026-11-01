@@ -12,6 +12,7 @@ import {
   NavigationContainer,
   useIsFocused,
   useNavigation,
+  useNavigationContainerRef,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -72,6 +73,7 @@ import CriticalUpdateHost from "./components/UI/CriticalUpdateHost";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
+import { getFocusedRouteName } from "./util/focused-route-name";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
@@ -354,6 +356,10 @@ function AuthenticatedStack() {
 
 function Navigation() {
   const authCtx = useContext(AuthContext);
+  const navigationRef = useNavigationContainerRef();
+  const [focusedRouteName, setFocusedRouteName] = useState<
+    string | undefined
+  >();
   const linking = {
     // If you are using universal links, you need to add your domain to the prefixes as well:
     // prefixes: [Linking.createURL('/'), 'https://app.example.com'],
@@ -377,9 +383,20 @@ function Navigation() {
     },
   };
 
+  const syncFocusedRoute = (state: Parameters<typeof getFocusedRouteName>[0]) => {
+    setFocusedRouteName(getFocusedRouteName(state));
+  };
+
   return (
     <NavigationContainer
+      ref={navigationRef}
       linking={linking}
+      onReady={() => {
+        syncFocusedRoute(navigationRef.getRootState());
+      }}
+      onStateChange={(state) => {
+        syncFocusedRoute(state);
+      }}
       fallback={
         <View
           style={{
@@ -395,7 +412,7 @@ function Navigation() {
     >
       {!authCtx.isAuthenticated && <NotAuthenticatedStack />}
       {authCtx.isAuthenticated && <AuthenticatedStack />}
-      <CriticalUpdateHost />
+      <CriticalUpdateHost focusedRouteName={focusedRouteName} />
     </NavigationContainer>
   );
 }

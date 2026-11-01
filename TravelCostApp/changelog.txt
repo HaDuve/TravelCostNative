@@ -12,6 +12,7 @@ __Newest Changes:
 - Fixed repeated trip downloads for unnamed budgets
 - Added required update overlay for critical app updates
 - Added reload option in Settings when a newer update is ready
+- Fixed app startup white screen after required-update check
 
 __Other Changes:
 

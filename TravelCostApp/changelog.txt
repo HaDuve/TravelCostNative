@@ -1,9 +1,16 @@
 Changelog Travel Expense App
 
+Formatting rules (not shown in-app; see .cursor/skills/update-budget-app/changelog-style.md):
+- First bullet = EAS update message headline.
+- Critical OTAs: prefix the first bullet with "[CRITICAL] " (exact token, uppercase).
+  That marks a force-apply update (branded overlay → reload). Non-critical OTAs omit it.
+- "Bugfixes and performance improvements" stays on its own bullet line.
+
 __Newest Changes:
 
 1.3.005n
-- Fix excessive data usage: stop repeated trip downloads for unnamed budgets
+- [CRITICAL] Fix excessive data usage: load budgets without downloading all expenses
+- Fixed repeated trip downloads for unnamed budgets
 
 __Other Changes:
 

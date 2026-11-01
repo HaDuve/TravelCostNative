@@ -19,6 +19,7 @@ import { i18n } from "../i18n/i18n";
 import { Traveller } from "./traveler";
 import { normalizeTravellers } from "./normalize-travellers";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { MMKV_KEY_PATTERNS } from "../store/mmkv-keys";
 import { ExpoPushToken } from "expo-notifications";
 import { getActiveTripId } from "./active-trip-id";
 import safeLogError from "./error";
@@ -28,6 +29,10 @@ import {
   getLastFetchTimestamp,
   setLastFetchTimestamp,
 } from "./last-fetch-timestamp";
+import {
+  tripMetadataFromShallow,
+  tripMetadataPatch,
+} from "./trip-metadata";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -269,12 +274,12 @@ export interface SyncLoadingCallback {
 export async function fetchExpensesWithUIDs(
   tripid: string,
   uidlist: string[],
-  useDelta: boolean = true,
+  useDelta = true,
   loadingCallback?: SyncLoadingCallback
 ) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
-  let latestTimestamp: number = 0;
+  let latestTimestamp = 0;
 
   // Notify sync start
   loadingCallback?.onStart?.();
@@ -336,7 +341,7 @@ export async function fetchExpensesWithUIDs(
 export async function fetchExpenses(
   tripid: string,
   uid: string,
-  useDelta: boolean = true,
+  useDelta = true,
   loadingCallback?: SyncLoadingCallback
 ) {
   if (!tripid || DEBUG_NO_DATA) return [];
@@ -622,10 +627,14 @@ export async function updateTrip(tripid: string, tripData: TripData) {
       throw new Error("No valid auth token");
     }
 
+    const metadata = tripMetadataPatch(tripData);
     const res = await axios.patch(
       `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`,
-      tripData
+      metadata
     );
+    if (typeof metadata.tripName === "string" && metadata.tripName.length > 0) {
+      setMMKVString(MMKV_KEY_PATTERNS.TRIP_NAME(tripid), metadata.tripName);
+    }
     return res;
   } catch (error) {
     throw new Error("error while updating trip");
@@ -641,13 +650,20 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
       return null;
     }
 
-    const response = await axios.get(
-      `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`,
-      {
-        timeout: AXIOS_TIMOUT_LONG,
-      }
-    );
-    return response.data;
+    const [shallowResponse, travellers] = await Promise.all([
+      axios.get(
+        `${BACKEND_URL}/trips/${tripid}.json?shallow=true&auth=${authToken}`,
+        {
+          timeout: AXIOS_TIMOUT_LONG,
+        }
+      ),
+      getTravellers(tripid),
+    ]);
+    const trip = tripMetadataFromShallow(shallowResponse.data, travellers);
+    if (typeof trip.tripName === "string" && trip.tripName.length > 0) {
+      setMMKVString(MMKV_KEY_PATTERNS.TRIP_NAME(tripid), trip.tripName);
+    }
+    return trip;
   } catch (error) {
     throw new Error("error while fetching trip");
   }
@@ -779,7 +795,7 @@ export async function getUIDs(tripid: string) {
 export async function getAllExpenses(
   tripid: string,
   uid?: string,
-  useDelta: boolean = true,
+  useDelta = true,
   loadingCallback?: SyncLoadingCallback
 ) {
   const uids = await getUIDs(tripid);
@@ -901,6 +917,10 @@ export async function fetchUserName(userId: string): Promise<string> {
 
 export async function fetchTripName(tripId: string): Promise<string> {
   try {
+    if (!tripId) return null;
+    const cached = getMMKVString(MMKV_KEY_PATTERNS.TRIP_NAME(tripId));
+    if (cached) return cached;
+
     const authToken = await getValidIdToken();
     if (!authToken) {
       console.warn("[HTTP] No valid auth token for fetchTripName");
@@ -908,12 +928,17 @@ export async function fetchTripName(tripId: string): Promise<string> {
     }
 
     const response = await axios.get(
-      `${BACKEND_URL}/trips/${tripId}.json?auth=${authToken}`,
+      `${BACKEND_URL}/trips/${tripId}/tripName.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
     );
-    return response.data.tripName;
+    const tripName =
+      typeof response.data === "string" ? response.data : response.data?.tripName;
+    if (typeof tripName === "string" && tripName.length > 0) {
+      setMMKVString(MMKV_KEY_PATTERNS.TRIP_NAME(tripId), tripName);
+    }
+    return tripName;
   } catch (error) {
     safeLogError(error);
   }

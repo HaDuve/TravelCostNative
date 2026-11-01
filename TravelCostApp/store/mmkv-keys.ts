@@ -41,6 +41,7 @@ export type TripHistoryItemKey = `tripHistoryItem_${string}`;
 export type CurrencyExchangeBaseKey = `currencyExchange_base_${string}`;
 export type TripCacheKey = `trip_${string}`;
 export type TripLastUpdateIsoKey = `lastUpdateISO_trip_${string}`;
+export type TripNameKey = `tripName_${string}`;
 export type LastFetchKey = `lastFetch_${string}`;
 export type LastUpdateAllExpensesTripKey = `lastUpdate_allExpenses_tripid_${string}`;
 export type LastUpdateIsoAllExpensesTripKey =
@@ -60,6 +61,7 @@ export const MMKV_KEY_PATTERNS = {
   TRIP: (tripid: string): TripCacheKey => `trip_${tripid}`,
   TRIP_LAST_UPDATE_ISO: (tripid: string): TripLastUpdateIsoKey =>
     `lastUpdateISO_trip_${tripid}`,
+  TRIP_NAME: (tripid: string): TripNameKey => `tripName_${tripid}`,
   LAST_FETCH: (tripid: string): LastFetchKey => `lastFetch_${tripid}`,
   LAST_UPDATE_ALL_EXPENSES_TRIP: (
     tripid: string
@@ -82,6 +84,7 @@ export type MMKVDynamicKey =
   | CurrencyExchangeBaseKey
   | TripCacheKey
   | TripLastUpdateIsoKey
+  | TripNameKey
   | LastFetchKey
   | LastUpdateAllExpensesTripKey
   | LastUpdateIsoAllExpensesTripKey
@@ -99,6 +102,7 @@ export function isValidMMKVKey(key: string): key is MMKVKey {
     key.startsWith("expenseDraft_") ||
     key.startsWith("tripHistoryItem_") ||
     key.startsWith("currencyExchange_base_") ||
+    key.startsWith("tripName_") ||
     key.startsWith("trip_") ||
     key.startsWith("lastUpdateISO_trip_") ||
     key.startsWith("lastFetch_") ||

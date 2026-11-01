@@ -114,6 +114,20 @@ describe("trip-form", () => {
 
       expect(trip.dailyBudget).toBe("100.00");
     });
+
+    it("omits Traveller roster from updateTrip metadata payloads", () => {
+      const trip = buildTripFormSubmitData({
+        mode: "edit",
+        tripid: "t1",
+        tripName: "Named",
+        tripCurrency: "EUR",
+        totalBudget: "100",
+        dailyBudget: "10",
+        isDynamicDailyBudget: false,
+      });
+
+      expect(trip).not.toHaveProperty("travellers");
+    });
   });
 
   describe("hasOptionalTripFormValues", () => {

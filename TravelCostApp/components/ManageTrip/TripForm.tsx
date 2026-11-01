@@ -592,7 +592,6 @@ const TripForm = ({ navigation, route }) => {
       startDate,
       endDate,
       tripid: editedTripId,
-      travellers: travellers,
       isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
       wasImplicitDefault,
     });

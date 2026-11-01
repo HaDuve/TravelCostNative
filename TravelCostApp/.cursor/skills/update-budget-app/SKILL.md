@@ -107,8 +107,13 @@ Summarize **user-visible** changes only. Style rules: [changelog-style.md](chang
 Quick rules:
 - **Short bullets:** one scannable idea per `-` line; split related work into several bullets instead of one long line. See [changelog-style.md](changelog-style.md#short-bullets-required-rule).
 - **Headline first:** the first `-` bullet becomes the EAS update message title.
+- **Critical vs normal OTA:** most updates are normal. Only cost/security/data-loss (or similarly urgent) fixes are critical. Mark those by appending `!` to the **version line** (`1.3.005n!`) — not in bullet text. That gates the in-app force-apply overlay. See [changelog-style.md](changelog-style.md#critical-otas-required-rule). After `version:bump:eas`, edit the new version line to add `!` when needed:
+  ```
+  1.3.005n!
+  - Fix excessive data usage: stop repeated trip downloads for unnamed budgets
+  ```
 - **OTA patch:** typically **2–4 short feature bullets** + `Bugfixes and performance improvements` on its **own line**. Pure internal fixes → bugfixes line only.
-- **Consolidation (under 24h):** add or edit bullets in place — do not use `version:bump:eas --notes`.
+- **Consolidation (under 24h):** add or edit bullets in place — do not use `version:bump:eas --notes`. Keep or add `!` on the version line when the release must force-apply.
 - **Store release:** up to 2–3 feature bullets, then `Bugfixes and performance improvements` on its **own line**.
 - **Never** combine bugfixes with a feature on one line (see [changelog-style.md](changelog-style.md)).
 - Mirror recent tone: `Added …`, `Improved …`, `Fixed …`, `New …`; screen names as in the app.
@@ -319,6 +324,7 @@ eas build:list --limit 3
 | `pnpm run update` (`eas update --auto`) | `pnpm run update:{tier}` |
 | `npm` / `yarn` | `pnpm` only |
 | Generic changelog when diff shows a user-visible fix | Name the fix concisely |
+| Marking every OTA with `!` on the version line | Reserve `!` for urgent force-apply fixes only |
 | `version:bump` for OTA-only patches | `version:bump:eas` or edit in place |
 | `version:bump:eas` when app version must change | `version:bump` + native build |
 | `version:bump:eas` when last OTA on target branch was under 24h ago | Edit `changelog.txt` in place (consolidate), then `update:{tier}` |

@@ -119,6 +119,8 @@ If `message` matches newest changelog version and `createdAt` is under 24 hours 
 
 `Bugfixes and performance improvements` must always be its own bullet — never on the same line as a feature. See [changelog-style.md](changelog-style.md).
 
+**Critical OTAs:** append `!` to the version line (`1.3.005n!`). That alone gates the force-apply overlay; omit for normal OTAs. See [changelog-style.md](changelog-style.md#critical-otas-required-rule).
+
 `update:production` (no args) publishes using newest block: `{version}: {first bullet}`.
 
 Writing style: [changelog-style.md](changelog-style.md).

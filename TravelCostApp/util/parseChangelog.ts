@@ -48,8 +48,9 @@ export function parseChangelog(changelogString: string): ChangelogItem[] {
       const versionInfo = lines[0];
       const changes = parseChangelogBulletLines(lines.slice(1));
 
+      // Optional trailing "!" = critical OTA mark (kept in the displayed version).
       const versionStringMatch = versionInfo.match(
-        /(\d+\.\d+\.\d+[a-zA-Z]*\d*)/
+        /(\d+\.\d+\.\d+[a-zA-Z]*\d*!?)/
       );
 
       if (versionStringMatch) {

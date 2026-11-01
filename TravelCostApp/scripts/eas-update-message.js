@@ -1,4 +1,5 @@
-const VERSION_PARSE_RE = /^(\d+)\.(\d+)\.(\d+)([a-z]*)$/i;
+// Optional trailing "!" marks a critical (force-apply) OTA.
+const VERSION_PARSE_RE = /^(\d+)\.(\d+)\.(\d+)([a-z]*)(!)?$/i;
 
 function parseEasUpdateArgs(argv) {
   const opts = {

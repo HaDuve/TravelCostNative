@@ -56,6 +56,25 @@ describe("readMessageFromChangelogSource", () => {
     );
   });
 
+  it("keeps a trailing ! on critical version lines in the EAS message", () => {
+    const source = [
+      "Changelog Travel Expense App",
+      "",
+      "__Newest Changes:",
+      "",
+      "1.3.005n!",
+      "- Fix excessive data usage: stop repeated trip downloads for unnamed budgets",
+      "",
+      "__Other Changes:",
+      "",
+      "1.3.005m",
+    ].join("\n");
+
+    expect(readMessageFromChangelogSource(source)).toBe(
+      "1.3.005n!: Fix excessive data usage: stop repeated trip downloads for unnamed budgets",
+    );
+  });
+
   it("returns null when changelog markers are missing", () => {
     expect(readMessageFromChangelogSource("no markers here")).toBeNull();
   });

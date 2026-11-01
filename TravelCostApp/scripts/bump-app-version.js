@@ -20,7 +20,8 @@ const APP_JSON = path.join(ROOT, "app.json");
 const CHANGELOG = path.join(ROOT, "changelog.txt");
 
 const VERSION_RE = /version:\s*["']([^"']+)["']/;
-const VERSION_PARSE_RE = /^(\d+)\.(\d+)\.(\d+)([a-z]*)$/i;
+// Optional trailing "!" marks a critical (force-apply) OTA; ignored when bumping.
+const VERSION_PARSE_RE = /^(\d+)\.(\d+)\.(\d+)([a-z]*)(!)?$/i;
 const DEFAULT_NOTES = ["Bugfixes and performance improvements"];
 
 function parseArgs(argv) {
@@ -174,9 +175,11 @@ function updateChangelog(next, notes) {
   const movedPrevious = previousNewest
     ? `${previousNewest}\n\n${restAfterOther}`
     : restAfterOther;
+  // Keep title + formatting-rules preamble above __Newest Changes:.
+  const preamble = source.slice(0, newestIdx).trimEnd() || "Changelog Travel Expense App";
 
   const updated = [
-    "Changelog Travel Expense App",
+    preamble,
     "",
     newestMarker,
     "",

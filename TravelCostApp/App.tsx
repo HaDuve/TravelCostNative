@@ -68,12 +68,14 @@ import {
   DEBUG_POLLING_INTERVAL,
 } from "./confAppConstants";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
+import CriticalUpdateHost from "./components/UI/CriticalUpdateHost";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
+import { CriticalOtaProvider } from "./store/critical-ota-context";
 import { UserData } from "./store/user-context";
 import FilteredPieCharts from "./screens/FilteredPieCharts";
 import {
@@ -393,6 +395,7 @@ function Navigation() {
     >
       {!authCtx.isAuthenticated && <NotAuthenticatedStack />}
       {authCtx.isAuthenticated && <AuthenticatedStack />}
+      <CriticalUpdateHost />
     </NavigationContainer>
   );
 }
@@ -877,11 +880,13 @@ export default function App() {
                       <NetworkProvider>
                         <LayoutContextProvider>
                           <OrientationContextProvider>
-                            <GestureHandlerRootView style={{ flex: 1 }}>
-                              <Root />
+                            <CriticalOtaProvider>
+                              <GestureHandlerRootView style={{ flex: 1 }}>
+                                <Root />
 
-                              <ToastComponent />
-                            </GestureHandlerRootView>
+                                <ToastComponent />
+                              </GestureHandlerRootView>
+                            </CriticalOtaProvider>
                           </OrientationContextProvider>
                         </LayoutContextProvider>
                       </NetworkProvider>

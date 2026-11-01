@@ -41,4 +41,18 @@ describe("parseChangelog", () => {
       },
     ]);
   });
+
+  it("keeps a trailing ! on critical version lines", () => {
+    const source = `1.3.005n!
+- Fix excessive data usage: stop repeated trip downloads for unnamed budgets`;
+
+    expect(parseChangelog(source)).toEqual([
+      {
+        versionString: "1.3.005n!",
+        changes: [
+          "\n\n• Fix excessive data usage: stop repeated trip downloads for unnamed budgets",
+        ],
+      },
+    ]);
+  });
 });

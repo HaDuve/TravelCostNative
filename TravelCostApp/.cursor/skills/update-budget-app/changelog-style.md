@@ -18,6 +18,31 @@ __Other Changes:
 - Bullets: `- ` prefix, no trailing period.
 - Blank line between version blocks in `__Other Changes__`.
 
+## Critical OTAs (required rule)
+
+Most OTAs are **not** critical. Only mark an update critical when users must apply it soon (e.g. cost/security/data-loss fix). The force-apply overlay (check → fetch → branded block → reload) runs **only** for critical updates.
+
+**Token:** append `!` to the **version line** (no space): `1.3.005n!`. Bullets stay normal user-facing copy — do not put `CRITICAL` / `[CRITICAL]` in bullet text.
+
+```
+# Critical OTA
+1.3.005n!
+- Fix excessive data usage: stop repeated trip downloads for unnamed budgets
+
+# Normal OTA (default) — no bang
+1.3.005m
+- New Premium Nomad status screen with perks, renewal dates, and manage subscription
+- Bugfixes and performance improvements
+```
+
+Rules:
+- Put `!` only on the version line of that block — never inside bullets.
+- Do **not** invent variants (`!!`, ` *`, `[CRITICAL]`). Parsers and the force-overlay gate look for a version line ending in `!` (EAS message shape: `{version}!: {first bullet}`).
+- When consolidating under 24h: if the block is already critical, keep the `!` on the version line; if you are promoting a normal block to critical, add `!` to the version line before republishing.
+- After `version:bump:eas`, the new version line is unmarked by default — edit it to add `!` when the new OTA must force-apply.
+- Store releases can use `1.3.006!` the same way when a hard apply is required; default remains unmarked.
+- A short rules reminder may live at the top of `changelog.txt` (above `__Newest Changes:`); the in-app Changelog screen ignores that preamble. The version string may show a trailing `!` in-app — that is intentional and quiet.
+
 ## Short bullets (required rule)
 
 Each `-` line becomes its own bullet in the app. Prefer **several short bullets** over one long run-on line.
@@ -124,6 +149,12 @@ When the last OTA on the target branch was published **under 24 hours ago** and 
 1.3.005f
 - Fixed expense amount rounding in split summary
 - Bugfixes and performance improvements
+```
+
+**OTA — critical force-apply:**
+```
+1.3.005n!
+- Fix excessive data usage: stop repeated trip downloads for unnamed budgets
 ```
 
 **OTA — small feature + polish:**

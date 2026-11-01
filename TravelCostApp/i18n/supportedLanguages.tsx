@@ -402,6 +402,12 @@ const en = {
   settingsCurrentVersionLine: "Current version created at: %{createdAt}",
   settingsLatestVersionLine: "Latest version available at: %{createdAt}",
   settingsUpdatesDisabledLabel: "Updates disabled on this build",
+  settingsApplyUpdate: "Reload to update",
+  settingsApplyUpdateError: "Could not apply the update. Please try again.",
+  criticalUpdateOverlayTitle: "Required update",
+  criticalUpdateOverlayBody:
+    "A required update is ready. Reload now to keep Budget for Nomads working correctly.",
+  criticalUpdateOverlayReload: "Reload now",
   settingsSkipCat: "Skip Category Picker",
   settingsShowAdvanced: "Always Show More Options",
   settingsShowFlags: "Show Flag Icons",
@@ -1088,6 +1094,13 @@ const de = {
   settingsCurrentVersionLine: "Aktuelle Version erstellt am: %{createdAt}",
   settingsLatestVersionLine: "Neueste Version verfügbar ab: %{createdAt}",
   settingsUpdatesDisabledLabel: "Updates sind in diesem Build deaktiviert",
+  settingsApplyUpdate: "Neu laden zum Aktualisieren",
+  settingsApplyUpdateError:
+    "Update konnte nicht angewendet werden. Bitte erneut versuchen.",
+  criticalUpdateOverlayTitle: "Erforderliches Update",
+  criticalUpdateOverlayBody:
+    "Ein erforderliches Update ist bereit. Bitte jetzt neu laden, damit Budget for Nomads weiter korrekt funktioniert.",
+  criticalUpdateOverlayReload: "Jetzt neu laden",
   settingsSkipCat: "Kategorieauswahl überspringen",
   settingsShowAdvanced: "Immer Optionen anzeigen",
   settingsShowFlags: "Länderflaggen anzeigen",
@@ -1788,6 +1801,13 @@ const fr = {
   settingsCurrentVersionLine: "Version actuelle créée le : %{createdAt}",
   settingsLatestVersionLine: "Dernière version disponible le : %{createdAt}",
   settingsUpdatesDisabledLabel: "Mises à jour désactivées sur ce build",
+  settingsApplyUpdate: "Recharger pour mettre à jour",
+  settingsApplyUpdateError:
+    "Impossible d'appliquer la mise à jour. Réessayez.",
+  criticalUpdateOverlayTitle: "Mise à jour requise",
+  criticalUpdateOverlayBody:
+    "Une mise à jour requise est prête. Rechargez maintenant pour que Budget for Nomads continue de fonctionner correctement.",
+  criticalUpdateOverlayReload: "Recharger maintenant",
   settingsSkipCat: "Passer la sélection de catégorie",
   settingsShowAdvanced: "Toujours afficher plus d'options",
   settingsShowFlags: "Afficher les icônes de drapeau",
@@ -2477,6 +2497,13 @@ const ru = {
   settingsCurrentVersionLine: "Текущая версия создана: %{createdAt}",
   settingsLatestVersionLine: "Последняя версия доступна: %{createdAt}",
   settingsUpdatesDisabledLabel: "Обновления отключены в этом билде",
+  settingsApplyUpdate: "Перезагрузить для обновления",
+  settingsApplyUpdateError:
+    "Не удалось применить обновление. Попробуйте ещё раз.",
+  criticalUpdateOverlayTitle: "Требуется обновление",
+  criticalUpdateOverlayBody:
+    "Требуемое обновление готово. Перезагрузите сейчас, чтобы Budget for Nomads продолжал работать корректно.",
+  criticalUpdateOverlayReload: "Перезагрузить сейчас",
   settingsSkipCat: "Пропустить выбор категории",
   settingsShowAdvanced: "Всегда показывать дополнительные опции",
   settingsShowFlags: "Показывать значки флагов",

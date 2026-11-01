@@ -117,6 +117,8 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   const [travellers, setTravellers] = useState<Traveller[]>([]);
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
+  // Implicit default trips have an empty tripName, so "loaded" can't be inferred from it.
+  const [hydratedTripid, setHydratedTripid] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
   const [tripCurrency, setTripCurrency] = useState("");
   const [dailyBudget, setdailyBudget] = useState("");
@@ -189,7 +191,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
 
   useInterval(
     () => {
-      if (tripid && tripName) {
+      if (tripid && tripid === hydratedTripid) {
         setIsLoading(false);
         return;
       }
@@ -245,6 +247,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     if (!trip) return;
     if (tripid === "reset") {
       _setTripid("");
+      setHydratedTripid("");
       setTripName("");
       setTotalBudget("");
       setTripCurrency("");
@@ -263,6 +266,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     const hydratedTrip = hydrateTrip({ ...trip, tripid: trip.tripid ?? tripid });
 
     _setTripid(tripid);
+    setHydratedTripid(tripid);
     setTripName(hydratedTrip.tripName);
     setTotalBudget(hydratedTrip.totalBudget!);
     setTripCurrency(hydratedTrip.tripCurrency);

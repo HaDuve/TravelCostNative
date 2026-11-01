@@ -8,11 +8,8 @@ Formatting rules (not shown in-app; see .cursor/skills/update-budget-app/changel
 __Newest Changes:
 
 1.3.005n!
-- Fix excessive data usage: load budgets without downloading all expenses
-- Fixed repeated trip downloads for unnamed budgets
-- Added required update overlay for critical app updates
-- Added reload option in Settings when a newer update is ready
-- Fixed app startup white screen after required-update check
+- Fixed startup white screen when trip currency data is invalid
+- Fix excessive data usage and required-update apply flow
 
 __Other Changes:
 

@@ -30,10 +30,14 @@ export function hydrateTrip(raw: TripData): TripData {
   const dailyBudget =
     Number(dailyBudgetRaw) < 0 ? "0.0001" : dailyBudgetRaw;
 
+  const tripCurrency =
+    typeof trip.tripCurrency === "string" ? trip.tripCurrency : "";
+
   return {
     ...trip,
     totalBudget,
     dailyBudget,
+    tripCurrency,
     isPaid: trip.isPaid ?? isPaidString.notPaid,
     isPaidDate: trip.isPaidDate ?? "",
   };

@@ -54,6 +54,14 @@ describe("hydrateTrip", () => {
     expect(hydrated.dailyBudget).toBe("0.0001");
   });
 
+  it("coerces non-string tripCurrency to empty string", () => {
+    const hydrated = hydrateTrip(
+      minimalTrip({ tripCurrency: 1 as unknown as string })
+    );
+
+    expect(hydrated.tripCurrency).toBe("");
+  });
+
   it.each([
     ["empty isPaidDate", ""],
     ["invalid isPaidDate", "not-a-date"],

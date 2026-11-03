@@ -62,6 +62,24 @@ describe("hydrateTrip", () => {
     expect(hydrated.tripCurrency).toBe("");
   });
 
+  it("treats boolean true totalBudget/dailyBudget/dates as missing (shallow placeholders)", () => {
+    const hydrated = hydrateTrip(
+      minimalTrip({
+        totalBudget: true as unknown as string,
+        dailyBudget: true as unknown as string,
+        startDate: true as unknown as string,
+        endDate: true as unknown as string,
+        tripCurrency: true as unknown as string,
+      })
+    );
+
+    expect(hydrated.totalBudget).toBe(MAX_JS_NUMBER.toString());
+    expect(hydrated.dailyBudget).toBe("0");
+    expect(hydrated.startDate).toBeUndefined();
+    expect(hydrated.endDate).toBeUndefined();
+    expect(hydrated.tripCurrency).toBe("");
+  });
+
   it.each([
     ["empty isPaidDate", ""],
     ["invalid isPaidDate", "not-a-date"],

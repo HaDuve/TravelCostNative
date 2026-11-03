@@ -663,9 +663,17 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
     );
     if (shallowResponse.data == null) return null;
 
+    const shallowKeys =
+      typeof shallowResponse.data === "object" && shallowResponse.data !== null
+        ? shallowResponse.data
+        : {};
+    const presentMetadataKeys = TRIP_METADATA_FIELD_KEYS.filter(
+      (key) => key in shallowKeys
+    );
+
     const [travellers, ...leafResponses] = await Promise.all([
       getTravellers(tripid),
-      ...TRIP_METADATA_FIELD_KEYS.map((key) =>
+      ...presentMetadataKeys.map((key) =>
         axios.get(
           `${BACKEND_URL}/trips/${tripid}/${key}.json?auth=${authToken}`,
           { timeout: AXIOS_TIMOUT_LONG }
@@ -674,7 +682,7 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
     ]);
 
     const leaves: Partial<Record<TripMetadataFieldKey, unknown>> = {};
-    TRIP_METADATA_FIELD_KEYS.forEach((key, index) => {
+    presentMetadataKeys.forEach((key, index) => {
       leaves[key] = leafResponses[index]?.data;
     });
     const trip = tripMetadataFromLeaves(leaves, travellers);

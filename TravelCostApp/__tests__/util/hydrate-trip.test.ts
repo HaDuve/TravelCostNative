@@ -62,22 +62,34 @@ describe("hydrateTrip", () => {
     expect(hydrated.tripCurrency).toBe("");
   });
 
-  it("treats boolean true totalBudget/dailyBudget/dates as missing (shallow placeholders)", () => {
+  it("strips all non-boolean true placeholders so Active trip state never keeps them", () => {
     const hydrated = hydrateTrip(
       minimalTrip({
+        tripName: true as unknown as string,
         totalBudget: true as unknown as string,
         dailyBudget: true as unknown as string,
         startDate: true as unknown as string,
         endDate: true as unknown as string,
         tripCurrency: true as unknown as string,
+        isPaid: true as unknown as never,
+        isPaidDate: true as unknown as string,
+        categories: true as unknown as never,
+        isDynamicDailyBudget: true,
+        isImplicitDefault: false,
       })
     );
 
+    expect(hydrated.tripName).toBeUndefined();
     expect(hydrated.totalBudget).toBe(MAX_JS_NUMBER.toString());
     expect(hydrated.dailyBudget).toBe("0");
     expect(hydrated.startDate).toBeUndefined();
     expect(hydrated.endDate).toBeUndefined();
     expect(hydrated.tripCurrency).toBe("");
+    expect(hydrated.isPaid).toBe(isPaidString.notPaid);
+    expect(hydrated.isPaidDate).toBe("");
+    expect(hydrated.categories).toBeUndefined();
+    expect(hydrated.isDynamicDailyBudget).toBe(true);
+    expect(hydrated.isImplicitDefault).toBe(false);
   });
 
   it.each([

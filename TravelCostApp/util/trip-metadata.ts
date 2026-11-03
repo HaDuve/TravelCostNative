@@ -31,8 +31,9 @@ const TRIP_BOOLEAN_METADATA_KEYS = new Set<TripMetadataFieldKey>([
 ]);
 
 /**
- * Shallow GET placeholders are boolean `true` for any non-primitive-at-location
- * child. Boolean metadata fields are the only keys that may keep a boolean.
+ * True when `value` is a boolean `true` stub that must not be treated as real
+ * non-boolean metadata (shallow truncation, corrupt leaf, or bad write-back).
+ * Boolean metadata fields may keep real `true`/`false`.
  */
 export function isShallowMetadataPlaceholder(
   key: TripMetadataFieldKey,
@@ -40,31 +41,6 @@ export function isShallowMetadataPlaceholder(
 ): boolean {
   if (TRIP_BOOLEAN_METADATA_KEYS.has(key)) return false;
   return value === true;
-}
-
-/**
- * Drop shallow `true` placeholders and non-metadata keys from a shallow trip
- * snapshot, then attach the Traveller roster from a separate read.
- */
-export function tripMetadataFromShallow(
-  shallow: Record<string, unknown> | null | undefined,
-  travellersRaw: unknown
-): TripData {
-  const trip: TripData = {};
-  if (!shallow || typeof shallow !== "object") {
-    trip.travellers = normalizeTravellers(travellersRaw);
-    return trip;
-  }
-
-  for (const key of TRIP_METADATA_FIELD_KEYS) {
-    if (!(key in shallow)) continue;
-    const value = shallow[key];
-    if (isShallowMetadataPlaceholder(key, value)) continue;
-    (trip as Record<string, unknown>)[key] = value;
-  }
-
-  trip.travellers = normalizeTravellers(travellersRaw);
-  return trip;
 }
 
 /**

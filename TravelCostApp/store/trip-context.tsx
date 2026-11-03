@@ -17,6 +17,7 @@ import type { TripData } from "../types/trip";
 import { settleTrip } from "../util/settlement";
 import { useTripTotalSpent } from "../hooks/useTripTotalSpent";
 import { hydrateTrip } from "../util/hydrate-trip";
+import { hasPoisonedTripMetadata } from "../util/trip-metadata";
 import { normalizeTravellers } from "../util/normalize-travellers";
 import {
   leaveTrip as executeLeaveTrip,
@@ -387,6 +388,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     if (tripData) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const hadDeprecatedTotalSum = "totalSum" in (tripData as any);
+      const hadPoisonedMetadata = hasPoisonedTripMetadata(tripData);
       const migratedTrip = await setCurrentTrip(tripData.tripid ?? "", tripData);
       if (!migratedTrip) {
         setIsLoading(false);
@@ -403,7 +405,11 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
         tripData.isPaidDate &&
         !tripData.isPaidTimestamp &&
         migratedTrip.isPaidTimestamp;
-      if (didMigrateSettlementData || hadDeprecatedTotalSum) {
+      if (
+        didMigrateSettlementData ||
+        hadDeprecatedTotalSum ||
+        hadPoisonedMetadata
+      ) {
         await saveTripDataInStorage(migratedTrip);
       }
 

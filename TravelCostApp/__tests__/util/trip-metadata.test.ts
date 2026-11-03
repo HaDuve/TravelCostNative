@@ -1,15 +1,13 @@
 import {
   hasPoisonedTripMetadata,
-  tripMetadataFromShallow,
+  tripMetadataFromLeaves,
   tripMetadataPatch,
 } from "../../util/trip-metadata";
 import { isPaidString } from "../../util/expense";
 
-describe("tripMetadataFromShallow", () => {
-  it("drops shallow true placeholders from non-boolean metadata so string fields never become true", () => {
-    // Firebase REST docs (2026-10-20): shallow=true on an object truncates
-    // every child value to true — including string/number leaves.
-    const trip = tripMetadataFromShallow(
+describe("tripMetadataFromLeaves", () => {
+  it("drops true placeholders from non-boolean metadata so string fields never become true", () => {
+    const trip = tripMetadataFromLeaves(
       {
         tripName: true,
         totalBudget: true,
@@ -22,9 +20,6 @@ describe("tripMetadataFromShallow", () => {
         isPaidTimestamp: true,
         tripProgress: true,
         categories: true,
-        travellers: true,
-        tokens: true,
-        "uid-alice": true,
         isDynamicDailyBudget: true,
         isImplicitDefault: false,
       },
@@ -49,8 +44,8 @@ describe("tripMetadataFromShallow", () => {
     ]);
   });
 
-  it("keeps real scalar metadata when present (non-shallow / leaf payloads)", () => {
-    const trip = tripMetadataFromShallow(
+  it("keeps real scalar metadata from leaf payloads", () => {
+    const trip = tripMetadataFromLeaves(
       {
         tripName: "Bali",
         totalBudget: "5000",

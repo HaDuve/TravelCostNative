@@ -124,6 +124,48 @@ describe("fetchTrip metadata (no Expenses download)", () => {
     expect((trip as Record<string, unknown>).travellers).not.toBe(true);
   });
 
+  it("only leaf-fetches metadata keys present on the shallow map", async () => {
+    mockedAxios.get.mockImplementation(async (url: string) => {
+      if (url.includes("shallow=true") && url.includes(`/trips/trip-sparse.json`)) {
+        return {
+          data: {
+            tripName: true,
+            tripCurrency: true,
+            travellers: true,
+            "uid-alice": true,
+          },
+        };
+      }
+      if (url.includes(`/trips/trip-sparse/travellers.json`)) {
+        return { data: {} };
+      }
+      if (url.includes(`/trips/trip-sparse/tripName.json`)) {
+        return { data: "Sparse" };
+      }
+      if (url.includes(`/trips/trip-sparse/tripCurrency.json`)) {
+        return { data: "EUR" };
+      }
+      throw new Error(`Unexpected GET ${url}`);
+    });
+
+    const trip = await fetchTrip("trip-sparse");
+
+    const requestedUrls = mockedAxios.get.mock.calls.map((c) => c[0] as string);
+    expect(requestedUrls.some((u) => u.includes(`/trips/trip-sparse/tripName.json`))).toBe(
+      true
+    );
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-sparse/tripCurrency.json`))
+    ).toBe(true);
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-sparse/totalBudget.json`))
+    ).toBe(false);
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-sparse/startDate.json`))
+    ).toBe(false);
+    expect(trip).toMatchObject({ tripName: "Sparse", tripCurrency: "EUR" });
+  });
+
   it("returns null when the trip node is missing so callers can treat it as not found", async () => {
     mockedAxios.get.mockImplementation(async (url: string) => {
       if (url.includes("shallow=true") && url.includes(`/trips/missing-trip.json`)) {

@@ -30,8 +30,10 @@ import {
   setLastFetchTimestamp,
 } from "./last-fetch-timestamp";
 import {
-  tripMetadataFromShallow,
+  TRIP_METADATA_FIELD_KEYS,
+  tripMetadataFromLeaves,
   tripMetadataPatch,
+  type TripMetadataFieldKey,
 } from "./trip-metadata";
 
 const BACKEND_URL =
@@ -650,24 +652,41 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
       return null;
     }
 
-    const [shallowResponse, travellers] = await Promise.all([
-      axios.get(
-        `${BACKEND_URL}/trips/${tripid}.json?shallow=true&auth=${authToken}`,
-        {
-          timeout: AXIOS_TIMOUT_LONG,
-        }
-      ),
-      getTravellers(tripid),
-    ]);
+    // Shallow only proves the trip node exists and avoids downloading Expense
+    // subtrees. Per Firebase REST docs, shallow=true truncates *every* child
+    // to `true` (scalars included), so metadata must be read from leaf paths.
+    const shallowResponse = await axios.get(
+      `${BACKEND_URL}/trips/${tripid}.json?shallow=true&auth=${authToken}`,
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
+    );
     if (shallowResponse.data == null) return null;
-    const trip = tripMetadataFromShallow(shallowResponse.data, travellers);
-    if (
-      shallowResponse.data.categories === true &&
-      trip.categories === undefined
-    ) {
-      const categories = await fetchCategories(tripid);
-      if (categories) trip.categories = categories;
-    }
+
+    const shallowKeys =
+      typeof shallowResponse.data === "object" && shallowResponse.data !== null
+        ? shallowResponse.data
+        : {};
+    const presentMetadataKeys = TRIP_METADATA_FIELD_KEYS.filter(
+      (key) => key in shallowKeys
+    );
+
+    const [travellers, ...leafResponses] = await Promise.all([
+      getTravellers(tripid),
+      ...presentMetadataKeys.map((key) =>
+        axios.get(
+          `${BACKEND_URL}/trips/${tripid}/${key}.json?auth=${authToken}`,
+          { timeout: AXIOS_TIMOUT_LONG }
+        )
+      ),
+    ]);
+
+    const leaves: Partial<Record<TripMetadataFieldKey, unknown>> = {};
+    presentMetadataKeys.forEach((key, index) => {
+      leaves[key] = leafResponses[index]?.data;
+    });
+    const trip = tripMetadataFromLeaves(leaves, travellers);
+
     if (typeof trip.tripName === "string" && trip.tripName.length > 0) {
       setMMKVString(MMKV_KEY_PATTERNS.TRIP_NAME(tripid), trip.tripName);
     }

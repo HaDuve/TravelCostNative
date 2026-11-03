@@ -31,23 +31,25 @@ describe("fetchTrip metadata (no Expenses download)", () => {
     jest.clearAllMocks();
   });
 
-  it("requests a shallow trip GET plus the Traveller roster, not the full trip node", async () => {
+  it("loads trip metadata via leaf GETs so shallow true placeholders never become string fields", async () => {
+    // Real Firebase shallow=true on a trip object returns every child as true
+    // (scalars included). Scalars must be read from leaf paths instead.
     mockedAxios.get.mockImplementation(async (url: string) => {
       if (url.includes("shallow=true") && url.includes(`/trips/trip-1.json`)) {
         return {
           data: {
-            tripName: "Bali",
-            totalBudget: "5000",
-            dailyBudget: "100",
-            tripCurrency: "EUR",
-            startDate: "2026-01-01",
-            endDate: "2026-01-31",
-            isPaid: isPaidString.notPaid,
-            isPaidDate: "",
-            isPaidTimestamp: undefined,
+            tripName: true,
+            totalBudget: true,
+            dailyBudget: true,
+            tripCurrency: true,
+            startDate: true,
+            endDate: true,
+            isPaid: true,
+            isPaidDate: true,
+            isPaidTimestamp: true,
             isDynamicDailyBudget: true,
-            isImplicitDefault: false,
-            categories: JSON.stringify([{ catId: "food", catName: "Food" }]),
+            isImplicitDefault: true,
+            categories: true,
             travellers: true,
             tokens: true,
             "uid-alice": true,
@@ -60,6 +62,26 @@ describe("fetchTrip metadata (no Expenses download)", () => {
             keyA: { uid: "uid-alice", userName: "Alice", touched: false },
           },
         };
+      }
+      const leafMatch = url.match(/\/trips\/trip-1\/([^/.]+)\.json/);
+      if (leafMatch) {
+        const leaf = leafMatch[1];
+        const leaves: Record<string, unknown> = {
+          tripName: "Bali",
+          totalBudget: "5000",
+          dailyBudget: "100",
+          tripCurrency: "EUR",
+          startDate: "2026-01-01",
+          endDate: "2026-01-31",
+          isPaid: isPaidString.notPaid,
+          isPaidDate: "",
+          isPaidTimestamp: null,
+          isDynamicDailyBudget: true,
+          isImplicitDefault: false,
+          categories: JSON.stringify([{ catId: "food", catName: "Food" }]),
+          tripProgress: null,
+        };
+        if (leaf in leaves) return { data: leaves[leaf] };
       }
       throw new Error(`Unexpected GET ${url}`);
     });
@@ -77,6 +99,12 @@ describe("fetchTrip metadata (no Expenses download)", () => {
     expect(
       requestedUrls.some((u) => u.includes(`/trips/trip-1/travellers.json`))
     ).toBe(true);
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-1/tripCurrency.json`))
+    ).toBe(true);
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-1/totalBudget.json`))
+    ).toBe(true);
 
     expect(trip).toMatchObject({
       tripName: "Bali",
@@ -89,9 +117,53 @@ describe("fetchTrip metadata (no Expenses download)", () => {
       isImplicitDefault: false,
       travellers: [{ uid: "uid-alice", userName: "Alice" }],
     });
+    expect(trip.tripCurrency).not.toBe(true);
+    expect(trip.totalBudget).not.toBe(true);
     expect(trip).not.toHaveProperty("tokens");
     expect(trip).not.toHaveProperty("uid-alice");
     expect((trip as Record<string, unknown>).travellers).not.toBe(true);
+  });
+
+  it("only leaf-fetches metadata keys present on the shallow map", async () => {
+    mockedAxios.get.mockImplementation(async (url: string) => {
+      if (url.includes("shallow=true") && url.includes(`/trips/trip-sparse.json`)) {
+        return {
+          data: {
+            tripName: true,
+            tripCurrency: true,
+            travellers: true,
+            "uid-alice": true,
+          },
+        };
+      }
+      if (url.includes(`/trips/trip-sparse/travellers.json`)) {
+        return { data: {} };
+      }
+      if (url.includes(`/trips/trip-sparse/tripName.json`)) {
+        return { data: "Sparse" };
+      }
+      if (url.includes(`/trips/trip-sparse/tripCurrency.json`)) {
+        return { data: "EUR" };
+      }
+      throw new Error(`Unexpected GET ${url}`);
+    });
+
+    const trip = await fetchTrip("trip-sparse");
+
+    const requestedUrls = mockedAxios.get.mock.calls.map((c) => c[0] as string);
+    expect(requestedUrls.some((u) => u.includes(`/trips/trip-sparse/tripName.json`))).toBe(
+      true
+    );
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-sparse/tripCurrency.json`))
+    ).toBe(true);
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-sparse/totalBudget.json`))
+    ).toBe(false);
+    expect(
+      requestedUrls.some((u) => u.includes(`/trips/trip-sparse/startDate.json`))
+    ).toBe(false);
+    expect(trip).toMatchObject({ tripName: "Sparse", tripCurrency: "EUR" });
   });
 
   it("returns null when the trip node is missing so callers can treat it as not found", async () => {
@@ -108,16 +180,18 @@ describe("fetchTrip metadata (no Expenses download)", () => {
     await expect(fetchTrip("missing-trip")).resolves.toBeNull();
   });
 
-  it("loads categories from the categories leaf when shallow truncates them to true", async () => {
-    const categories = [{ cat: "food", catString: "Food", icon: "food", color: "#000" }];
+  it("loads categories from the categories leaf alongside other metadata leaves", async () => {
+    const categoriesJson = JSON.stringify([
+      { cat: "food", catString: "Food", icon: "food", color: "#000" },
+    ]);
     mockedAxios.get.mockImplementation(async (url: string) => {
       if (url.includes("shallow=true") && url.includes(`/trips/trip-cats.json`)) {
         return {
           data: {
-            tripName: "Bali",
-            tripCurrency: "EUR",
-            totalBudget: "100",
-            dailyBudget: "10",
+            tripName: true,
+            tripCurrency: true,
+            totalBudget: true,
+            dailyBudget: true,
             categories: true,
             travellers: true,
           },
@@ -126,14 +200,23 @@ describe("fetchTrip metadata (no Expenses download)", () => {
       if (url.includes(`/trips/trip-cats/travellers.json`)) {
         return { data: {} };
       }
-      if (url.includes(`/trips/trip-cats/categories.json`)) {
-        return { data: JSON.stringify(categories) };
+      const leafMatch = url.match(/\/trips\/trip-cats\/([^/.]+)\.json/);
+      if (leafMatch) {
+        const leaf = leafMatch[1];
+        const leaves: Record<string, unknown> = {
+          tripName: "Bali",
+          tripCurrency: "EUR",
+          totalBudget: "100",
+          dailyBudget: "10",
+          categories: categoriesJson,
+        };
+        return { data: leaf in leaves ? leaves[leaf] : null };
       }
       throw new Error(`Unexpected GET ${url}`);
     });
 
     const trip = await fetchTrip("trip-cats");
-    expect(trip.categories).toEqual(categories);
+    expect(trip.categories).toBe(categoriesJson);
     expect(
       mockedAxios.get.mock.calls.some((c) =>
         String(c[0]).includes(`/trips/trip-cats/categories.json`)
@@ -203,5 +286,9 @@ describe("fetchTrip metadata (no Expenses download)", () => {
  * (`{"server":true,"trips":true,"users":true}`), not a 400 about mixed query
  * params. Official retrieve-data docs (updated 2026-10-20) restrict shallow only
  * against filtering params (orderBy/limit/…), not against auth.
+ *
+ * Important (same docs): shallow on an *object* truncates every child value to
+ * `true`, including string leaves — so trip metadata must be read from leaf
+ * paths, not taken from the shallow body.
  */
 

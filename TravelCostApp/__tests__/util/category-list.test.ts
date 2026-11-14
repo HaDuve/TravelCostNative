@@ -9,6 +9,8 @@ import {
   insertCategoryAt,
   appendNewCategoryTile,
   defaultTripCategoryList,
+  moveCategoryAt,
+  persistReorderedCategoryList,
   type CategoryListStore,
 } from "../../util/category-list";
 
@@ -342,5 +344,132 @@ describe("commitNewCategory", () => {
       missing: ["name", "icon"],
       list,
     });
+  });
+});
+
+describe("moveCategoryAt", () => {
+  const food = makeCategory({
+    cat: "food",
+    icon: "fast-food-outline",
+    catString: "Food",
+  });
+  const coffee = makeCategory({
+    cat: "Coffee",
+    icon: "cafe-outline",
+    catString: "Coffee",
+  });
+  const other = makeCategory({
+    cat: "other",
+    icon: "basket-outline",
+    catString: "Other",
+  });
+
+  it("moves a category earlier in the trip category list", () => {
+    const list = [food, coffee, other];
+
+    expect(moveCategoryAt(list, 2, 0)).toEqual([other, food, coffee]);
+    expect(list).toEqual([food, coffee, other]);
+  });
+
+  it("moves a category later in the trip category list", () => {
+    const list = [food, coffee, other];
+
+    expect(moveCategoryAt(list, 0, 2)).toEqual([coffee, other, food]);
+  });
+
+  it("keeps the + New Category tile fixed at the end when reordering", () => {
+    const newTile = makeCategory({
+      cat: "newCat",
+      icon: "add-outline",
+      catString: "+ New Category",
+    });
+    const list = [food, coffee, other, newTile];
+
+    expect(moveCategoryAt(list, 0, 2)).toEqual([
+      coffee,
+      other,
+      food,
+      newTile,
+    ]);
+  });
+});
+
+describe("persistReorderedCategoryList", () => {
+  const food = makeCategory({
+    cat: "food",
+    icon: "fast-food-outline",
+    catString: "Food",
+  });
+  const coffee = makeCategory({
+    cat: "Coffee",
+    icon: "cafe-outline",
+    catString: "Coffee",
+  });
+  const other = makeCategory({
+    cat: "other",
+    icon: "basket-outline",
+    catString: "Other",
+  });
+
+  it("persists the reordered trip category list to cache and the trip", async () => {
+    const previous = [food, coffee, other];
+    const next = [other, food, coffee];
+    const store = makeStore({ cache: previous });
+
+    const result = await persistReorderedCategoryList(
+      store,
+      "trip-1",
+      previous,
+      next,
+      { isOnline: true }
+    );
+
+    expect(result).toEqual({ status: "saved", list: next });
+    expect(store.cache).toEqual(next);
+    expect(store.remoteWrites).toEqual([next]);
+  });
+
+  it("reverts to the previous order when the trip update fails", async () => {
+    const previous = [food, coffee, other];
+    const next = [other, food, coffee];
+    const store = makeStore({
+      cache: previous,
+      saveRemote: jest.fn(async () => {
+        throw new Error("network down");
+      }),
+    });
+
+    const result = await persistReorderedCategoryList(
+      store,
+      "trip-1",
+      previous,
+      next,
+      { isOnline: true }
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      list: previous,
+      error: expect.any(Error),
+    });
+    expect(store.cache).toEqual(previous);
+  });
+
+  it("reverts to the previous order when offline", async () => {
+    const previous = [food, coffee, other];
+    const next = [other, food, coffee];
+    const store = makeStore({ cache: previous });
+
+    const result = await persistReorderedCategoryList(
+      store,
+      "trip-1",
+      previous,
+      next,
+      { isOnline: false }
+    );
+
+    expect(result).toEqual({ status: "offline", list: previous });
+    expect(store.saveRemote).not.toHaveBeenCalled();
+    expect(store.cache).toEqual(previous);
   });
 });

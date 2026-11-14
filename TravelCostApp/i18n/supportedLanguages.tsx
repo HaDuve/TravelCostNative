@@ -90,6 +90,8 @@ const en = {
   skipCategory: "Skip category",
   editCategories: "Edit categories",
   close: "Close",
+  moveCategoryEarlier: "Move earlier",
+  moveCategoryLater: "Move later",
 
   // Form Labels
   nameLabel: "Name",
@@ -778,6 +780,8 @@ const de = {
   skipCategory: "Kategorie überspringen",
   editCategories: "Kategorien bearbeiten",
   close: "Schließen",
+  moveCategoryEarlier: "Früher verschieben",
+  moveCategoryLater: "Später verschieben",
 
   // Form Labels
   nameLabel: "Name",
@@ -1504,6 +1508,8 @@ const fr = {
   skipCategory: "Passer la catégorie",
   editCategories: "Modifier les catégories",
   close: "Fermer",
+  moveCategoryEarlier: "Déplacer plus tôt",
+  moveCategoryLater: "Déplacer plus tard",
 
   // Form Labels
   nameLabel: "Nom",
@@ -2228,6 +2234,8 @@ const ru = {
   skipCategory: "Пропустить категорию",
   editCategories: "Редактировать категории",
   close: "Закрыть",
+  moveCategoryEarlier: "Переместить раньше",
+  moveCategoryLater: "Переместить позже",
 
   // Form Labels
   nameLabel: "Имя",

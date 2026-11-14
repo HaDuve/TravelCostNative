@@ -18,8 +18,40 @@ jest.mock("@react-navigation/native", () => {
 
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(async () => {}),
-  ImpactFeedbackStyle: { Light: "Light" },
+  ImpactFeedbackStyle: { Light: "Light", Medium: "Medium" },
 }));
+
+jest.mock("react-native-sortables", () => {
+  const ReactActual = require("react");
+  const { View } = require("react-native");
+  const Passthrough = ({ children }: { children?: React.ReactNode }) =>
+    ReactActual.createElement(View, null, children);
+  return {
+    __esModule: true,
+    default: {
+      Grid: ({
+        data,
+        renderItem,
+      }: {
+        data: unknown[];
+        renderItem: (info: { item: unknown; index: number }) => React.ReactNode;
+      }) =>
+        ReactActual.createElement(
+          View,
+          { testID: "category-sortable-grid" },
+          data.map((item, index) =>
+            ReactActual.createElement(
+              View,
+              { key: String(index) },
+              renderItem({ item, index })
+            )
+          )
+        ),
+      Handle: Passthrough,
+      Touchable: Passthrough,
+    },
+  };
+});
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -75,7 +107,10 @@ jest.mock("../../util/category-list", () => {
 });
 
 import CategoryPickScreen from "../../screens/CategoryPickScreen";
-import { renderWithAppProviders } from "../fixtures/app-providers";
+import {
+  renderWithAppProviders,
+  type AppProviderOverrides,
+} from "../fixtures/app-providers";
 import { en } from "../../i18n/supportedLanguages";
 import { layoutFor } from "../../util/layout";
 import { categoryPickTileMinHeight } from "../../util/category-pick";
@@ -83,7 +118,7 @@ import { categoryPickTileMinHeight } from "../../util/category-pick";
 function renderScreen(
   routeParams: { expenseId?: string } = {},
   navigation = { navigate: jest.fn(), goBack: jest.fn() },
-  network = { isConnected: true, strongConnection: true }
+  overrides: AppProviderOverrides = {}
 ) {
   const screen = renderWithAppProviders(
     <CategoryPickScreen
@@ -92,7 +127,13 @@ function renderScreen(
     />,
     {
       wrapNavigation: false,
-      network,
+      network: { isConnected: true, strongConnection: true },
+      user: {
+        isPremium: true,
+        checkPremium: jest.fn(async () => true),
+        loadCatListFromAsyncInCtx: jest.fn(async () => {}),
+      },
+      ...overrides,
     }
   );
   return { screen, navigation };
@@ -222,7 +263,7 @@ describe("CategoryPickScreen", () => {
     const { screen, navigation } = renderScreen(
       {},
       { navigate: jest.fn(), goBack: jest.fn() },
-      { isConnected: false, strongConnection: false }
+      { network: { isConnected: false, strongConnection: false } }
     );
 
     await waitFor(() => {
@@ -338,5 +379,69 @@ describe("CategoryPickScreen", () => {
     expect(screen.queryByText(en.cancel)).toBeNull();
     expect(screen.queryByTestId("category-pick-back")).toBeNull();
     expect(screen.queryByTestId("category-pick-continue")).toBeNull();
+  });
+
+  it("enters reorder mode on long-press and shows Done", async () => {
+    const { screen, navigation } = renderScreen();
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Food")).toBeTruthy();
+    });
+
+    fireEvent(screen.getByLabelText("Food"), "onLongPress");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("category-pick-reorder-done")).toBeTruthy();
+      expect(screen.getByTestId("category-sortable-grid")).toBeTruthy();
+    });
+    expect(navigation.navigate).not.toHaveBeenCalledWith("Paywall");
+    expect(screen.queryByTestId("category-pick-skip")).toBeNull();
+  });
+
+  it("does not enter reorder when offline and explains why", async () => {
+    const { screen } = renderScreen(
+      {},
+      { navigate: jest.fn(), goBack: jest.fn() },
+      { network: { isConnected: false, strongConnection: false } }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Food")).toBeTruthy();
+    });
+
+    fireEvent(screen.getByLabelText("Food"), "onLongPress");
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith(
+        en.alertOffline,
+        en.alertNeedOnlineCategory
+      );
+    });
+    expect(screen.queryByTestId("category-pick-reorder-done")).toBeNull();
+  });
+
+  it("opens the paywall instead of reorder for non-premium travellers", async () => {
+    const { screen, navigation } = renderScreen(
+      {},
+      { navigate: jest.fn(), goBack: jest.fn() },
+      {
+        user: {
+          isPremium: false,
+          checkPremium: jest.fn(async () => false),
+          loadCatListFromAsyncInCtx: jest.fn(async () => {}),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Food")).toBeTruthy();
+    });
+
+    fireEvent(screen.getByLabelText("Food"), "onLongPress");
+
+    await waitFor(() => {
+      expect(navigation.navigate).toHaveBeenCalledWith("Paywall");
+    });
+    expect(screen.queryByTestId("category-pick-reorder-done")).toBeNull();
   });
 });

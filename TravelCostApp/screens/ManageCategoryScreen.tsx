@@ -51,7 +51,8 @@ import {
   writeCategoryList,
 } from "../util/category-list";
 
-const TOUCH_TARGET_MIN = dynamicScale(48, false, 0.5);
+/** Hard floor so rename/delete hit areas stay ≥48dp on small phones (AC). */
+const TOUCH_TARGET_MIN = Math.max(48, dynamicScale(48, false, 0.5));
 
 const ManageCategoryScreen = ({ navigation }) => {
   const defaultCategoryList: Category[] = useMemo(
@@ -100,7 +101,10 @@ const ManageCategoryScreen = ({ navigation }) => {
   }, [refreshCategoryList]);
 
   const persistCategoryList = useCallback(
-    async (newCategoryList: Category[]) => {
+    async (
+      newCategoryList: Category[],
+      options?: { previousList?: Category[] }
+    ) => {
       setIsUploading(true);
       try {
         const result = await writeCategoryList(
@@ -116,6 +120,10 @@ const ManageCategoryScreen = ({ navigation }) => {
             text2: i18n.t("checkConnectionError"),
             type: "error",
           });
+          // Offline skips cache/server — revert so Done→remount does not drop the edit.
+          if (options?.previousList) {
+            setCategoryList(options.previousList);
+          }
           return result;
         }
 
@@ -126,7 +134,7 @@ const ManageCategoryScreen = ({ navigation }) => {
             {
               text: i18n.t("retry"),
               onPress: () => {
-                void persistCategoryList(newCategoryList);
+                void persistCategoryList(newCategoryList, options);
               },
             },
           ]);
@@ -154,11 +162,16 @@ const ManageCategoryScreen = ({ navigation }) => {
       icon: selectedIconName,
     });
 
+    const previousList = categoryList;
     const newCategoryList = [...categoryList, newCategory];
     setCategoryList(newCategoryList);
-    await persistCategoryList(newCategoryList);
-    setNewCategoryName("");
-    setSelectedIconName("");
+    const result = await persistCategoryList(newCategoryList, {
+      previousList,
+    });
+    if (result.status === "saved" || result.status === "error") {
+      setNewCategoryName("");
+      setSelectedIconName("");
+    }
   };
 
   const handleCommitRename = async (index: number) => {
@@ -192,8 +205,9 @@ const ManageCategoryScreen = ({ navigation }) => {
     });
 
     setRenameError(null);
+    const previousList = categoryList;
     setCategoryList(result.list);
-    await persistCategoryList(result.list);
+    await persistCategoryList(result.list, { previousList });
   };
 
   const showDeletedCategoryUndo = (
@@ -221,6 +235,7 @@ const ManageCategoryScreen = ({ navigation }) => {
   };
 
   const handleDeleteCategory = async (index: number) => {
+    const previousList = categoryList;
     const { list, removed, index: removedIndex } = removeCategoryAt(
       categoryList,
       index
@@ -234,16 +249,20 @@ const ManageCategoryScreen = ({ navigation }) => {
     setCategoryList(list);
     setDraftNames({});
     setRenameError(null);
-    await persistCategoryList(list);
-    showDeletedCategoryUndo(removed, removedIndex, list);
+    const result = await persistCategoryList(list, { previousList });
+    // Undo only after a real save — offline/error must not claim "Category deleted".
+    if (result.status === "saved") {
+      showDeletedCategoryUndo(removed, removedIndex, list);
+    }
   };
 
   const handleResetCategoryList = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const previousList = categoryList;
     setCategoryList(defaultCategoryList);
     setDraftNames({});
     setRenameError(null);
-    await persistCategoryList(defaultCategoryList);
+    await persistCategoryList(defaultCategoryList, { previousList });
   };
 
   const renderCategoryItem = ({ item, index }) => {

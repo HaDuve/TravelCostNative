@@ -1,9 +1,9 @@
 import {
   FlatList,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
   Alert,
 } from "react-native";
@@ -18,14 +18,15 @@ import { TripContext } from "../store/trip-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
 import { Category } from "../util/category";
-import BackButton from "../components/UI/BackButton";
-import { setExpenseCat } from "../store/mmkv";
+import { getExpenseCat, setExpenseCat } from "../store/mmkv";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
+import { layoutFor } from "../util/layout";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import {
@@ -34,6 +35,14 @@ import {
   defaultTripCategoryList,
   readCategoryList,
 } from "../util/category-list";
+import {
+  categoryPickColumnCount,
+  categoryPickSelectionResult,
+  isCategoryTileSelected,
+  SKIP_CATEGORY_VALUE,
+  shouldShowCategoryPickSpinner,
+} from "../util/category-pick";
+import { categoryPickLayoutTokens } from "../styles/category-pick-layout-tokens";
 
 interface CategoryPickScreenProps {
   route: {
@@ -44,8 +53,18 @@ interface CategoryPickScreenProps {
   navigation: any;
 }
 
+const MIN_TOUCH_TARGET = 48;
+
 const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   const { expenseId } = route.params || {};
+  const { width, height, fontScale } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const layout = useMemo(() => layoutFor({ width, height }), [width, height]);
+  const tokens = useMemo(
+    () => categoryPickLayoutTokens(layout, fontScale),
+    [layout, fontScale]
+  );
+  const numColumns = categoryPickColumnCount(layout);
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -66,29 +85,66 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     []
   );
 
-  const [categoryList, setCategoryList] = useState(() =>
-    appendNewCategoryTile(defaultTripCategoryList(), newCategoryTile)
-  );
-  const [isFetching, setIsFetching] = useState(false);
+  const cachedOnMount = useMemo(() => {
+    const cached = categoryStore.getCached();
+    return cached != null && cached.length > 0;
+  }, [categoryStore]);
+
+  const [categoryList, setCategoryList] = useState(() => {
+    const cached = categoryStore.getCached();
+    const base =
+      cached && cached.length > 0
+        ? cached
+        : defaultTripCategoryList();
+    return appendNewCategoryTile(base, newCategoryTile);
+  });
+  const [isLoading, setIsLoading] = useState(!cachedOnMount);
+  const [hasCachedList, setHasCachedList] = useState(cachedOnMount);
+
+  const selectedCategory = useMemo(() => {
+    if (!expenseId) return undefined;
+    const temp = getExpenseCat(expenseId) as
+      | { category?: string }
+      | undefined
+      | null;
+    return temp?.category;
+  }, [expenseId]);
 
   useFocusEffect(
     useCallback(() => {
+      let cancelled = false;
       const loadCategories = async () => {
-        setIsFetching(true);
+        const hadCache =
+          (categoryStore.getCached()?.length ?? 0) > 0;
+        if (!hadCache) {
+          setIsLoading(true);
+        }
         try {
           const list = await readCategoryList(categoryStore, tripid, {
             isOnline,
           });
+          if (cancelled) return;
           setCategoryList(appendNewCategoryTile(list, newCategoryTile));
+          setHasCachedList(true);
         } finally {
-          setIsFetching(false);
+          if (!cancelled) {
+            setIsLoading(false);
+          }
         }
       };
       void loadCategories();
+      return () => {
+        cancelled = true;
+      };
     }, [categoryStore, isOnline, newCategoryTile, tripid])
   );
 
-  async function newCatPressHandler() {
+  const showSpinner = shouldShowCategoryPickSpinner({
+    isLoading,
+    hasCachedList,
+  });
+
+  async function openManageCategories() {
     if (!isOnline) {
       if (await isConnectionFastEnoughAsBool()) {
         navigation.navigate("ManageCategory");
@@ -100,68 +156,111 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     navigation.navigate("ManageCategory");
   }
 
-  const updateTempCategory = useCallback(
-    (categoryValue: string) => {
-      if (expenseId) {
-        setExpenseCat(expenseId, {
-          expenseId: expenseId,
-          category: categoryValue,
+  const applySelectionResult = useCallback(
+    (category: string, iconName?: string) => {
+      const result = categoryPickSelectionResult({
+        expenseId,
+        category,
+        iconName,
+      });
+
+      if (result.action === "goBack") {
+        setExpenseCat(result.expenseId, {
+          expenseId: result.expenseId,
+          category: result.category,
         });
+        navigation.goBack();
+        return;
       }
+
+      if (result.iconName) {
+        navigation.navigate("ManageExpense", {
+          pickedCat: result.pickedCat,
+          iconName: result.iconName,
+        });
+        return;
+      }
+
+      navigation.navigate("ManageExpense", {
+        pickedCat: result.pickedCat,
+      });
     },
-    [expenseId]
+    [expenseId, navigation]
   );
 
   async function catPressHandler(item: Category) {
-    setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (item.cat === "newCat") {
-      await newCatPressHandler();
-    } else {
-      const selectedCategory = item.cat ?? item.name;
-
-      trackEvent(VexoEvents.CATEGORY_PICKED, {
-        category: selectedCategory,
-        icon: item.icon,
-        hasExpenseId: !!expenseId,
-      });
-
-      if (expenseId) {
-        updateTempCategory(selectedCategory);
-        navigation.goBack();
-      } else {
-        navigation.navigate("ManageExpense", {
-          pickedCat: selectedCategory,
-          iconName: item.icon,
-        });
-      }
+      await openManageCategories();
+      return;
     }
-    setIsFetching(false);
+
+    const selected = item.cat ?? item.name ?? SKIP_CATEGORY_VALUE;
+
+    trackEvent(VexoEvents.CATEGORY_PICKED, {
+      category: selected,
+      icon: item.icon,
+      hasExpenseId: !!expenseId,
+    });
+
+    applySelectionResult(selected, item.icon);
   }
 
-  function renderCatItem(itemData) {
+  function skipCategoryHandler() {
+    applySelectionResult(SKIP_CATEGORY_VALUE);
+  }
+
+  function renderCatItem(itemData: { item: Category }) {
     const item = itemData.item;
-    if (!item.catString) item.catString = item.name;
+    const label = item.catString ?? item.name ?? item.cat ?? "";
+    const selected = isCategoryTileSelected(item.cat, selectedCategory);
 
     return (
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        accessibilityState={{ selected }}
+        testID={`category-pick-tile-${item.cat ?? "unknown"}`}
+        android_ripple={{ color: GlobalStyles.colors.gray600 }}
         style={({ pressed }) => [
-          styles.widthConstraint,
-          styles.itemContainer,
-          styles.buttonStyle,
+          {
+            flex: 1,
+            margin: tokens.tileMargin,
+            minHeight: Math.max(tokens.tileMinHeight, MIN_TOUCH_TARGET),
+          },
+          {
+            backgroundColor: GlobalStyles.colors.gray500,
+            borderRadius: tokens.tileBorderRadius,
+            ...GlobalStyles.strongShadow,
+          },
+          selected && styles.selectedTile,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
-        onPress={catPressHandler.bind(this, item)}
+        onPress={() => void catPressHandler(item)}
       >
-        <View style={styles.widthConstraint}>
-          <View style={styles.centerStyle}>
-            <Ionicons
-              name={item.icon}
-              size={dynamicScale(42, false, 0.5)}
-              color={item.color}
-            />
-            <Text style={styles.itemText}>{item.catString}</Text>
-          </View>
+        <View
+          style={[
+            styles.centerStyle,
+            { paddingHorizontal: tokens.tilePaddingHorizontal },
+          ]}
+        >
+          <Ionicons
+            name={item.icon as React.ComponentProps<typeof Ionicons>["name"]}
+            size={dynamicScale(42, false, 0.5)}
+            color={item.color}
+          />
+          <Text
+            style={[
+              styles.itemText,
+              {
+                fontSize: tokens.labelFontSize,
+                marginTop: tokens.tileLabelMarginTop,
+              },
+            ]}
+            numberOfLines={2}
+          >
+            {label}
+          </Text>
         </View>
       </Pressable>
     );
@@ -169,66 +268,113 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        numColumns={2}
-        data={categoryList}
-        renderItem={renderCatItem}
-        ListHeaderComponent={
-          <>
-            <BackButton style={{ zIndex: 1000 }} />
-            <View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {isFetching && (
-                <ActivityIndicator
-                  size="large"
-                  color={GlobalStyles.colors.gray500}
-                />
-              )}
-            </View>
-          </>
-        }
-        ListFooterComponent={
-          <View>
-            <View style={styles.buttonContainer}>
-              <ActionRow
-                testID="category-pick-continue"
-                tier="primary"
-                label={i18n.t("continue")}
-                icon="arrow-forward-outline"
-                onPress={() => {
-                  if (expenseId) {
-                    updateTempCategory("undefined");
-                    navigation.goBack();
-                  } else {
-                    navigation.navigate("ManageExpense", {
-                      pickedCat: "undefined",
-                    });
-                  }
-                }}
-              />
-              <ActionRow
-                testID="category-pick-back"
-                tier="secondary"
-                label={i18n.t("cancel")}
-                icon="arrow-back-outline"
-                onPress={() => {
-                  navigation.goBack();
-                }}
-              />
-            </View>
-          </View>
-        }
-        style={styles.listStyle}
-      ></FlatList>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Math.max(insets.top, tokens.headerSafeAreaFloor),
+            paddingHorizontal: tokens.headerPaddingHorizontal,
+            paddingBottom: tokens.headerPaddingBottom,
+            gap: tokens.headerGap,
+          },
+        ]}
+      >
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={i18n.t("close")}
+          testID="category-pick-close"
+          hitSlop={8}
+          android_ripple={{ color: GlobalStyles.colors.gray600, borderless: true }}
+          style={({ pressed }) => [
+            styles.headerButton,
+            pressed && GlobalStyles.pressed,
+          ]}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons
+            name="close-outline"
+            size={dynamicScale(28, false, 0.5)}
+            color={GlobalStyles.colors.textColor}
+          />
+        </Pressable>
+
+        <Text
+          accessibilityRole="header"
+          style={[styles.title, { fontSize: tokens.titleFontSize }]}
+          numberOfLines={1}
+        >
+          {i18n.t("pickCategoryTitle")}
+        </Text>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={i18n.t("editCategories")}
+          testID="category-pick-edit"
+          hitSlop={8}
+          android_ripple={{ color: GlobalStyles.colors.gray600, borderless: true }}
+          style={({ pressed }) => [
+            styles.headerButton,
+            styles.editButton,
+            { paddingHorizontal: tokens.editButtonPaddingHorizontal },
+            pressed && GlobalStyles.pressed,
+          ]}
+          onPress={() => void openManageCategories()}
+        >
+          <Text
+            style={[styles.editButtonText, { fontSize: tokens.editFontSize }]}
+            numberOfLines={1}
+          >
+            {i18n.t("editCategories")}
+          </Text>
+        </Pressable>
+      </View>
+
+      {showSpinner ? (
+        <View style={styles.spinnerContainer} testID="category-pick-spinner">
+          <ActivityIndicator
+            size="large"
+            color={GlobalStyles.colors.gray500}
+          />
+        </View>
+      ) : (
+        <FlatList
+          testID="category-pick-list"
+          key={`category-pick-cols-${numColumns}`}
+          numColumns={numColumns}
+          data={categoryList}
+          keyExtractor={(item, index) =>
+            `${item.cat ?? item.name ?? "cat"}-${index}`
+          }
+          renderItem={renderCatItem}
+          contentContainerStyle={{
+            paddingHorizontal: tokens.listPaddingHorizontal,
+            paddingBottom: tokens.listPaddingBottom,
+          }}
+          style={styles.listStyle}
+        />
+      )}
+
+      <View
+        style={[
+          styles.bottomBar,
+          {
+            paddingHorizontal: tokens.bottomBarPaddingHorizontal,
+            paddingTop: tokens.bottomBarPaddingTop,
+            paddingBottom: Math.max(
+              insets.bottom,
+              tokens.bottomBarSafeAreaFloor
+            ),
+          },
+        ]}
+      >
+        <ActionRow
+          testID="category-pick-skip"
+          tier="secondary"
+          label={i18n.t("skipCategory")}
+          icon="arrow-forward-outline"
+          onPress={skipCategoryHandler}
+        />
+      </View>
     </View>
   );
 };
@@ -241,67 +387,60 @@ CategoryPickScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  pressed: {
-    opacity: 0.4,
-  },
-  listStyle: {
-    paddingTop: "2%",
-  },
   container: {
     flex: 1,
-
-    ...Platform.select({
-      ios: {
-        padding: "1%",
-        paddingTop: "2%",
-        paddingHorizontal: "4%",
-      },
-      android: {
-        padding: "0%",
-        paddingTop: "2%",
-        paddingHorizontal: "5%",
-      },
-    }),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
-  widthConstraint: {
-    minWidth: "30%",
-    maxWidth: "100%",
-  },
-  rowContainer: {
+  header: {
     flexDirection: "row",
-    justifyContent: "space-around",
     alignItems: "center",
   },
-  centerStyle: {
-    flex: 1,
-
+  headerButton: {
+    minWidth: MIN_TOUCH_TARGET,
+    minHeight: MIN_TOUCH_TARGET,
     justifyContent: "center",
     alignItems: "center",
   },
-  buttonContainer: {
+  editButton: {
+    flexShrink: 1,
+  },
+  editButtonText: {
+    color: GlobalStyles.colors.primary400,
+    fontWeight: "400",
+  },
+  title: {
     flex: 1,
-    paddingVertical: "4%",
-    paddingHorizontal: "2%",
+    textAlign: "center",
+    color: GlobalStyles.colors.textColor,
+    fontWeight: "600",
   },
-  buttonStyle: {
-    backgroundColor: GlobalStyles.colors.gray500,
-    paddingVertical: "4%",
-    paddingHorizontal: "1%",
-    borderRadius: 12,
-    ...GlobalStyles.strongShadow,
-  },
-  itemContainer: {
+  listStyle: {
     flex: 1,
-    margin: "3%",
   },
-  onPressStyleItem: {
-    backgroundColor: GlobalStyles.colors.primary400,
+  spinnerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bottomBar: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: GlobalStyles.colors.gray500,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  centerStyle: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  selectedTile: {
+    backgroundColor: GlobalStyles.colors.primary100,
+    borderWidth: 2,
+    borderColor: GlobalStyles.colors.primary400,
   },
   itemText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    marginTop: "2%",
     color: GlobalStyles.colors.textColor,
-    fontWeight: "200",
-    fontStyle: "italic",
+    fontWeight: "400",
+    textAlign: "center",
+    flexShrink: 1,
   },
 });

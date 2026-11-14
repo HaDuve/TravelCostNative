@@ -86,6 +86,10 @@ const en = {
   catNatTravString: "Transport",
   catOtherString: "Other",
   catNewString: "New Category",
+  pickCategoryTitle: "Pick a category",
+  skipCategory: "Skip category",
+  editCategories: "Edit categories",
+  close: "Close",
 
   // Form Labels
   nameLabel: "Name",
@@ -767,6 +771,10 @@ const de = {
   catNatTravString: "Transport",
   catOtherString: "Andere",
   catNewString: "Neue Kategorie",
+  pickCategoryTitle: "Kategorie wählen",
+  skipCategory: "Kategorie überspringen",
+  editCategories: "Kategorien bearbeiten",
+  close: "Schließen",
 
   // Form Labels
   nameLabel: "Name",
@@ -1486,6 +1494,10 @@ const fr = {
   catNatTravString: "Transport",
   catOtherString: "Autre",
   catNewString: "Nouvelle catégorie",
+  pickCategoryTitle: "Choisir une catégorie",
+  skipCategory: "Passer la catégorie",
+  editCategories: "Modifier les catégories",
+  close: "Fermer",
 
   // Form Labels
   nameLabel: "Nom",
@@ -2203,6 +2215,10 @@ const ru = {
   catNatTravString: "Транспорт",
   catOtherString: "Другое",
   catNewString: "Новая категория",
+  pickCategoryTitle: "Выберите категорию",
+  skipCategory: "Пропустить категорию",
+  editCategories: "Редактировать категории",
+  close: "Закрыть",
 
   // Form Labels
   nameLabel: "Имя",

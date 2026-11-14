@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Alert, Keyboard, StyleSheet } from "react-native";
-import { act, fireEvent, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, waitFor, within } from "@testing-library/react-native";
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -219,6 +219,23 @@ describe("ManageCategoryScreen add form", () => {
       status: "saved",
       list: mockCategories,
     });
+  });
+
+  it("places the back control in the modal header above the add form", async () => {
+    const screen = renderScreen();
+
+    await screen.findByPlaceholderText(i18n.t("newCatNamePlaceholder"));
+
+    const header = screen.getByTestId("manage-category-header");
+    const back = within(header).getByTestId("manage-category-back");
+    expect(
+      within(screen.getByTestId("manage-category-footer")).queryByTestId(
+        "manage-category-back"
+      )
+    ).toBeNull();
+
+    fireEvent.press(back);
+    expect(navigation.pop).toHaveBeenCalled();
   });
 
   it("does not autofocus the name field and keeps Add always visible", async () => {

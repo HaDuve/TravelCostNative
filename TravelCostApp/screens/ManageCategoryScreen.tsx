@@ -4,6 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Pressable,
   StyleSheet,
   Alert,
   Keyboard,
@@ -464,6 +465,28 @@ const ManageCategoryScreen = ({ navigation }) => {
           behavior="padding"
           keyboardVerticalOffset={dynamicScale(12, true)}
         >
+          <View
+            style={styles.headerRow}
+            testID="manage-category-header"
+          >
+            <Pressable
+              testID="manage-category-back"
+              accessibilityRole="button"
+              accessibilityLabel={i18n.t("back")}
+              hitSlop={8}
+              style={styles.headerBackButton}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.pop();
+              }}
+            >
+              <Ionicons
+                name="chevron-back-outline"
+                size={24}
+                color={ManageCategoryTokens.backControl}
+              />
+            </Pressable>
+          </View>
           <View style={styles.addFormSection}>
             <View style={styles.nameRow}>
               <TextInput
@@ -548,16 +571,10 @@ const ManageCategoryScreen = ({ navigation }) => {
               keyboardShouldPersistTaps="handled"
             />
           ) : null}
-          <View style={styles.footerActions}>
-            <IconButton
-              icon={"chevron-back-outline"}
-              size={24}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                navigation.pop();
-              }}
-              color={ManageCategoryTokens.backControl}
-            />
+          <View
+            style={styles.footerActions}
+            testID="manage-category-footer"
+          >
             <ActionRow
               testID="manage-category-reset"
               tier="secondary"
@@ -603,6 +620,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: dynamicScale(16),
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: TOUCH_TARGET_MIN,
+    marginBottom: dynamicScale(4, true),
+  },
+  headerBackButton: {
+    minWidth: TOUCH_TARGET_MIN,
+    minHeight: TOUCH_TARGET_MIN,
+    alignItems: "center",
+    justifyContent: "center",
   },
   addFormSection: {
     flexShrink: 1,

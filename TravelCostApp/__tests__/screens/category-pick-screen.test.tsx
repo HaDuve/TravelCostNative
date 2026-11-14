@@ -259,6 +259,18 @@ describe("CategoryPickScreen", () => {
     expect(navigation.navigate).toHaveBeenCalledWith("ManageCategory");
   });
 
+  it("shows Edit categories as an icon control without visible title text", async () => {
+    const { screen } = renderScreen();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("category-pick-edit")).toBeTruthy();
+    });
+
+    expect(screen.getByLabelText(en.editCategories)).toBeTruthy();
+    expect(screen.queryByText(en.editCategories)).toBeNull();
+    expect(screen.getByTestId("icon-create-outline")).toBeTruthy();
+  });
+
   it("alerts when Edit categories is pressed offline", async () => {
     const { screen, navigation } = renderScreen(
       {},

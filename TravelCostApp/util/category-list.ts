@@ -54,28 +54,107 @@ export type CommitCategoryRenameResult =
   | { status: "committed"; list: Category[] }
   | { status: "rejected"; reason: "empty" | "duplicate"; list: Category[] };
 
+export type CategoryNameValidation =
+  | { status: "ok"; trimmed: string }
+  | { status: "rejected"; reason: "empty" | "duplicate" };
+
+/** Shared empty/duplicate rule for rename and add. */
+export function validateCategoryName(
+  list: Category[],
+  name: string,
+  options: { excludeIndex?: number } = {}
+): CategoryNameValidation {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return { status: "rejected", reason: "empty" };
+  }
+
+  const duplicate = list.some(
+    (category, i) =>
+      i !== options.excludeIndex &&
+      (category.catString === trimmed || category.cat === trimmed)
+  );
+  if (duplicate) {
+    return { status: "rejected", reason: "duplicate" };
+  }
+
+  return { status: "ok", trimmed };
+}
+
+export type AddCategoryMissingField = "name" | "icon";
+
+export type AddCategoryReadiness =
+  | { status: "ready" }
+  | { status: "incomplete"; missing: AddCategoryMissingField[] };
+
+export function getAddCategoryReadiness(
+  name: string,
+  iconName: string
+): AddCategoryReadiness {
+  const missing: AddCategoryMissingField[] = [];
+  if (!name.trim()) {
+    missing.push("name");
+  }
+  if (!iconName) {
+    missing.push("icon");
+  }
+  if (missing.length > 0) {
+    return { status: "incomplete", missing };
+  }
+  return { status: "ready" };
+}
+
+export type CommitNewCategoryResult =
+  | { status: "committed"; list: Category[]; category: Category }
+  | {
+      status: "incomplete";
+      missing: AddCategoryMissingField[];
+      list: Category[];
+    }
+  | { status: "rejected"; reason: "empty" | "duplicate"; list: Category[] };
+
+export function commitNewCategory(
+  list: Category[],
+  name: string,
+  iconName: string
+): CommitNewCategoryResult {
+  const readiness = getAddCategoryReadiness(name, iconName);
+  if (readiness.status === "incomplete") {
+    return { status: "incomplete", missing: readiness.missing, list };
+  }
+
+  const validation = validateCategoryName(list, name);
+  if (validation.status === "rejected") {
+    return { status: "rejected", reason: validation.reason, list };
+  }
+
+  const category: Category = {
+    cat: validation.trimmed,
+    catString: validation.trimmed,
+    icon: iconName,
+  };
+  return {
+    status: "committed",
+    list: [...list, category],
+    category,
+  };
+}
+
 export function commitCategoryRename(
   list: Category[],
   index: number,
   newName: string
 ): CommitCategoryRenameResult {
-  const trimmed = newName.trim();
-  if (!trimmed) {
-    return { status: "rejected", reason: "empty", list };
-  }
-
-  const duplicate = list.some(
-    (category, i) =>
-      i !== index &&
-      (category.catString === trimmed || category.cat === trimmed)
-  );
-  if (duplicate) {
-    return { status: "rejected", reason: "duplicate", list };
+  const validation = validateCategoryName(list, newName, {
+    excludeIndex: index,
+  });
+  if (validation.status === "rejected") {
+    return { status: "rejected", reason: validation.reason, list };
   }
 
   // Keep `cat` stable so existing Expenses still resolve this category's icon.
   const next = list.map((category, i) =>
-    i === index ? { ...category, catString: trimmed } : category
+    i === index ? { ...category, catString: validation.trimmed } : category
   );
   return { status: "committed", list: next };
 }

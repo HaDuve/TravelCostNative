@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Alert, StyleSheet } from "react-native";
+import { Alert, Keyboard, StyleSheet } from "react-native";
 import { act, fireEvent, waitFor } from "@testing-library/react-native";
 
 jest.mock("../../util/vexo-tracking", () => ({
@@ -17,9 +17,6 @@ jest.mock("react-native-toast-message", () => ({
 }));
 
 jest.mock("../../components/Premium/BlurPremium", () => () => null);
-jest.mock("../../components/UI/selectCategoryIcon", () => () => null);
-jest.mock("../../components/UI/InfoButton", () => () => null);
-jest.mock("react-native-modal", () => () => null);
 
 const mockCategories = [
   { cat: "food", icon: "fast-food-outline", catString: "Food" },
@@ -43,6 +40,7 @@ import Toast from "react-native-toast-message";
 import ManageCategoryScreen from "../../screens/ManageCategoryScreen";
 import { i18n } from "../../i18n/i18n";
 import { renderWithAppProviders } from "../fixtures/app-providers";
+import { formatCategoryIconLabel } from "../../util/category-icons";
 
 const navigation = {
   navigate: jest.fn(),
@@ -57,7 +55,10 @@ function deletedCategoryUndoToastCalls() {
   );
 }
 
-function renderScreen(network?: { isConnected: boolean; strongConnection: boolean }) {
+function renderScreen(network?: {
+  isConnected: boolean;
+  strongConnection: boolean;
+}) {
   return renderWithAppProviders(
     <ManageCategoryScreen
       route={{ params: {} }}
@@ -207,5 +208,164 @@ describe("ManageCategoryScreen delete persist", () => {
       minHeight?: number;
     };
     expect(renameStyle.minHeight).toBeGreaterThanOrEqual(48);
+  });
+});
+
+describe("ManageCategoryScreen add form", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockReadCategoryList.mockResolvedValue([...mockCategories]);
+    mockWriteCategoryList.mockResolvedValue({
+      status: "saved",
+      list: mockCategories,
+    });
+  });
+
+  it("does not autofocus the name field and keeps Add always visible", async () => {
+    const screen = renderScreen();
+
+    const nameField = await screen.findByPlaceholderText(
+      i18n.t("newCatNamePlaceholder")
+    );
+    expect(nameField.props.autoFocus).toBeFalsy();
+
+    expect(screen.getByTestId("manage-category-add")).toBeTruthy();
+  });
+
+  it("shows an inline hint when Add is tapped without a name or icon", async () => {
+    const screen = renderScreen();
+
+    await screen.findByPlaceholderText(i18n.t("newCatNamePlaceholder"));
+    fireEvent.press(screen.getByTestId("manage-category-add"));
+
+    expect(
+      await screen.findByText(i18n.t("categoryAddMissingNameAndIcon"))
+    ).toBeTruthy();
+  });
+
+  it("shows an inline hint when Add is tapped with a name but no icon", async () => {
+    const screen = renderScreen();
+
+    const nameField = await screen.findByPlaceholderText(
+      i18n.t("newCatNamePlaceholder")
+    );
+    fireEvent.changeText(nameField, "Snacks");
+    fireEvent.press(screen.getByTestId("manage-category-add"));
+
+    expect(
+      await screen.findByText(i18n.t("categoryAddMissingIcon"))
+    ).toBeTruthy();
+  });
+
+  it("adds a category on the happy path and clears the form", async () => {
+    mockWriteCategoryList.mockImplementation(async (_store, _tripid, list) => ({
+      status: "saved",
+      list,
+    }));
+
+    const screen = renderScreen();
+    const nameField = await screen.findByPlaceholderText(
+      i18n.t("newCatNamePlaceholder")
+    );
+    fireEvent.changeText(nameField, "Coffee");
+    fireEvent.press(
+      screen.getByLabelText(formatCategoryIconLabel("cafe-outline"))
+    );
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("manage-category-add"));
+    });
+
+    await waitFor(() => {
+      expect(mockWriteCategoryList).toHaveBeenCalled();
+    });
+
+    expect(
+      await screen.findByLabelText(
+        i18n.t("deleteCategoryA11y", { name: "Coffee" })
+      )
+    ).toBeTruthy();
+    expect(nameField.props.value).toBe("");
+  });
+
+  it("reverts an offline add and keeps the form filled", async () => {
+    mockWriteCategoryList.mockResolvedValue({
+      status: "offline",
+      list: mockCategories,
+    });
+
+    const screen = renderScreen({
+      isConnected: false,
+      strongConnection: false,
+    });
+    const nameField = await screen.findByPlaceholderText(
+      i18n.t("newCatNamePlaceholder")
+    );
+    fireEvent.changeText(nameField, "Coffee");
+    fireEvent.press(
+      screen.getByLabelText(formatCategoryIconLabel("cafe-outline"))
+    );
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("manage-category-add"));
+    });
+
+    await waitFor(() => {
+      expect(mockWriteCategoryList).toHaveBeenCalled();
+    });
+
+    expect(
+      screen.queryByLabelText(i18n.t("deleteCategoryA11y", { name: "Coffee" }))
+    ).toBeNull();
+    expect(nameField.props.value).toBe("Coffee");
+  });
+
+  it("shrinks the icon picker when the keyboard opens so Add stays reachable", async () => {
+    const keyboardHandlers: Array<(e?: unknown) => void> = [];
+    const addListenerSpy = jest
+      .spyOn(Keyboard, "addListener")
+      .mockImplementation((event, handler) => {
+        if (event === "keyboardWillShow" || event === "keyboardDidShow") {
+          keyboardHandlers.push(handler as (e?: unknown) => void);
+        }
+        return { remove: jest.fn() } as any;
+      });
+
+    const screen = renderScreen();
+    await screen.findByPlaceholderText(i18n.t("newCatNamePlaceholder"));
+
+    const pickerBefore = screen.getByTestId("manage-category-icon-picker");
+    const styleBefore = StyleSheet.flatten(pickerBefore.props.style) as {
+      maxHeight?: number;
+    };
+    const maxBefore = styleBefore.maxHeight ?? 0;
+
+    expect(keyboardHandlers.length).toBeGreaterThan(0);
+    await act(async () => {
+      keyboardHandlers.forEach((handler) => handler());
+    });
+
+    const pickerAfter = screen.getByTestId("manage-category-icon-picker");
+    const styleAfter = StyleSheet.flatten(pickerAfter.props.style) as {
+      maxHeight?: number;
+    };
+    expect(styleAfter.maxHeight).toBeLessThan(maxBefore);
+    expect(screen.getByTestId("manage-category-add")).toBeTruthy();
+
+    addListenerSpy.mockRestore();
+  });
+
+  it("sizes the info modal to content instead of a fixed height", async () => {
+    const screen = renderScreen();
+
+    await screen.findByPlaceholderText(i18n.t("newCatNamePlaceholder"));
+    fireEvent.press(screen.getByTestId("manage-category-info"));
+
+    const modalBody = await screen.findByTestId("manage-category-info-modal");
+    const style = Array.isArray(modalBody.props.style)
+      ? Object.assign({}, ...modalBody.props.style)
+      : modalBody.props.style;
+    expect(style.height).toBeUndefined();
+    expect(style.maxHeight).toBeUndefined();
   });
 });

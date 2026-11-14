@@ -4,15 +4,16 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
-  ZoomIn,
   ZoomInLeft,
-  ZoomOut,
   ZoomOutRight,
 } from "react-native-reanimated";
 import { i18n } from "../i18n/i18n";
@@ -40,8 +41,11 @@ import safeLogError from "../util/error";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import { CATEGORY_ICON_CHOICES } from "../util/category-icons";
+import { ManageCategoryTokens } from "../styles/manage-category-tokens";
 import {
   commitCategoryRename,
+  commitNewCategory,
   createCategoryListStore,
   defaultTripCategoryList,
   insertCategoryAt,
@@ -49,12 +53,29 @@ import {
   removeCategoryAt,
   UNDO_DELETE_CATEGORY_WINDOW_MS,
   writeCategoryList,
+  type AddCategoryMissingField,
 } from "../util/category-list";
 
 /** Hard floor so rename/delete hit areas stay ≥48dp on small phones (AC). */
 const TOUCH_TARGET_MIN = Math.max(48, dynamicScale(48, false, 0.5));
+const ICON_CELL = 56;
+const ICON_PICKER_MAX_HEIGHT = dynamicScale(168, true);
+const ICON_PICKER_KEYBOARD_MAX_HEIGHT = dynamicScale(72, true);
+
+function addHintMessage(missing: AddCategoryMissingField[]): string {
+  const hasName = missing.includes("name");
+  const hasIcon = missing.includes("icon");
+  if (hasName && hasIcon) {
+    return i18n.t("categoryAddMissingNameAndIcon");
+  }
+  if (hasName) {
+    return i18n.t("categoryAddMissingName");
+  }
+  return i18n.t("categoryAddMissingIcon");
+}
 
 const ManageCategoryScreen = ({ navigation }) => {
+  const { width: windowWidth } = useWindowDimensions();
   const defaultCategoryList: Category[] = useMemo(
     () => defaultTripCategoryList(),
     []
@@ -72,9 +93,11 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [selectedIconName, setSelectedIconName] = useState("");
+  const [addHint, setAddHint] = useState<string | null>(null);
 
   const [isFetching, setIsFetching] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
@@ -82,6 +105,31 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
+
+  const iconGridContentWidth = Math.max(
+    ICON_CELL,
+    windowWidth - dynamicScale(48, false, 0.5)
+  );
+  const iconPickerMaxHeight = keyboardVisible
+    ? ICON_PICKER_KEYBOARD_MAX_HEIGHT
+    : ICON_PICKER_MAX_HEIGHT;
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, () => {
+      setKeyboardVisible(true);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardVisible(false);
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const refreshCategoryList = useCallback(async () => {
     try {
@@ -149,26 +197,41 @@ const ManageCategoryScreen = ({ navigation }) => {
     },
     [categoryStore, isOnline, tripid, userCtx]
   );
+
   const handleAddCategory = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const newCategory: Category = {
-      catString: newCategoryName,
-      icon: selectedIconName,
-      cat: newCategoryName,
-    };
+    const result = commitNewCategory(
+      categoryList,
+      newCategoryName,
+      selectedIconName
+    );
+
+    if (result.status === "incomplete") {
+      setAddHint(addHintMessage(result.missing));
+      return;
+    }
+
+    if (result.status === "rejected") {
+      setAddHint(
+        result.reason === "empty"
+          ? i18n.t("categoryNameEmpty")
+          : i18n.t("categoryNameDuplicate")
+      );
+      return;
+    }
 
     trackEvent(VexoEvents.CATEGORY_CREATED, {
-      categoryName: newCategoryName,
-      icon: selectedIconName,
+      categoryName: result.category.catString,
+      icon: result.category.icon,
     });
 
+    setAddHint(null);
     const previousList = categoryList;
-    const newCategoryList = [...categoryList, newCategory];
-    setCategoryList(newCategoryList);
-    const result = await persistCategoryList(newCategoryList, {
+    setCategoryList(result.list);
+    const persistResult = await persistCategoryList(result.list, {
       previousList,
     });
-    if (result.status === "saved" || result.status === "error") {
+    if (persistResult.status === "saved" || persistResult.status === "error") {
       setNewCategoryName("");
       setSelectedIconName("");
     }
@@ -336,137 +399,6 @@ const ManageCategoryScreen = ({ navigation }) => {
     );
   };
 
-  const ioniconsList = [
-    "wallet-outline",
-    "cash-outline",
-    "card-outline",
-    "list-outline",
-    "calculator-outline",
-    "pricetag-outline",
-    "cart-outline",
-    "compass-outline",
-    "happy-outline",
-    "trophy-outline",
-    "gift-outline",
-    "pie-chart-outline",
-    "podium-outline",
-    "fitness-outline",
-    "pulse-outline",
-    "desktop-outline",
-    "cube-outline",
-    "flame-outline",
-    "color-palette-outline",
-    "rocket-outline",
-    "leaf-outline",
-    "pint-outline",
-    "wine-outline",
-    "film-outline",
-    "game-controller-outline",
-    "book-outline",
-    "tv-outline",
-    "gift-outline",
-    "cloud-outline",
-    "thermometer-outline",
-    "flash-outline",
-    "train-outline",
-    "school-outline",
-    "flower-outline",
-    "radio-outline",
-    "pizza-outline",
-    "medical-outline",
-    "american-football-outline",
-    "musical-note-outline",
-    "musical-notes-outline",
-    "headset-outline",
-    "ice-cream-outline",
-    "cafe-outline",
-    "paw-outline",
-    "thumbs-up-outline",
-    "battery-dead-outline",
-    "watch-outline",
-    "chatbubbles-outline",
-    "cloudy-outline",
-    "desktop-outline",
-    "document-outline",
-    "easel-outline",
-    "eye-outline",
-    "fast-food-outline",
-    "film-outline",
-    "football-outline",
-    "glasses-outline",
-    "heart-outline",
-    "key-outline",
-    "laptop-outline",
-    "leaf-outline",
-    "moon-outline",
-    "nutrition-outline",
-    "partly-sunny-outline",
-    "people-outline",
-    "person-outline",
-    "planet-outline",
-    "pulse-outline",
-    "rainy-outline",
-    "rose-outline",
-    "search-outline",
-    "shirt-outline",
-    "speedometer-outline",
-    "stopwatch-outline",
-    "sunny-outline",
-    "thunderstorm-outline",
-    "time-outline",
-    "volume-high-outline",
-    "walk-outline",
-    "water-outline",
-  ];
-  const bigDisplay = dynamicScale(680, true) > 850;
-  const arrays = [];
-  const size = bigDisplay ? 3 : 2;
-  while (ioniconsList?.length > 0) arrays.push(ioniconsList.splice(0, size));
-
-  function renderRowIconPicker({ item }) {
-    return (
-      <View style={[{ margin: dynamicScale(5) }]}>
-        <View
-          style={{
-            marginBottom: dynamicScale(2, true),
-          }}
-        >
-          <SelectCategoryIcon
-            iconName={item[0]}
-            selectedIconName={selectedIconName}
-            setSelectedIconName={setSelectedIconName}
-          />
-        </View>
-        {item?.length > 1 ? (
-          <View
-            style={{
-              marginBottom: dynamicScale(2, true),
-            }}
-          >
-            <SelectCategoryIcon
-              iconName={item[1]}
-              selectedIconName={selectedIconName}
-              setSelectedIconName={setSelectedIconName}
-            />
-          </View>
-        ) : null}
-        {item?.length > 2 ? (
-          <View
-            style={{
-              marginBottom: dynamicScale(2, true),
-            }}
-          >
-            <SelectCategoryIcon
-              iconName={item[2]}
-              selectedIconName={selectedIconName}
-              setSelectedIconName={setSelectedIconName}
-            />
-          </View>
-        ) : null}
-      </View>
-    );
-  }
-
   const [infoIsVisible, setInfoIsVisible] = useState(false);
   const [infoTitleText, setInfoTitleText] = useState("");
   const [infoContentText, setInfoContentText] = useState("");
@@ -504,7 +436,10 @@ const ManageCategoryScreen = ({ navigation }) => {
       onBackdropPress={handleClose}
       onBackButtonPress={handleClose}
     >
-      <View style={styles.infoModalContainer}>
+      <View
+        style={styles.infoModalContainer}
+        testID="manage-category-info-modal"
+      >
         <Text style={styles.infoTitleText}>{infoTitleText}</Text>
         <Text style={styles.infoContentText}>{infoContentText}</Text>
         <ActionRow
@@ -524,102 +459,95 @@ const ManageCategoryScreen = ({ navigation }) => {
         colors={GlobalStyles.gradientColors}
         style={styles.container}
       >
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
-          <View
-            style={[
-              styles.inputContainer,
-              bigDisplay && {
-                minHeight: dynamicScale(284, false, 0.3),
-                maxHeight: dynamicScale(284, false, 0.3),
-              },
-            ]}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: "10%",
-                marginRight: "5%",
-              }}
-            >
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior="padding"
+          keyboardVerticalOffset={dynamicScale(12, true)}
+        >
+          <View style={styles.addFormSection}>
+            <View style={styles.nameRow}>
               <TextInput
-                autoFocus={true}
-                style={[styles.newCategoryInput]}
+                autoFocus={false}
+                style={styles.newCategoryInput}
                 placeholder={i18n.t("newCatNamePlaceholder")}
                 value={newCategoryName}
                 textAlign="center"
-                onChangeText={(text) => setNewCategoryName(text)}
+                onChangeText={(text) => {
+                  setNewCategoryName(text);
+                  if (addHint) {
+                    setAddHint(null);
+                  }
+                }}
               />
               <InfoButton
+                testID="manage-category-info"
                 onPress={showInfoHandler.bind(this, infoEnum.titleInfo)}
-                containerStyle={{ marginTop: "2%", marginLeft: "8%" }}
-              ></InfoButton>
+                containerStyle={styles.infoButton}
+              />
             </View>
-            <FlatList
-              horizontal
-              data={arrays}
-              renderItem={renderRowIconPicker}
-            ></FlatList>
-            {!isUploading &&
-              newCategoryName?.length > 0 &&
-              selectedIconName?.length > 0 && (
-                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                  <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={handleAddCategory}
-                  >
-                    <Text style={styles.addButtonText}>{i18n.t("add")}</Text>
-                  </TouchableOpacity>
-                </Animated.View>
-              )}
-            {isUploading && (
-              <View style={styles.addButton}>
-                <ActivityIndicator size="small" color="#fff" />
+            <ScrollView
+              testID="manage-category-icon-picker"
+              style={[
+                styles.iconPickerScroll,
+                { maxHeight: iconPickerMaxHeight },
+              ]}
+              contentContainerStyle={[
+                styles.iconGrid,
+                { width: iconGridContentWidth },
+              ]}
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled
+            >
+              {CATEGORY_ICON_CHOICES.map((iconName) => (
+                <SelectCategoryIcon
+                  key={iconName}
+                  iconName={iconName}
+                  selectedIconName={selectedIconName}
+                  setSelectedIconName={(name) => {
+                    setSelectedIconName(name);
+                    if (addHint) {
+                      setAddHint(null);
+                    }
+                  }}
+                />
+              ))}
+            </ScrollView>
+            {addHint ? (
+              <Text style={styles.addHintText} testID="manage-category-add-hint">
+                {addHint}
+              </Text>
+            ) : null}
+            {isUploading ? (
+              <View style={styles.addButton} testID="manage-category-add">
+                <ActivityIndicator
+                  size="small"
+                  color={ManageCategoryTokens.addButtonText}
+                />
               </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.addButton}
+                testID="manage-category-add"
+                accessibilityRole="button"
+                onPress={() => {
+                  void handleAddCategory();
+                }}
+              >
+                <Text style={styles.addButtonText}>{i18n.t("add")}</Text>
+              </TouchableOpacity>
             )}
           </View>
-          <View
-            style={{
-              height: dynamicScale(16, true),
-              width: "100%",
-              zIndex: 10,
-              borderBottomWidth: 1,
-              borderBottomColor: GlobalStyles.colors.primary100,
-              shadowColor: GlobalStyles.colors.primaryGrayed,
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.42,
-              shadowRadius: 2.42,
-            }}
-          />
-          {categoryList && (
+          {categoryList ? (
             <Animated.FlatList
+              style={styles.flex}
               data={categoryList}
               renderItem={renderCategoryItem}
               keyExtractor={(item, index) => `${item.cat}-${index}`}
               refreshing={isFetching}
               onRefresh={refreshCategoryList}
+              keyboardShouldPersistTaps="handled"
             />
-          )}
-          <View
-            style={{
-              height: 16,
-              width: "100%",
-              zIndex: 10,
-              borderTopWidth: 1,
-              borderTopColor: GlobalStyles.colors.primary100,
-              shadowColor: GlobalStyles.colors.primaryGrayed,
-              shadowOffset: {
-                width: 0,
-                height: -2,
-              },
-              shadowOpacity: 0.42,
-              shadowRadius: 2.42,
-              overflow: "visible",
-            }}
-          />
+          ) : null}
           <View style={styles.footerActions}>
             <IconButton
               icon={"chevron-back-outline"}
@@ -628,8 +556,8 @@ const ManageCategoryScreen = ({ navigation }) => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.pop();
               }}
-              color={GlobalStyles.colors.primaryGrayed}
-            ></IconButton>
+              color={ManageCategoryTokens.backControl}
+            />
             <ActionRow
               testID="manage-category-reset"
               tier="secondary"
@@ -669,54 +597,74 @@ ManageCategoryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: dynamicScale(16),
   },
-  inputContainer: {
-    flex: 1,
+  addFormSection: {
+    flexShrink: 1,
     alignItems: "center",
-    minHeight: dynamicScale(220, false, 0.3),
-    maxHeight: dynamicScale(220, false, 0.3),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
     marginBottom: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(4, false, 0.5),
+    padding: dynamicScale(8, false, 0.5),
     ...GlobalStyles.shadowPrimary,
   },
-  newCategoryInput: {
-    alignItems: "center",
-    flex: 1,
-    height: dynamicScale(40, false, 0.5),
-    maxHeight: dynamicScale(40, false, 0.5),
-    fontSize: dynamicScale(20, false, 0.5),
-    color: GlobalStyles.colors.primary400,
-    borderBottomWidth: 1,
-    borderBottomColor: GlobalStyles.colors.primary500,
-  },
-  iconPicker: {
+  nameRow: {
     flexDirection: "row",
     alignItems: "center",
+    width: "100%",
+    paddingHorizontal: dynamicScale(8, false, 0.5),
   },
-  iconButton: {
-    padding: dynamicScale(8, false, 0.5),
-    marginHorizontal: dynamicScale(8, false, 0.5),
-    borderRadius: dynamicScale(16, false, 0.5),
+  infoButton: {
+    marginLeft: dynamicScale(8, false, 0.5),
   },
-  selectedIconButton: {
-    backgroundColor: GlobalStyles.colors.gray500Accent,
+  newCategoryInput: {
+    flex: 1,
+    minHeight: TOUCH_TARGET_MIN,
+    fontSize: dynamicScale(20, false, 0.5),
+    color: GlobalStyles.colors.primary700,
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.primary700,
+    paddingVertical: dynamicScale(8, false, 0.5),
+  },
+  iconPickerScroll: {
+    alignSelf: "stretch",
+    flexShrink: 1,
+    marginTop: dynamicScale(8, true),
+  },
+  iconGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  addHintText: {
+    fontSize: dynamicScale(12, false, 0.5),
+    color: GlobalStyles.colors.error500,
+    marginTop: dynamicScale(4, true),
+    textAlign: "center",
+    paddingHorizontal: dynamicScale(8, false, 0.5),
   },
   addButton: {
-    backgroundColor: "#538076",
+    backgroundColor: ManageCategoryTokens.addButtonBackground,
     borderRadius: dynamicScale(8, false, 0.5),
-    paddingVertical: dynamicScale(8, false, 0.5),
+    paddingVertical: dynamicScale(12, false, 0.5),
     paddingHorizontal: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(12, false, 0.5),
-    marginTop: dynamicScale(-24, false, 0.5),
+    marginVertical: dynamicScale(8, false, 0.5),
+    minHeight: TOUCH_TARGET_MIN,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "stretch",
+    marginHorizontal: dynamicScale(8, false, 0.5),
   },
   addButtonText: {
     fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.backgroundColor,
+    color: ManageCategoryTokens.addButtonText,
+    fontWeight: "600",
   },
   categoryItem: {
     flex: 1,
@@ -735,7 +683,7 @@ const styles = StyleSheet.create({
   },
   categoryNameInput: {
     fontSize: dynamicScale(16, false, 0.5),
-    color: "#434343",
+    color: GlobalStyles.colors.textColor,
     minHeight: TOUCH_TARGET_MIN,
     paddingVertical: dynamicScale(12, false, 0.5),
   },
@@ -756,58 +704,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  modalContainer: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(16, false, 0.5),
-    width: "80%",
-    height: "40%",
-    justifyContent: "space-evenly",
-  },
-  modalTitle: {
-    fontSize: dynamicScale(20, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.primary400,
-    textAlign: "center",
-  },
-  modalText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.primary400,
-    textAlign: "center",
-  },
-  modalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-  },
-  modalButton: {
-    backgroundColor: GlobalStyles.colors.primary400,
-    borderRadius: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(8, false, 0.5),
-    width: "40%",
-  },
-  modalButtonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.backgroundColor,
-    textAlign: "center",
-  },
   infoModalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(8, false, 0.5),
     padding: dynamicScale(16, false, 0.5),
     width: "80%",
-    height: "40%",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
   infoTitleText: {
     fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
+    marginBottom: dynamicScale(8, true),
   },
   infoContentText: {
     fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
+    marginBottom: dynamicScale(12, true),
   },
   footerActions: {
     paddingHorizontal: dynamicScale(8, false, 0.5),

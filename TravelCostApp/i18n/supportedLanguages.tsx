@@ -19,6 +19,8 @@ const en = {
   signOutAlertMess: "Are you sure you want to sign out?",
   confirm: "Okay",
   confirm2: "Confirm",
+  done: "Done",
+  retry: "Retry",
   continue: "Continue",
   back: "Back",
   cancel: "Cancel",
@@ -454,6 +456,13 @@ const en = {
   newCatNamePlaceholder: "New category name ...",
   reset: "Reset",
   sureResetCategories: "Are you sure you want to reset your categories?",
+  categoryNameEmpty: "Name cannot be empty",
+  categoryNameDuplicate: "A category with this name already exists",
+  toastDeletedCategory1: "Category deleted",
+  toastDeletedCategory2: "You can undo this action",
+  toastErrorSaveCategories: "Could not save categories, please try again!",
+  deleteCategoryA11y: "Delete %{name}",
+  renameCategoryA11y: "Rename %{name}",
   infoNewCatTitle: "New Category Info",
   infoNewCatText:
     "Enter a name for your category and then choose a suitable symbol for your category." +
@@ -690,6 +699,8 @@ const de = {
   signOutAlertMess: "Bist du sicher, dass du dich abmelden willst?",
   confirm: "Okay",
   confirm2: "Bestätigen",
+  done: "Fertig",
+  retry: "Erneut versuchen",
   continue: "Weiter",
   back: "Zurück",
   cancel: "Abbrechen",
@@ -1150,6 +1161,14 @@ const de = {
   reset: "Zurücksetzen",
   sureResetCategories:
     "Bist du sicher, dass du die Kategorien zurücksetzen möchten?",
+  categoryNameEmpty: "Name darf nicht leer sein",
+  categoryNameDuplicate: "Eine Kategorie mit diesem Namen existiert bereits",
+  toastDeletedCategory1: "Kategorie gelöscht",
+  toastDeletedCategory2: "Du kannst diese Aktion rückgängig machen",
+  toastErrorSaveCategories:
+    "Kategorien konnten nicht gespeichert werden, bitte erneut versuchen!",
+  deleteCategoryA11y: "%{name} löschen",
+  renameCategoryA11y: "%{name} umbenennen",
   infoNewCatTitle: "Neue Kategorie Info",
   infoNewCatText:
     "Gib einen Namen für deine Kategorie ein und suche dir dann ein passendes Symbol für deine Kategorie aus." +
@@ -1400,6 +1419,8 @@ const fr = {
   signOutAlertMess: "Êtes-vous sûr(e) de vouloir vous déconnecter ?",
   confirm: "D'accord",
   confirm2: "Confirmer",
+  done: "Terminé",
+  retry: "Réessayer",
   continue: "Continuer",
   back: "Retour",
   cancel: "Annuler",
@@ -1855,6 +1876,14 @@ const fr = {
   reset: "Réinitialiser",
   sureResetCategories:
     "Êtes-vous sûr de vouloir réinitialiser vos catégories ?",
+  categoryNameEmpty: "Le nom ne peut pas être vide",
+  categoryNameDuplicate: "Une catégorie avec ce nom existe déjà",
+  toastDeletedCategory1: "Catégorie supprimée",
+  toastDeletedCategory2: "Vous pouvez annuler cette action",
+  toastErrorSaveCategories:
+    "Impossible d'enregistrer les catégories, veuillez réessayer !",
+  deleteCategoryA11y: "Supprimer %{name}",
+  renameCategoryA11y: "Renommer %{name}",
   infoNewCatTitle: "Informations sur la nouvelle catégorie",
   infoNewCatText:
     "Entrez un nom pour votre catégorie, puis choisissez un symbole approprié pour votre catégorie." +
@@ -2107,6 +2136,8 @@ const ru = {
   signOutAlertMess: "Вы уверены, что хотите выйти?",
   confirm: "Окей",
   confirm2: "Подтвердить",
+  done: "Готово",
+  retry: "Повторить",
   continue: "Продолжить",
   back: "Назад",
   cancel: "Отмена",
@@ -2551,6 +2582,14 @@ const ru = {
   newCatNamePlaceholder: "Новое название категории ...",
   reset: "Сбросить",
   sureResetCategories: "Вы уверены, что хотите сбросить свои категории?",
+  categoryNameEmpty: "Имя не может быть пустым",
+  categoryNameDuplicate: "Категория с таким именем уже существует",
+  toastDeletedCategory1: "Категория удалена",
+  toastDeletedCategory2: "Вы можете отменить это действие",
+  toastErrorSaveCategories:
+    "Не удалось сохранить категории, пожалуйста, попробуйте снова!",
+  deleteCategoryA11y: "Удалить %{name}",
+  renameCategoryA11y: "Переименовать %{name}",
   infoNewCatTitle: "Информация о новой категории",
   infoNewCatText:
     "Введите имя для вашей категории, а затем выберите подходящий символ для вашей категории." +

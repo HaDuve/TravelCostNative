@@ -5,37 +5,35 @@ import {
   StyleSheet,
   Text,
   View,
+  Alert,
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useContext, useCallback } from "react";
 import ActionRow from "../components/UI/ActionRow";
 import { GlobalStyles } from "../constants/styles";
 
 import { i18n } from "../i18n/i18n";
-import { fetchCategories } from "../util/http";
-import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { Alert } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
-import { Category, DEFAULTCATEGORIES } from "../util/category";
+import { Category } from "../util/category";
 import BackButton from "../components/UI/BackButton";
-import {
-  getMMKVObject,
-  MMKV_KEYS,
-  setMMKVObject,
-  setExpenseCat,
-} from "../store/mmkv";
-import { useCallback } from "react";
+import { setExpenseCat } from "../store/mmkv";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import {
+  appendNewCategoryTile,
+  createCategoryListStore,
+  defaultTripCategoryList,
+  readCategoryList,
+} from "../util/category-list";
 
 interface CategoryPickScreenProps {
   route: {
@@ -55,59 +53,44 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const tripid = tripCtx.tripid;
 
-  const CATLIST = DEFAULTCATEGORIES;
+  const categoryStore = useMemo(() => createCategoryListStore(), []);
 
-  const [categoryList, setCategoryList] = useState(CATLIST);
-  // isfetching state
+  const newCategoryTile: Category = useMemo(
+    () => ({
+      id: 6,
+      icon: "add-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "newCat",
+      catString: i18n.t("catNewString"),
+    }),
+    []
+  );
+
+  const [categoryList, setCategoryList] = useState(() =>
+    appendNewCategoryTile(defaultTripCategoryList(), newCategoryTile)
+  );
   const [isFetching, setIsFetching] = useState(false);
 
-  // state to check if we just came from manageCategoryScreen
-
-  // load categories from server or asyncstore
   useFocusEffect(
     useCallback(() => {
       const loadCategories = async () => {
-        setStoredCategories();
-        if (!isOnline) return;
         setIsFetching(true);
-        const categories = await fetchCategories(tripid);
-        if (categories) {
-          const tempList = [...categories];
-          tempList.push({
-            id: 6,
-            icon: "add-outline",
-            color: GlobalStyles.colors.textColor,
-            cat: "newCat",
-            catString: i18n.t("catNewString"),
+        try {
+          const list = await readCategoryList(categoryStore, tripid, {
+            isOnline,
           });
-          setCategoryList(tempList);
-          setMMKVObject(MMKV_KEYS.CATEGORY_LIST, categories);
-        }
-        setIsFetching(false);
-      };
-
-      // first try to load categories from asyncstore
-      const setStoredCategories = () => {
-        const categories = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
-        if (categories) {
-          categories.push({
-            id: 6,
-            icon: "add-outline",
-            color: GlobalStyles.colors.textColor,
-            cat: "newCat",
-            catString: i18n.t("catNewString"),
-          });
-          setCategoryList(categories);
+          setCategoryList(appendNewCategoryTile(list, newCategoryTile));
+        } finally {
+          setIsFetching(false);
         }
       };
-      loadCategories();
-    }, [tripid, isOnline])
+      void loadCategories();
+    }, [categoryStore, isOnline, newCategoryTile, tripid])
   );
 
   async function newCatPressHandler() {
     if (!isOnline) {
       if (await isConnectionFastEnoughAsBool()) {
-        // try again
         navigation.navigate("ManageCategory");
         return;
       }
@@ -117,7 +100,6 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     navigation.navigate("ManageCategory");
   }
 
-  // Helper function to update category in temp storage
   const updateTempCategory = useCallback(
     (categoryValue: string) => {
       if (expenseId) {
@@ -138,7 +120,6 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     } else {
       const selectedCategory = item.cat ?? item.name;
 
-      // Track category selection
       trackEvent(VexoEvents.CATEGORY_PICKED, {
         category: selectedCategory,
         icon: item.icon,
@@ -146,11 +127,9 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       });
 
       if (expenseId) {
-        // Coming from ManageExpense - store and go back
         updateTempCategory(selectedCategory);
         navigation.goBack();
       } else {
-        // Coming from AddExpenseButton - navigate to ManageExpense
         navigation.navigate("ManageExpense", {
           pickedCat: selectedCategory,
           iconName: item.icon,

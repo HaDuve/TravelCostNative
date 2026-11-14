@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
 } from "react-native";
-// import animated from reanimated
 import Animated, {
   ZoomIn,
   ZoomInLeft,
@@ -17,51 +18,61 @@ import Animated, {
 import { i18n } from "../i18n/i18n";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
-import { fetchCategories, updateTrip } from "../util/http";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
 import ActionRow from "../components/UI/ActionRow";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
-import { KeyboardAvoidingView } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
-import { Category, DEFAULTCATEGORIES } from "../util/category";
+import { Category } from "../util/category";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
 import { NetworkContext } from "../store/network-context";
 import InfoButton from "../components/UI/InfoButton";
 import Modal from "react-native-modal";
 import BlurPremium from "../components/Premium/BlurPremium";
-import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
-import { useMemo } from "react";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import {
+  commitCategoryRename,
+  createCategoryListStore,
+  defaultTripCategoryList,
+  insertCategoryAt,
+  readCategoryList,
+  removeCategoryAt,
+  UNDO_DELETE_CATEGORY_WINDOW_MS,
+  writeCategoryList,
+} from "../util/category-list";
+
+const TOUCH_TARGET_MIN = dynamicScale(48, false, 0.5);
 
 const ManageCategoryScreen = ({ navigation }) => {
-  // defaultCategories minus the last element (-new cat element)
   const defaultCategoryList: Category[] = useMemo(
-    () => DEFAULTCATEGORIES.slice(0, DEFAULTCATEGORIES?.length - 1),
+    () => defaultTripCategoryList(),
     []
   );
 
+  const categoryStore = useMemo(() => createCategoryListStore(), []);
+
   const [categoryList, setCategoryList] =
     useState<Category[]>(defaultCategoryList);
+  const [draftNames, setDraftNames] = useState<Record<number, string>>({});
+  const [renameError, setRenameError] = useState<{
+    index: number;
+    reason: "empty" | "duplicate";
+  } | null>(null);
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [selectedIconName, setSelectedIconName] = useState("");
 
   const [isFetching, setIsFetching] = useState(false);
-  const [touched, setTouched] = useState(false);
-
-  // use state for is uploading
   const [isUploading, setIsUploading] = useState(false);
 
   const userCtx = useContext(UserContext);
@@ -71,71 +82,65 @@ const ManageCategoryScreen = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
 
-  const loadCategoryList = useCallback(async () => {
-    try {
-      const categoryList = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
-      if (categoryList !== null) {
-        setCategoryList(categoryList);
-      } else {
-        setCategoryList(defaultCategoryList);
-      }
-    } catch (error) {
-      safeLogError(error);
-    }
-    setIsFetching(false);
-  }, []);
-
-  useEffect(() => {
-    loadCategoryList();
-  }, [loadCategoryList]);
-
-  const fetchCategoryList = useCallback(async () => {
-    if (!isOnline) {
-      await loadCategoryList();
-      return;
-    }
+  const refreshCategoryList = useCallback(async () => {
     try {
       setIsFetching(true);
-      const categories = await fetchCategories(tripid);
-      if (categories) {
-        const tempList = [...categories];
-        setCategoryList(tempList);
-        setIsFetching(false);
-      }
+      const list = await readCategoryList(categoryStore, tripid, { isOnline });
+      setCategoryList(list.length > 0 ? list : defaultCategoryList);
     } catch (error) {
       safeLogError(error);
-    }
-    if (categoryList?.length === 0) {
-      await loadCategoryList();
-    }
-    if (categoryList?.length === 0) {
       setCategoryList(defaultCategoryList);
+    } finally {
+      setIsFetching(false);
     }
-  }, [isOnline, loadCategoryList, tripid]);
+  }, [categoryStore, defaultCategoryList, isOnline, tripid]);
 
-  const saveCategoryList = async (newCategoryList) => {
-    setIsUploading(true);
-    // if not isOnline, alert user
-    if (!isOnline) {
-      Toast.show({
-        text1: i18n.t("noConnection"),
-        text2: i18n.t("checkConnectionError"),
-        type: "error",
-      });
-      navigation.pop(2);
-    }
-    try {
-      setMMKVObject(MMKV_KEYS.CATEGORY_LIST, categoryList);
-      await updateTrip(tripid, {
-        categories: JSON.stringify(newCategoryList),
-      });
-      await userCtx.loadCatListFromAsyncInCtx(tripid);
-    } catch (error) {
-      safeLogError(error);
-    }
-    setIsUploading(false);
-  };
+  useEffect(() => {
+    refreshCategoryList();
+  }, [refreshCategoryList]);
 
+  const persistCategoryList = useCallback(
+    async (newCategoryList: Category[]) => {
+      setIsUploading(true);
+      try {
+        const result = await writeCategoryList(
+          categoryStore,
+          tripid,
+          newCategoryList,
+          { isOnline }
+        );
+
+        if (result.status === "offline") {
+          Toast.show({
+            text1: i18n.t("noConnection"),
+            text2: i18n.t("checkConnectionError"),
+            type: "error",
+          });
+          return result;
+        }
+
+        if (result.status === "error") {
+          safeLogError(result.error);
+          Alert.alert(i18n.t("error"), i18n.t("toastErrorSaveCategories"), [
+            { text: i18n.t("cancel"), style: "cancel" },
+            {
+              text: i18n.t("retry"),
+              onPress: () => {
+                void persistCategoryList(newCategoryList);
+              },
+            },
+          ]);
+          return result;
+        }
+
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        return result;
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [categoryStore, isOnline, tripid, userCtx]
+  );
   const handleAddCategory = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newCategory: Category = {
@@ -144,7 +149,6 @@ const ManageCategoryScreen = ({ navigation }) => {
       cat: newCategoryName,
     };
 
-    // Track category creation
     trackEvent(VexoEvents.CATEGORY_CREATED, {
       categoryName: newCategoryName,
       icon: selectedIconName,
@@ -152,58 +156,106 @@ const ManageCategoryScreen = ({ navigation }) => {
 
     const newCategoryList = [...categoryList, newCategory];
     setCategoryList(newCategoryList);
-    setTouched(true);
-    await saveCategoryList(newCategoryList);
+    await persistCategoryList(newCategoryList);
     setNewCategoryName("");
     setSelectedIconName("");
-    // navigate to category pick screen
-    // navigation.navigate("CategoryPick");
   };
 
-  const handleEditCategory = async (index, newName) => {
-    const oldName = categoryList[index]?.catString;
-    const newCategoryList = [...categoryList];
-    newCategoryList[index].catString = newName;
-    newCategoryList[index].cat = newName;
-
-    // Track category edit (only when name actually changes)
-    if (oldName !== newName) {
-      trackEvent(VexoEvents.CATEGORY_EDITED, {
-        oldName: oldName,
-        newName: newName,
-        icon: categoryList[index]?.icon,
-      });
+  const handleCommitRename = async (index: number) => {
+    if (!(index in draftNames)) {
+      return;
     }
+    const draft = draftNames[index];
+    const previousName = categoryList[index]?.catString ?? "";
+    const result = commitCategoryRename(categoryList, index, draft);
 
-    setCategoryList(newCategoryList);
-    setTouched(true);
-    await saveCategoryList(newCategoryList);
-  };
-
-  const handleDeleteCategory = async (index) => {
-    const deletedCategory = categoryList[index];
-
-    // Track category deletion
-    trackEvent(VexoEvents.CATEGORY_DELETED, {
-      categoryName: deletedCategory?.catString,
-      icon: deletedCategory?.icon,
+    setDraftNames((prev) => {
+      const next = { ...prev };
+      delete next[index];
+      return next;
     });
 
-    const newCategoryList = [...categoryList];
-    newCategoryList.splice(index, 1);
-    setCategoryList(newCategoryList);
-    setTouched(true);
-    await saveCategoryList(newCategoryList);
+    if (result.status === "rejected") {
+      setRenameError({ index, reason: result.reason });
+      return;
+    }
+
+    if (result.list[index]?.catString === previousName) {
+      setRenameError(null);
+      return;
+    }
+
+    trackEvent(VexoEvents.CATEGORY_EDITED, {
+      oldName: previousName,
+      newName: result.list[index]?.catString,
+      icon: categoryList[index]?.icon,
+    });
+
+    setRenameError(null);
+    setCategoryList(result.list);
+    await persistCategoryList(result.list);
+  };
+
+  const showDeletedCategoryUndo = (
+    removed: Category,
+    index: number,
+    listAfterDelete: Category[]
+  ) => {
+    const actionId = `${Date.now()}-${removed.cat}-${index}`;
+    Toast.show({
+      type: "deletedExpense",
+      text1: i18n.t("toastDeletedCategory1"),
+      text2: i18n.t("toastDeletedCategory2"),
+      visibilityTime: UNDO_DELETE_CATEGORY_WINDOW_MS,
+      autoHide: true,
+      props: {
+        actionId,
+        onUndo: async () => {
+          Toast.hide();
+          const restored = insertCategoryAt(listAfterDelete, removed, index);
+          setCategoryList(restored);
+          await persistCategoryList(restored);
+        },
+      },
+    });
+  };
+
+  const handleDeleteCategory = async (index: number) => {
+    const { list, removed, index: removedIndex } = removeCategoryAt(
+      categoryList,
+      index
+    );
+
+    trackEvent(VexoEvents.CATEGORY_DELETED, {
+      categoryName: removed?.catString,
+      icon: removed?.icon,
+    });
+
+    setCategoryList(list);
+    setDraftNames({});
+    setRenameError(null);
+    await persistCategoryList(list);
+    showDeletedCategoryUndo(removed, removedIndex, list);
   };
 
   const handleResetCategoryList = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setCategoryList(defaultCategoryList);
-    setTouched(true);
-    await saveCategoryList(defaultCategoryList);
+    setDraftNames({});
+    setRenameError(null);
+    await persistCategoryList(defaultCategoryList);
   };
 
   const renderCategoryItem = ({ item, index }) => {
+    const displayName =
+      index in draftNames ? draftNames[index] : item.catString ?? "";
+    const errorForRow =
+      renameError?.index === index
+        ? renameError.reason === "empty"
+          ? i18n.t("categoryNameEmpty")
+          : i18n.t("categoryNameDuplicate")
+        : null;
+
     return (
       <Animated.View
         entering={ZoomInLeft}
@@ -215,19 +267,44 @@ const ManageCategoryScreen = ({ navigation }) => {
           size={dynamicScale(24, false, 0.3)}
           color={GlobalStyles.colors.textColor}
         />
-        <TextInput
-          style={styles.categoryNameInput}
-          value={item.catString}
-          autoCapitalize="sentences"
-          autoComplete="off"
-          autoCorrect={false}
-          onChangeText={(newName) => handleEditCategory(index, newName)}
-        />
+        <View style={styles.categoryNameColumn}>
+          <TextInput
+            style={styles.categoryNameInput}
+            value={displayName}
+            autoCapitalize="sentences"
+            autoComplete="off"
+            autoCorrect={false}
+            accessibilityLabel={i18n.t("renameCategoryA11y", {
+              name: item.catString ?? item.cat,
+            })}
+            onChangeText={(newName) => {
+              setDraftNames((prev) => ({ ...prev, [index]: newName }));
+              if (renameError?.index === index) {
+                setRenameError(null);
+              }
+            }}
+            onBlur={() => {
+              void handleCommitRename(index);
+            }}
+            onSubmitEditing={() => {
+              void handleCommitRename(index);
+            }}
+            returnKeyType="done"
+          />
+          {errorForRow ? (
+            <Text style={styles.renameErrorText}>{errorForRow}</Text>
+          ) : null}
+        </View>
         <TouchableOpacity
           style={styles.deleteButton}
+          accessibilityRole="button"
+          accessibilityLabel={i18n.t("deleteCategoryA11y", {
+            name: item.catString ?? item.cat,
+          })}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           onPress={async () => {
             await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            handleDeleteCategory(index);
+            void handleDeleteCategory(index);
           }}
         >
           <Ionicons
@@ -322,10 +399,8 @@ const ManageCategoryScreen = ({ navigation }) => {
     "walk-outline",
     "water-outline",
   ];
-  // get dimensions
   const bigDisplay = dynamicScale(680, true) > 850;
   const arrays = [];
-  // 1-3 possible items per row
   const size = bigDisplay ? 3 : 2;
   while (ioniconsList?.length > 0) arrays.push(ioniconsList.splice(0, size));
 
@@ -373,7 +448,6 @@ const ManageCategoryScreen = ({ navigation }) => {
     );
   }
 
-  // useStates for info Modal
   const [infoIsVisible, setInfoIsVisible] = useState(false);
   const [infoTitleText, setInfoTitleText] = useState("");
   const [infoContentText, setInfoContentText] = useState("");
@@ -386,7 +460,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     let contentText = "";
     switch (infoEnu) {
       case infoEnum.titleInfo:
-        titleText = i18n.t("infoNewCatTitle"); //i18n.t("currencyInfoTitle");
+        titleText = i18n.t("infoNewCatTitle");
         contentText = i18n.t("infoNewCatText");
         break;
       default:
@@ -397,7 +471,6 @@ const ManageCategoryScreen = ({ navigation }) => {
     setInfoIsVisible(true);
   }
 
-  // handle close
   function handleClose() {
     setInfoIsVisible(false);
   }
@@ -491,10 +564,8 @@ const ManageCategoryScreen = ({ navigation }) => {
               height: dynamicScale(16, true),
               width: "100%",
               zIndex: 10,
-              //transparent border color
               borderBottomWidth: 1,
               borderBottomColor: GlobalStyles.colors.primary100,
-              // shadow over the flatlist
               shadowColor: GlobalStyles.colors.primaryGrayed,
               shadowOffset: {
                 width: 0,
@@ -502,16 +573,15 @@ const ManageCategoryScreen = ({ navigation }) => {
               },
               shadowOpacity: 0.42,
               shadowRadius: 2.42,
-              // elevation: 1,
             }}
           />
           {categoryList && (
             <Animated.FlatList
               data={categoryList}
               renderItem={renderCategoryItem}
-              keyExtractor={(item, index) => `${index}`}
+              keyExtractor={(item, index) => `${item.cat}-${index}`}
               refreshing={isFetching}
-              onRefresh={fetchCategoryList}
+              onRefresh={refreshCategoryList}
             />
           )}
           <View
@@ -519,10 +589,8 @@ const ManageCategoryScreen = ({ navigation }) => {
               height: 16,
               width: "100%",
               zIndex: 10,
-              //transparent border color
               borderTopWidth: 1,
               borderTopColor: GlobalStyles.colors.primary100,
-              // shadow over the flatlist
               shadowColor: GlobalStyles.colors.primaryGrayed,
               shadowOffset: {
                 width: 0,
@@ -530,7 +598,6 @@ const ManageCategoryScreen = ({ navigation }) => {
               },
               shadowOpacity: 0.42,
               shadowRadius: 2.42,
-              // elevation: 3,
               overflow: "visible",
             }}
           />
@@ -546,8 +613,7 @@ const ManageCategoryScreen = ({ navigation }) => {
             ></IconButton>
             <ActionRow
               testID="manage-category-reset"
-              tier="gradient"
-              accentColors={GlobalStyles.gradientAccentButton}
+              tier="secondary"
               label={i18n.t("reset")}
               icon="refresh-outline"
               onPress={() => {
@@ -558,19 +624,16 @@ const ManageCategoryScreen = ({ navigation }) => {
                 );
               }}
             />
-            {touched && (
-              <ActionRow
-                testID="manage-category-confirm"
-                tier="primary"
-                label={i18n.t("confirm")}
-                icon="checkmark-circle-outline"
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setTouched(false);
-                  navigation.pop();
-                }}
-              />
-            )}
+            <ActionRow
+              testID="manage-category-done"
+              tier="primary"
+              label={i18n.t("done")}
+              icon="checkmark-circle-outline"
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.pop();
+              }}
+            />
           </View>
         </KeyboardAvoidingView>
       </BackgroundGradient>
@@ -603,7 +666,6 @@ const styles = StyleSheet.create({
     ...GlobalStyles.shadowPrimary,
   },
   newCategoryInput: {
-    // center
     alignItems: "center",
     flex: 1,
     height: dynamicScale(40, false, 0.5),
@@ -648,14 +710,27 @@ const styles = StyleSheet.create({
     zIndex: 1,
     ...GlobalStyles.strongShadow,
   },
+  categoryNameColumn: {
+    flex: 1,
+    marginLeft: dynamicScale(16, false, 0.5),
+  },
   categoryNameInput: {
     fontSize: dynamicScale(16, false, 0.5),
     color: "#434343",
-    marginLeft: dynamicScale(16, false, 0.5),
-    flex: 1,
+    minHeight: TOUCH_TARGET_MIN,
+    paddingVertical: dynamicScale(12, false, 0.5),
+  },
+  renameErrorText: {
+    fontSize: dynamicScale(12, false, 0.5),
+    color: GlobalStyles.colors.error500,
+    marginTop: dynamicScale(2, true),
   },
   deleteButton: {
     marginLeft: dynamicScale(16, false, 0.5),
+    minWidth: TOUCH_TARGET_MIN,
+    minHeight: TOUCH_TARGET_MIN,
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalStyle: {
     flex: 1,

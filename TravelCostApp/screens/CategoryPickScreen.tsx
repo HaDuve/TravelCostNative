@@ -648,18 +648,15 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             }}
             style={({ pressed }) => [
               styles.headerButton,
-              styles.editButton,
-              { paddingHorizontal: tokens.editButtonPaddingHorizontal },
               pressed && GlobalStyles.pressed,
             ]}
             onPress={() => void openManageCategories()}
           >
-            <Text
-              style={[styles.editButtonText, { fontSize: tokens.editFontSize }]}
-              numberOfLines={1}
-            >
-              {i18n.t("editCategories")}
-            </Text>
+            <Ionicons
+              name="create-outline"
+              size={dynamicScale(26, false, 0.5)}
+              color={GlobalStyles.colors.primary400}
+            />
           </Pressable>
         )}
       </View>

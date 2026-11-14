@@ -9,6 +9,7 @@ __Newest Changes:
 
 1.3.005p
 - New drag-and-drop category reorder on Category Pick
+- Added more category icons for sports, travel, and everyday spending
 - Improved Manage Categories save, rename, and undo delete
 - Improved Category Pick layout and Edit Categories control
 - Bugfixes and performance improvements

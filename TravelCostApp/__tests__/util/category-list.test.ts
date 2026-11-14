@@ -3,6 +3,8 @@ import {
   writeCategoryList,
   readCategoryList,
   commitCategoryRename,
+  commitNewCategory,
+  getAddCategoryReadiness,
   removeCategoryAt,
   insertCategoryAt,
   appendNewCategoryTile,
@@ -267,5 +269,78 @@ describe("removeCategoryAt / insertCategoryAt", () => {
 
     const restored = insertCategoryAt(removed.list, removed.removed, removed.index);
     expect(restored).toEqual(list);
+  });
+});
+
+describe("getAddCategoryReadiness", () => {
+  it("reports a missing name when the field is blank", () => {
+    expect(getAddCategoryReadiness("", "cafe-outline")).toEqual({
+      status: "incomplete",
+      missing: ["name"],
+    });
+  });
+
+  it("reports a missing icon when none is selected", () => {
+    expect(getAddCategoryReadiness("Coffee", "")).toEqual({
+      status: "incomplete",
+      missing: ["icon"],
+    });
+  });
+
+  it("reports both missing fields when neither name nor icon is set", () => {
+    expect(getAddCategoryReadiness("   ", "")).toEqual({
+      status: "incomplete",
+      missing: ["name", "icon"],
+    });
+  });
+
+  it("is ready when both a name and an icon are present", () => {
+    expect(getAddCategoryReadiness("Coffee", "cafe-outline")).toEqual({
+      status: "ready",
+    });
+  });
+});
+
+describe("commitNewCategory", () => {
+  const list = [
+    makeCategory({ cat: "food", icon: "fast-food-outline", catString: "Food" }),
+  ];
+
+  it("appends a new category at the end of the trip category list", () => {
+    const result = commitNewCategory(list, "Coffee", "cafe-outline");
+
+    expect(result).toEqual({
+      status: "committed",
+      category: makeCategory({
+        cat: "Coffee",
+        icon: "cafe-outline",
+        catString: "Coffee",
+      }),
+      list: [
+        list[0],
+        makeCategory({
+          cat: "Coffee",
+          icon: "cafe-outline",
+          catString: "Coffee",
+        }),
+      ],
+    });
+    expect(list).toHaveLength(1);
+  });
+
+  it("rejects a duplicate name with the same rule as rename", () => {
+    expect(commitNewCategory(list, "Food", "cafe-outline")).toEqual({
+      status: "rejected",
+      reason: "duplicate",
+      list,
+    });
+  });
+
+  it("reports incomplete instead of saving when name or icon is missing", () => {
+    expect(commitNewCategory(list, "", "")).toEqual({
+      status: "incomplete",
+      missing: ["name", "icon"],
+      list,
+    });
   });
 });

@@ -1,0 +1,111 @@
+/** Deduplicate icon names while preserving first-seen order. */
+export function uniqueCategoryIcons(icons: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const icon of icons) {
+    if (seen.has(icon)) {
+      continue;
+    }
+    seen.add(icon);
+    result.push(icon);
+  }
+  return result;
+}
+
+/** Readable label for category icon accessibility (e.g. cafe-outline → Cafe). */
+export function formatCategoryIconLabel(iconName: string): string {
+  return iconName
+    .replace(/-outline$/i, "")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+const RAW_CATEGORY_ICON_CHOICES = [
+  "wallet-outline",
+  "cash-outline",
+  "card-outline",
+  "list-outline",
+  "calculator-outline",
+  "pricetag-outline",
+  "cart-outline",
+  "compass-outline",
+  "happy-outline",
+  "trophy-outline",
+  "gift-outline",
+  "pie-chart-outline",
+  "podium-outline",
+  "fitness-outline",
+  "pulse-outline",
+  "desktop-outline",
+  "cube-outline",
+  "flame-outline",
+  "color-palette-outline",
+  "rocket-outline",
+  "leaf-outline",
+  "pint-outline",
+  "wine-outline",
+  "film-outline",
+  "game-controller-outline",
+  "book-outline",
+  "tv-outline",
+  "gift-outline",
+  "cloud-outline",
+  "thermometer-outline",
+  "flash-outline",
+  "train-outline",
+  "school-outline",
+  "flower-outline",
+  "radio-outline",
+  "pizza-outline",
+  "medical-outline",
+  "american-football-outline",
+  "musical-note-outline",
+  "musical-notes-outline",
+  "headset-outline",
+  "ice-cream-outline",
+  "cafe-outline",
+  "paw-outline",
+  "thumbs-up-outline",
+  "battery-dead-outline",
+  "watch-outline",
+  "chatbubbles-outline",
+  "cloudy-outline",
+  "desktop-outline",
+  "document-outline",
+  "easel-outline",
+  "eye-outline",
+  "fast-food-outline",
+  "film-outline",
+  "football-outline",
+  "glasses-outline",
+  "heart-outline",
+  "key-outline",
+  "laptop-outline",
+  "leaf-outline",
+  "moon-outline",
+  "nutrition-outline",
+  "partly-sunny-outline",
+  "people-outline",
+  "person-outline",
+  "planet-outline",
+  "pulse-outline",
+  "rainy-outline",
+  "rose-outline",
+  "search-outline",
+  "shirt-outline",
+  "speedometer-outline",
+  "stopwatch-outline",
+  "sunny-outline",
+  "thunderstorm-outline",
+  "time-outline",
+  "volume-high-outline",
+  "walk-outline",
+  "water-outline",
+];
+
+/** Duplicate-free icon names for the Manage categories picker. */
+export const CATEGORY_ICON_CHOICES = uniqueCategoryIcons(
+  RAW_CATEGORY_ICON_CHOICES
+);

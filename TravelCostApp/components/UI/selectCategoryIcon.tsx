@@ -4,24 +4,29 @@ import { GlobalStyles } from "../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import { dynamicScale } from "../../util/scalingUtil";
+import { formatCategoryIconLabel } from "../../util/category-icons";
+
+const TOUCH_TARGET_MIN = 48;
 
 const SelectCategoryIcon = ({
   selectedIconName,
   iconName,
   setSelectedIconName,
 }) => {
+  const selected = selectedIconName === iconName;
+
   return (
     <TouchableOpacity
-      style={[
-        styles.iconButton,
-        selectedIconName === iconName && styles.selectedIconButton,
-      ]}
+      style={[styles.iconButton, selected && styles.selectedIconButton]}
       onPress={() => setSelectedIconName(iconName)}
+      accessibilityRole="button"
+      accessibilityLabel={formatCategoryIconLabel(iconName)}
+      accessibilityState={{ selected }}
     >
       <Ionicons
         name={iconName}
-        size={dynamicScale(42, false, 0.3)}
-        color={GlobalStyles.colors.primary400}
+        size={dynamicScale(28, false, 0.3)}
+        color={GlobalStyles.colors.primary700}
       />
     </TouchableOpacity>
   );
@@ -37,9 +42,13 @@ SelectCategoryIcon.propTypes = {
 
 const styles = StyleSheet.create({
   iconButton: {
-    padding: 4,
-    marginHorizontal: 4,
-    borderRadius: 16,
+    minWidth: TOUCH_TARGET_MIN,
+    minHeight: TOUCH_TARGET_MIN,
+    padding: dynamicScale(4, false, 0.5),
+    margin: dynamicScale(4, false, 0.5),
+    borderRadius: dynamicScale(16, false, 0.5),
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedIconButton: {
     backgroundColor: GlobalStyles.colors.primary50,

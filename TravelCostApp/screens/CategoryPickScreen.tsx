@@ -26,6 +26,7 @@ import { Category } from "../util/category";
 import { getExpenseCat, setExpenseCat } from "../store/mmkv";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
+import { layoutFor } from "../util/layout";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import {
@@ -41,6 +42,7 @@ import {
   SKIP_CATEGORY_VALUE,
   shouldShowCategoryPickSpinner,
 } from "../util/category-pick";
+import { categoryPickLayoutTokens } from "../styles/category-pick-layout-tokens";
 
 interface CategoryPickScreenProps {
   route: {
@@ -55,9 +57,14 @@ const MIN_TOUCH_TARGET = 48;
 
 const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   const { expenseId } = route.params || {};
-  const { width } = useWindowDimensions();
+  const { width, height, fontScale } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const numColumns = categoryPickColumnCount(width);
+  const layout = useMemo(() => layoutFor({ width, height }), [width, height]);
+  const tokens = useMemo(
+    () => categoryPickLayoutTokens(layout, fontScale),
+    [layout, fontScale]
+  );
+  const numColumns = categoryPickColumnCount(layout);
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -205,9 +212,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
 
   function renderCatItem(itemData: { item: Category }) {
     const item = itemData.item;
-    if (!item.catString) item.catString = item.name;
-
-    const label = item.catString ?? item.cat ?? "";
+    const label = item.catString ?? item.name ?? item.cat ?? "";
     const selected = isCategoryTileSelected(item.cat, selectedCategory);
 
     return (
@@ -215,22 +220,45 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         accessibilityRole="button"
         accessibilityLabel={label}
         accessibilityState={{ selected }}
+        testID={`category-pick-tile-${item.cat ?? "unknown"}`}
         android_ripple={{ color: GlobalStyles.colors.gray600 }}
         style={({ pressed }) => [
-          styles.itemContainer,
-          styles.buttonStyle,
+          {
+            flex: 1,
+            margin: tokens.tileMargin,
+            minHeight: Math.max(tokens.tileMinHeight, MIN_TOUCH_TARGET),
+          },
+          {
+            backgroundColor: GlobalStyles.colors.gray500,
+            borderRadius: tokens.tileBorderRadius,
+            ...GlobalStyles.strongShadow,
+          },
           selected && styles.selectedTile,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => void catPressHandler(item)}
       >
-        <View style={styles.centerStyle}>
+        <View
+          style={[
+            styles.centerStyle,
+            { paddingHorizontal: tokens.tilePaddingHorizontal },
+          ]}
+        >
           <Ionicons
             name={item.icon as React.ComponentProps<typeof Ionicons>["name"]}
             size={dynamicScale(42, false, 0.5)}
             color={item.color}
           />
-          <Text style={styles.itemText} numberOfLines={2}>
+          <Text
+            style={[
+              styles.itemText,
+              {
+                fontSize: tokens.labelFontSize,
+                marginTop: tokens.tileLabelMarginTop,
+              },
+            ]}
+            numberOfLines={2}
+          >
             {label}
           </Text>
         </View>
@@ -243,7 +271,12 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       <View
         style={[
           styles.header,
-          { paddingTop: Math.max(insets.top, dynamicScale(8, false, 0.5)) },
+          {
+            paddingTop: Math.max(insets.top, tokens.headerSafeAreaFloor),
+            paddingHorizontal: tokens.headerPaddingHorizontal,
+            paddingBottom: tokens.headerPaddingBottom,
+            gap: tokens.headerGap,
+          },
         ]}
       >
         <Pressable
@@ -267,7 +300,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
 
         <Text
           accessibilityRole="header"
-          style={styles.title}
+          style={[styles.title, { fontSize: tokens.titleFontSize }]}
           numberOfLines={1}
         >
           {i18n.t("pickCategoryTitle")}
@@ -282,18 +315,22 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
           style={({ pressed }) => [
             styles.headerButton,
             styles.editButton,
+            { paddingHorizontal: tokens.editButtonPaddingHorizontal },
             pressed && GlobalStyles.pressed,
           ]}
           onPress={() => void openManageCategories()}
         >
-          <Text style={styles.editButtonText} numberOfLines={1}>
+          <Text
+            style={[styles.editButtonText, { fontSize: tokens.editFontSize }]}
+            numberOfLines={1}
+          >
             {i18n.t("editCategories")}
           </Text>
         </Pressable>
       </View>
 
       {showSpinner ? (
-        <View style={styles.spinnerContainer}>
+        <View style={styles.spinnerContainer} testID="category-pick-spinner">
           <ActivityIndicator
             size="large"
             color={GlobalStyles.colors.gray500}
@@ -301,6 +338,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         </View>
       ) : (
         <FlatList
+          testID="category-pick-list"
           key={`category-pick-cols-${numColumns}`}
           numColumns={numColumns}
           data={categoryList}
@@ -308,7 +346,10 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             `${item.cat ?? item.name ?? "cat"}-${index}`
           }
           renderItem={renderCatItem}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{
+            paddingHorizontal: tokens.listPaddingHorizontal,
+            paddingBottom: tokens.listPaddingBottom,
+          }}
           style={styles.listStyle}
         />
       )}
@@ -316,7 +357,14 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       <View
         style={[
           styles.bottomBar,
-          { paddingBottom: Math.max(insets.bottom, dynamicScale(12, false, 0.5)) },
+          {
+            paddingHorizontal: tokens.bottomBarPaddingHorizontal,
+            paddingTop: tokens.bottomBarPaddingTop,
+            paddingBottom: Math.max(
+              insets.bottom,
+              tokens.bottomBarSafeAreaFloor
+            ),
+          },
         ]}
       >
         <ActionRow
@@ -346,9 +394,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: dynamicScale(12, false, 0.5),
-    paddingBottom: dynamicScale(8, false, 0.5),
-    gap: dynamicScale(8, false, 0.5),
   },
   headerButton: {
     minWidth: MIN_TOUCH_TARGET,
@@ -358,26 +403,19 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flexShrink: 1,
-    paddingHorizontal: dynamicScale(8, false, 0.5),
   },
   editButtonText: {
     color: GlobalStyles.colors.primary400,
-    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "400",
   },
   title: {
     flex: 1,
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
-    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "600",
   },
   listStyle: {
     flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: dynamicScale(12, false, 0.5),
-    paddingBottom: dynamicScale(8, false, 0.5),
   },
   spinnerContainer: {
     flex: 1,
@@ -385,8 +423,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bottomBar: {
-    paddingHorizontal: dynamicScale(12, false, 0.5),
-    paddingTop: dynamicScale(8, false, 0.5),
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: GlobalStyles.colors.gray500,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -395,18 +431,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: dynamicScale(4, false, 0.5),
-  },
-  buttonStyle: {
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 12,
-    ...GlobalStyles.strongShadow,
-  },
-  itemContainer: {
-    flex: 1,
-    margin: dynamicScale(8, false, 0.5),
-    height: dynamicScale(120, false, 0.5),
-    minHeight: MIN_TOUCH_TARGET,
   },
   selectedTile: {
     backgroundColor: GlobalStyles.colors.primary100,
@@ -414,8 +438,6 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primary400,
   },
   itemText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    marginTop: dynamicScale(4, false, 0.5),
     color: GlobalStyles.colors.textColor,
     fontWeight: "400",
     textAlign: "center",

@@ -1,26 +1,59 @@
 import {
   categoryPickColumnCount,
   categoryPickSelectionResult,
+  categoryPickTileMinHeight,
   isCategoryTileSelected,
   SKIP_CATEGORY_VALUE,
   shouldShowCategoryPickSpinner,
 } from "../../util/category-pick";
+import { layoutFor } from "../../util/layout";
 
 describe("categoryPickColumnCount", () => {
-  it("uses 3 columns on phone widths", () => {
-    expect(categoryPickColumnCount(320)).toBe(3);
-    expect(categoryPickColumnCount(390)).toBe(3);
-    expect(categoryPickColumnCount(599)).toBe(3);
+  it("uses 3 columns on narrow layouts", () => {
+    expect(categoryPickColumnCount(layoutFor({ width: 320, height: 568 }))).toBe(
+      3
+    );
+    expect(categoryPickColumnCount(layoutFor({ width: 390, height: 844 }))).toBe(
+      3
+    );
+    expect(categoryPickColumnCount(layoutFor({ width: 599, height: 800 }))).toBe(
+      3
+    );
   });
 
-  it("uses 4 columns on medium tablet widths", () => {
-    expect(categoryPickColumnCount(600)).toBe(4);
-    expect(categoryPickColumnCount(767)).toBe(4);
+  it("uses 4 columns on medium layouts", () => {
+    expect(categoryPickColumnCount(layoutFor({ width: 600, height: 800 }))).toBe(
+      4
+    );
+    expect(categoryPickColumnCount(layoutFor({ width: 767, height: 900 }))).toBe(
+      4
+    );
   });
 
-  it("uses 5 columns on wide tablet widths", () => {
-    expect(categoryPickColumnCount(768)).toBe(5);
-    expect(categoryPickColumnCount(1024)).toBe(5);
+  it("uses 5 columns on wide layouts", () => {
+    expect(categoryPickColumnCount(layoutFor({ width: 768, height: 1024 }))).toBe(
+      5
+    );
+    expect(
+      categoryPickColumnCount(layoutFor({ width: 1024, height: 768 }))
+    ).toBe(5);
+  });
+});
+
+describe("categoryPickTileMinHeight", () => {
+  const layout = layoutFor({ width: 390, height: 844 });
+
+  it("uses a shared base height from layout space tokens at fontScale 1", () => {
+    const expected =
+      layout.space(7) * 2 + layout.space(3); /* ~112: icon + 2 label lines */
+    expect(categoryPickTileMinHeight(layout, 1)).toBe(expected);
+  });
+
+  it("grows shared tile height with larger Dynamic Type fontScale", () => {
+    const base = categoryPickTileMinHeight(layout, 1);
+    const large = categoryPickTileMinHeight(layout, 2);
+    expect(large).toBe(base * 2);
+    expect(large).toBeGreaterThan(base);
   });
 });
 

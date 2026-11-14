@@ -180,6 +180,55 @@ export function insertCategoryAt(
   return [...list.slice(0, clamped), category, ...list.slice(clamped)];
 }
 
+/** Move a category within the trip list; "+ New Category" tile stays last. */
+export function moveCategoryAt(
+  list: Category[],
+  fromIndex: number,
+  toIndex: number
+): Category[] {
+  const newTile = list.find((category) => category.cat === NEW_CATEGORY_CAT);
+  const movable = withoutNewCategoryTile(list);
+  if (
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= movable.length ||
+    toIndex >= movable.length ||
+    fromIndex === toIndex
+  ) {
+    return list;
+  }
+
+  const next = [...movable];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return newTile ? [...next, newTile] : next;
+}
+
+/**
+ * Persist a reordered trip category list. On offline/error, returns the
+ * previous order so the UI can revert.
+ */
+export async function persistReorderedCategoryList(
+  store: CategoryListStore,
+  tripid: string,
+  previousList: Category[],
+  nextList: Category[],
+  options: { isOnline: boolean }
+): Promise<WriteCategoryListResult> {
+  const previousClean = withoutNewCategoryTile(previousList);
+  const result = await writeCategoryList(store, tripid, nextList, options);
+
+  if (result.status === "saved") {
+    return result;
+  }
+
+  if (result.status === "offline") {
+    return { status: "offline", list: previousClean };
+  }
+
+  return { status: "error", list: previousClean, error: result.error };
+}
+
 export async function readCategoryList(
   store: CategoryListStore,
   tripid: string,

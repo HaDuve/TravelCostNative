@@ -1,24 +1,44 @@
 import {
+  AccessibilityInfo,
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
-  Alert,
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useState, useMemo, useContext, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useContext,
+  useCallback,
+  useEffect,
+} from "react";
 import ActionRow from "../components/UI/ActionRow";
 import { GlobalStyles } from "../constants/styles";
 
 import { i18n } from "../i18n/i18n";
 import { TripContext } from "../store/trip-context";
+import { UserContext } from "../store/user-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  useAnimatedRef,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+  cancelAnimation,
+} from "react-native-reanimated";
+import Sortable, {
+  type SortableGridRenderItem,
+} from "react-native-sortables";
 
 import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
@@ -29,11 +49,16 @@ import { dynamicScale } from "../util/scalingUtil";
 import { layoutFor } from "../util/layout";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import safeLogError from "../util/error";
 import {
   appendNewCategoryTile,
   createCategoryListStore,
   defaultTripCategoryList,
+  moveCategoryAt,
+  NEW_CATEGORY_CAT,
+  persistReorderedCategoryList,
   readCategoryList,
+  withoutNewCategoryTile,
 } from "../util/category-list";
 import {
   categoryPickColumnCount,
@@ -42,7 +67,10 @@ import {
   SKIP_CATEGORY_VALUE,
   shouldShowCategoryPickSpinner,
 } from "../util/category-pick";
-import { categoryPickLayoutTokens } from "../styles/category-pick-layout-tokens";
+import {
+  categoryPickLayoutTokens,
+  type CategoryPickLayoutTokens,
+} from "../styles/category-pick-layout-tokens";
 
 interface CategoryPickScreenProps {
   route: {
@@ -55,6 +83,82 @@ interface CategoryPickScreenProps {
 
 const MIN_TOUCH_TARGET = 48;
 
+function CategoryTileContent({
+  item,
+  label,
+  isReordering,
+  reduceMotion,
+  tokens,
+}: {
+  item: Category;
+  label: string;
+  isReordering: boolean;
+  reduceMotion: boolean;
+  tokens: CategoryPickLayoutTokens;
+}) {
+  const wobble = useSharedValue(0);
+
+  useEffect(() => {
+    if (!isReordering || reduceMotion || item.cat === NEW_CATEGORY_CAT) {
+      cancelAnimation(wobble);
+      wobble.value = 0;
+      return;
+    }
+    wobble.value = withRepeat(
+      withSequence(
+        withTiming(-1.5, { duration: 90 }),
+        withTiming(1.5, { duration: 180 }),
+        withTiming(0, { duration: 90 })
+      ),
+      -1,
+      false
+    );
+    return () => {
+      cancelAnimation(wobble);
+    };
+  }, [isReordering, item.cat, reduceMotion, wobble]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${wobble.value}deg` }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        styles.centerStyle,
+        { paddingHorizontal: tokens.tilePaddingHorizontal },
+        animatedStyle,
+      ]}
+    >
+      {isReordering && item.cat !== NEW_CATEGORY_CAT ? (
+        <Ionicons
+          name="reorder-three-outline"
+          size={dynamicScale(18, false, 0.5)}
+          color={GlobalStyles.colors.gray700}
+          style={styles.dragAffordance}
+        />
+      ) : null}
+      <Ionicons
+        name={item.icon as React.ComponentProps<typeof Ionicons>["name"]}
+        size={dynamicScale(42, false, 0.5)}
+        color={item.color}
+      />
+      <Text
+        style={[
+          styles.itemText,
+          {
+            fontSize: tokens.labelFontSize,
+            marginTop: tokens.tileLabelMarginTop,
+          },
+        ]}
+        numberOfLines={2}
+      >
+        {label}
+      </Text>
+    </Animated.View>
+  );
+}
+
 const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   const { expenseId } = route.params || {};
   const { width, height, fontScale } = useWindowDimensions();
@@ -65,9 +169,11 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     [layout, fontScale]
   );
   const numColumns = categoryPickColumnCount(layout);
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const userCtx = useContext(UserContext);
 
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const tripid = tripCtx.tripid;
@@ -79,7 +185,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       id: 6,
       icon: "add-outline",
       color: GlobalStyles.colors.textColor,
-      cat: "newCat",
+      cat: NEW_CATEGORY_CAT,
       catString: i18n.t("catNewString"),
     }),
     []
@@ -100,6 +206,12 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   });
   const [isLoading, setIsLoading] = useState(!cachedOnMount);
   const [hasCachedList, setHasCachedList] = useState(cachedOnMount);
+  const [isReordering, setIsReordering] = useState(false);
+  const [orderBeforeReorder, setOrderBeforeReorder] = useState<Category[] | null>(
+    null
+  );
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   const selectedCategory = useMemo(() => {
     if (!expenseId) return undefined;
@@ -110,8 +222,26 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     return temp?.category;
   }, [expenseId]);
 
+  useEffect(() => {
+    let mounted = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (mounted) setReduceMotion(enabled);
+    });
+    const subscription = AccessibilityInfo.addEventListener(
+      "reduceMotionChanged",
+      (enabled) => {
+        setReduceMotion(enabled);
+      }
+    );
+    return () => {
+      mounted = false;
+      subscription.remove();
+    };
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
+      if (isReordering) return;
       let cancelled = false;
       const loadCategories = async () => {
         const hadCache =
@@ -136,7 +266,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       return () => {
         cancelled = true;
       };
-    }, [categoryStore, isOnline, newCategoryTile, tripid])
+    }, [categoryStore, isOnline, isReordering, newCategoryTile, tripid])
   );
 
   const showSpinner = shouldShowCategoryPickSpinner({
@@ -189,8 +319,9 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   );
 
   async function catPressHandler(item: Category) {
+    if (isReordering) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (item.cat === "newCat") {
+    if (item.cat === NEW_CATEGORY_CAT) {
       await openManageCategories();
       return;
     }
@@ -206,19 +337,147 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     applySelectionResult(selected, item.icon);
   }
 
+  async function tryEnterReorder(item: Category) {
+    if (isReordering || item.cat === NEW_CATEGORY_CAT) return;
+
+    if (!isOnline) {
+      Alert.alert(i18n.t("alertOffline"), i18n.t("alertNeedOnlineCategory"));
+      return;
+    }
+
+    const isPremium =
+      userCtx.isPremium || (await userCtx.checkPremium?.()) || false;
+    if (!isPremium) {
+      navigation.navigate("Paywall");
+      return;
+    }
+
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setOrderBeforeReorder(categoryList);
+    setIsReordering(true);
+  }
+
+  const persistCurrentOrder = useCallback(
+    async (listToSave: Category[]) => {
+      const previous =
+        withoutNewCategoryTile(orderBeforeReorder ?? categoryList);
+      const next = withoutNewCategoryTile(listToSave);
+      setIsSavingOrder(true);
+      try {
+        const result = await persistReorderedCategoryList(
+          categoryStore,
+          tripid,
+          previous,
+          next,
+          { isOnline }
+        );
+
+        if (result.status === "saved") {
+          setCategoryList(appendNewCategoryTile(result.list, newCategoryTile));
+          setOrderBeforeReorder(null);
+          setIsReordering(false);
+          await userCtx.loadCatListFromAsyncInCtx?.(tripid);
+          return;
+        }
+
+        setCategoryList(
+          appendNewCategoryTile(result.list, newCategoryTile)
+        );
+
+        if (result.status === "offline") {
+          Alert.alert(i18n.t("alertOffline"), i18n.t("alertNeedOnlineCategory"));
+          setIsReordering(false);
+          setOrderBeforeReorder(null);
+          return;
+        }
+
+        safeLogError(result.error);
+        Alert.alert(i18n.t("error"), i18n.t("toastErrorSaveCategories"), [
+          { text: i18n.t("cancel"), style: "cancel" },
+          {
+            text: i18n.t("retry"),
+            onPress: () => {
+              setCategoryList(listToSave);
+              void persistCurrentOrder(listToSave);
+            },
+          },
+        ]);
+      } finally {
+        setIsSavingOrder(false);
+      }
+    },
+    [
+      categoryList,
+      categoryStore,
+      isOnline,
+      newCategoryTile,
+      orderBeforeReorder,
+      tripid,
+      userCtx,
+    ]
+  );
+
+  async function finishReorder() {
+    if (isSavingOrder) return;
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await persistCurrentOrder(categoryList);
+  }
+
   function skipCategoryHandler() {
+    if (isReordering) return;
     applySelectionResult(SKIP_CATEGORY_VALUE);
+  }
+
+  const onAccessibilityMove = useCallback(
+    (item: Category, direction: "earlier" | "later") => {
+      if (!isReordering || item.cat === NEW_CATEGORY_CAT) return;
+      const movable = withoutNewCategoryTile(categoryList);
+      const fromIndex = movable.findIndex((c) => c.cat === item.cat);
+      if (fromIndex < 0) return;
+      const toIndex =
+        direction === "earlier" ? fromIndex - 1 : fromIndex + 1;
+      if (toIndex < 0 || toIndex >= movable.length) return;
+      setCategoryList(moveCategoryAt(categoryList, fromIndex, toIndex));
+    },
+    [categoryList, isReordering]
+  );
+
+  function tileAccessibilityProps(item: Category, label: string) {
+    if (!isReordering || item.cat === NEW_CATEGORY_CAT) {
+      return {
+        accessibilityRole: "button" as const,
+        accessibilityLabel: label,
+      };
+    }
+    return {
+      accessibilityRole: "button" as const,
+      accessibilityLabel: label,
+      accessibilityActions: [
+        { name: "moveEarlier", label: i18n.t("moveCategoryEarlier") },
+        { name: "moveLater", label: i18n.t("moveCategoryLater") },
+      ],
+      onAccessibilityAction: (event: {
+        nativeEvent: { actionName: string };
+      }) => {
+        if (event.nativeEvent.actionName === "moveEarlier") {
+          onAccessibilityMove(item, "earlier");
+        } else if (event.nativeEvent.actionName === "moveLater") {
+          onAccessibilityMove(item, "later");
+        }
+      },
+    };
   }
 
   function renderCatItem(itemData: { item: Category }) {
     const item = itemData.item;
-    const label = item.catString ?? item.name ?? item.cat ?? "";
+    if (!item.catString) item.catString = item.name;
+
+    const label = item.catString ?? item.cat ?? "";
     const selected = isCategoryTileSelected(item.cat, selectedCategory);
 
     return (
       <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={label}
+        {...tileAccessibilityProps(item, label)}
         accessibilityState={{ selected }}
         testID={`category-pick-tile-${item.cat ?? "unknown"}`}
         android_ripple={{ color: GlobalStyles.colors.gray600 }}
@@ -237,34 +496,69 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => void catPressHandler(item)}
+        onLongPress={() => void tryEnterReorder(item)}
+        delayLongPress={350}
       >
-        <View
-          style={[
-            styles.centerStyle,
-            { paddingHorizontal: tokens.tilePaddingHorizontal },
-          ]}
-        >
-          <Ionicons
-            name={item.icon as React.ComponentProps<typeof Ionicons>["name"]}
-            size={dynamicScale(42, false, 0.5)}
-            color={item.color}
-          />
-          <Text
-            style={[
-              styles.itemText,
-              {
-                fontSize: tokens.labelFontSize,
-                marginTop: tokens.tileLabelMarginTop,
-              },
-            ]}
-            numberOfLines={2}
-          >
-            {label}
-          </Text>
-        </View>
+        <CategoryTileContent
+          item={item}
+          label={label}
+          isReordering={false}
+          reduceMotion={reduceMotion}
+          tokens={tokens}
+        />
       </Pressable>
     );
   }
+
+  const renderSortableItem = useCallback<SortableGridRenderItem<Category>>(
+    ({ item }) => {
+      if (!item.catString) item.catString = item.name;
+      const label = item.catString ?? item.cat ?? "";
+      const isFixed = item.cat === NEW_CATEGORY_CAT;
+      const selected = isCategoryTileSelected(item.cat, selectedCategory);
+
+      const body = (
+        <View
+          {...tileAccessibilityProps(item, label)}
+          accessibilityState={{ selected }}
+          testID={`category-pick-tile-${item.cat ?? "unknown"}`}
+          style={[
+            styles.sortableItemContainer,
+            {
+              backgroundColor: GlobalStyles.colors.gray500,
+              borderRadius: tokens.tileBorderRadius,
+              minHeight: Math.max(tokens.tileMinHeight, MIN_TOUCH_TARGET),
+              ...GlobalStyles.strongShadow,
+            },
+            selected && styles.selectedTile,
+            isReordering &&
+              reduceMotion &&
+              !isFixed &&
+              styles.reorderHighlight,
+          ]}
+        >
+          <CategoryTileContent
+            item={item}
+            label={label}
+            isReordering={isReordering}
+            reduceMotion={reduceMotion}
+            tokens={tokens}
+          />
+        </View>
+      );
+
+      return (
+        <Sortable.Handle mode={isFixed ? "fixed-order" : "draggable"}>
+          {body}
+        </Sortable.Handle>
+      );
+    },
+    // tileAccessibilityProps closes over onAccessibilityMove / isReordering
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isReordering, onAccessibilityMove, reduceMotion, selectedCategory, tokens]
+  );
+
+  const gap = tokens.tileMargin;
 
   return (
     <View style={styles.container}>
@@ -289,7 +583,17 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             styles.headerButton,
             pressed && GlobalStyles.pressed,
           ]}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            if (isReordering) {
+              if (orderBeforeReorder) {
+                setCategoryList(orderBeforeReorder);
+              }
+              setIsReordering(false);
+              setOrderBeforeReorder(null);
+              return;
+            }
+            navigation.goBack();
+          }}
         >
           <Ionicons
             name="close-outline"
@@ -306,27 +610,58 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
           {i18n.t("pickCategoryTitle")}
         </Text>
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={i18n.t("editCategories")}
-          testID="category-pick-edit"
-          hitSlop={8}
-          android_ripple={{ color: GlobalStyles.colors.gray600, borderless: true }}
-          style={({ pressed }) => [
-            styles.headerButton,
-            styles.editButton,
-            { paddingHorizontal: tokens.editButtonPaddingHorizontal },
-            pressed && GlobalStyles.pressed,
-          ]}
-          onPress={() => void openManageCategories()}
-        >
-          <Text
-            style={[styles.editButtonText, { fontSize: tokens.editFontSize }]}
-            numberOfLines={1}
+        {isReordering ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={i18n.t("done")}
+            testID="category-pick-reorder-done"
+            hitSlop={8}
+            disabled={isSavingOrder}
+            android_ripple={{
+              color: GlobalStyles.colors.gray600,
+              borderless: true,
+            }}
+            style={({ pressed }) => [
+              styles.headerButton,
+              styles.editButton,
+              { paddingHorizontal: tokens.editButtonPaddingHorizontal },
+              pressed && GlobalStyles.pressed,
+            ]}
+            onPress={() => void finishReorder()}
           >
-            {i18n.t("editCategories")}
-          </Text>
-        </Pressable>
+            <Text
+              style={[styles.editButtonText, { fontSize: tokens.editFontSize }]}
+              numberOfLines={1}
+            >
+              {i18n.t("done")}
+            </Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={i18n.t("editCategories")}
+            testID="category-pick-edit"
+            hitSlop={8}
+            android_ripple={{
+              color: GlobalStyles.colors.gray600,
+              borderless: true,
+            }}
+            style={({ pressed }) => [
+              styles.headerButton,
+              styles.editButton,
+              { paddingHorizontal: tokens.editButtonPaddingHorizontal },
+              pressed && GlobalStyles.pressed,
+            ]}
+            onPress={() => void openManageCategories()}
+          >
+            <Text
+              style={[styles.editButtonText, { fontSize: tokens.editFontSize }]}
+              numberOfLines={1}
+            >
+              {i18n.t("editCategories")}
+            </Text>
+          </Pressable>
+        )}
       </View>
 
       {showSpinner ? (
@@ -336,6 +671,34 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             color={GlobalStyles.colors.gray500}
           />
         </View>
+      ) : isReordering ? (
+        <Animated.ScrollView
+          ref={scrollableRef}
+          style={styles.listStyle}
+          contentContainerStyle={{
+            paddingHorizontal: tokens.listPaddingHorizontal,
+            paddingBottom: tokens.listPaddingBottom,
+          }}
+        >
+          <Sortable.Grid
+            columns={numColumns}
+            data={categoryList}
+            customHandle
+            hapticsEnabled
+            keyExtractor={(item) => item.cat ?? item.name ?? "cat"}
+            renderItem={renderSortableItem}
+            rowGap={gap}
+            columnGap={gap}
+            scrollableRef={scrollableRef}
+            onDragEnd={({ data }) => {
+              const withoutNew = withoutNewCategoryTile(data);
+              setCategoryList(
+                appendNewCategoryTile(withoutNew, newCategoryTile)
+              );
+            }}
+            overflow="visible"
+          />
+        </Animated.ScrollView>
       ) : (
         <FlatList
           testID="category-pick-list"
@@ -354,27 +717,43 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         />
       )}
 
-      <View
-        style={[
-          styles.bottomBar,
-          {
-            paddingHorizontal: tokens.bottomBarPaddingHorizontal,
-            paddingTop: tokens.bottomBarPaddingTop,
-            paddingBottom: Math.max(
-              insets.bottom,
-              tokens.bottomBarSafeAreaFloor
-            ),
-          },
-        ]}
-      >
-        <ActionRow
-          testID="category-pick-skip"
-          tier="secondary"
-          label={i18n.t("skipCategory")}
-          icon="arrow-forward-outline"
-          onPress={skipCategoryHandler}
+      {!isReordering ? (
+        <View
+          style={[
+            styles.bottomBar,
+            {
+              paddingHorizontal: tokens.bottomBarPaddingHorizontal,
+              paddingTop: tokens.bottomBarPaddingTop,
+              paddingBottom: Math.max(
+                insets.bottom,
+                tokens.bottomBarSafeAreaFloor
+              ),
+            },
+          ]}
+        >
+          <ActionRow
+            testID="category-pick-skip"
+            tier="secondary"
+            label={i18n.t("skipCategory")}
+            icon="arrow-forward-outline"
+            onPress={skipCategoryHandler}
+          />
+        </View>
+      ) : (
+        <View
+          style={[
+            styles.bottomBar,
+            {
+              paddingHorizontal: tokens.bottomBarPaddingHorizontal,
+              paddingTop: tokens.bottomBarPaddingTop,
+              paddingBottom: Math.max(
+                insets.bottom,
+                tokens.bottomBarSafeAreaFloor
+              ),
+            },
+          ]}
         />
-      </View>
+      )}
     </View>
   );
 };
@@ -432,8 +811,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  dragAffordance: {
+    position: "absolute",
+    top: dynamicScale(4, false, 0.5),
+    right: dynamicScale(4, false, 0.5),
+  },
+  sortableItemContainer: {
+    height: dynamicScale(120, false, 0.5),
+    minHeight: MIN_TOUCH_TARGET,
+  },
   selectedTile: {
     backgroundColor: GlobalStyles.colors.primary100,
+    borderWidth: 2,
+    borderColor: GlobalStyles.colors.primary400,
+  },
+  reorderHighlight: {
     borderWidth: 2,
     borderColor: GlobalStyles.colors.primary400,
   },

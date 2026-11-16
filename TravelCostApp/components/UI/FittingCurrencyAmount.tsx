@@ -288,11 +288,21 @@ export function FittingCurrencyAmountPair({
         {fullProbeText}
       </Text>
       <View style={[styles.pairRow, rowStyle]}>
-        <Text style={textStyle} numberOfLines={1}>
+        <Text
+          style={[textStyle, styles.pairAmount]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+        >
           {spentText}
         </Text>
         <Text style={textStyle}>/</Text>
-        <Text style={textStyle} numberOfLines={1}>
+        <Text
+          style={[textStyle, styles.pairAmount]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+        >
           {budgetText}
         </Text>
       </View>
@@ -327,7 +337,12 @@ export function FittingCurrencyAmount({
       >
         {fullText}
       </Text>
-      <Text style={style} numberOfLines={1}>
+      <Text
+        style={style}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
         {displayText}
       </Text>
     </View>
@@ -349,6 +364,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+    flexShrink: 1,
+  },
+  pairAmount: {
+    flexShrink: 1,
   },
   fullProbe: {
     position: "absolute",

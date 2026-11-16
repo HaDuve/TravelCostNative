@@ -349,6 +349,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+    flexShrink: 1,
   },
   fullProbe: {
     position: "absolute",

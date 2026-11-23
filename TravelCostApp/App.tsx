@@ -1,5 +1,11 @@
 import React from "react";
-import { useContext, useEffect, useState, useLayoutEffect } from "react";
+import {
+  useContext,
+  useEffect,
+  useState,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { View, Keyboard, Platform, AppState } from "react-native";
 import {
   SafeAreaProvider,
@@ -72,6 +78,11 @@ import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import CriticalUpdateHost from "./components/UI/CriticalUpdateHost";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
+import {
+  canAttemptOnlineSetup,
+  initialOnlineSetupBackoff,
+  recordOnlineSetupFailure,
+} from "./util/online-setup-backoff";
 import { isForeground } from "./util/appState";
 import { getFocusedRouteName } from "./util/focused-route-name";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
@@ -546,6 +557,7 @@ function Root() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
   const [onlineSetupDone, setOnlineSetupDone] = useState(false);
+  const onlineSetupBackoff = useRef(initialOnlineSetupBackoff());
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -566,7 +578,10 @@ function Root() {
         asyncQueue();
 
         const delayedOnlineSetup = async () => {
-          if (!onlineSetupDone) {
+          if (
+            !onlineSetupDone &&
+            canAttemptOnlineSetup(onlineSetupBackoff.current, Date.now())
+          ) {
             const { isFastEnough } = await isConnectionFastEnough();
             if (isFastEnough) {
               const storedUid = await secureStoreGetItem("uid");
@@ -586,6 +601,11 @@ function Root() {
                 await activateTrip(tripid, activateTripDeps(storedUid));
                 await onlineSetup(checkUser, tripid, storedUid);
               } catch (error) {
+                safeLogError(error, "App.tsx delayedOnlineSetup");
+                onlineSetupBackoff.current = recordOnlineSetupFailure(
+                  onlineSetupBackoff.current,
+                  Date.now()
+                );
                 setOnlineSetupDone(false);
               }
             }

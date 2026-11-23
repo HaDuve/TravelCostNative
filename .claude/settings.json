@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "haduve-skills": {
+      "source": {
+        "source": "github",
+        "repo": "HaDuve/claude-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "claude-skills@haduve-skills": true
+  }
+}

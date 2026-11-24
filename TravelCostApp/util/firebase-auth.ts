@@ -77,7 +77,44 @@ export function getValidIdToken(): Promise<string | null> {
   return inFlightTokenRequest;
 }
 
-async function resolveValidIdToken(): Promise<string | null> {
+/**
+ * Token to retry with after RTDB rejected `rejectedToken` (401/403). Reuses a
+ * token another caller has already refreshed; otherwise refreshes once.
+ * Concurrent rejections share one refresh.
+ */
+let inFlightRejectionRefresh: Promise<string | null> | null = null;
+
+export function refreshIdTokenAfterRejection(
+  rejectedToken: string
+): Promise<string | null> {
+  if (!inFlightRejectionRefresh) {
+    inFlightRejectionRefresh = resolveAfterRejection(rejectedToken).finally(
+      () => {
+        inFlightRejectionRefresh = null;
+      }
+    );
+  }
+  return inFlightRejectionRefresh;
+}
+
+async function resolveAfterRejection(
+  rejectedToken: string
+): Promise<string | null> {
+  const storedToken = await secureStoreGetItem("token");
+  if (storedToken && storedToken !== rejectedToken) return storedToken;
+  return resolveValidIdToken(true);
+}
+
+/** True while a refresh token or password credentials remain stored. */
+export async function hasStoredCredentials(): Promise<boolean> {
+  const refreshToken = await secureStoreGetItem("refreshToken");
+  if (refreshToken) return true;
+  const email = await secureStoreGetItem("ENCM");
+  const password = await secureStoreGetItem("ENCP");
+  return !!email && !!password;
+}
+
+async function resolveValidIdToken(forceRefresh = false): Promise<string | null> {
   try {
     const currentToken = await secureStoreGetItem("token");
     const tokenExpiry = await secureStoreGetItem("tokenExpiry");
@@ -93,7 +130,7 @@ async function resolveValidIdToken(): Promise<string | null> {
     const expiryTime = tokenExpiry ? parseInt(tokenExpiry) : 0;
     const bufferTime = 5 * 60 * 1000; // 5 minutes
 
-    if (now >= expiryTime - bufferTime) {
+    if (forceRefresh || now >= expiryTime - bufferTime) {
       if (refreshToken) {
         const newToken = await refreshIdToken(refreshToken);
         if (newToken) {

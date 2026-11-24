@@ -29,6 +29,7 @@ import {
 } from "./secure-storage";
 import { reloadApp } from "../util/appState";
 import safeLogError from "../util/error";
+import { setAuthLostHandler } from "../util/auth-failure";
 
 export const AuthContext = createContext({
   uid: "",
@@ -50,6 +51,12 @@ function AuthContextProvider({ children }) {
       setuidString(uid);
     }
     loadUID();
+  }, []);
+
+  // No valid token and no stored credentials: show the login screen
+  useEffect(() => {
+    setAuthLostHandler(() => setAuthToken(null));
+    return () => setAuthLostHandler(null);
   }, []);
 
   // Initialize authentication on app startup

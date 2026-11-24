@@ -88,3 +88,6 @@ dist/
 # CLAUDE*
 
 # @end expo-cli.env
+
+# Firebase emulator logs
+database-debug.log

@@ -39,7 +39,7 @@ import {
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-// Field name for server timestamp in expense data -- needs to be updated in .rules firebase backend
+// Field name for server timestamp in expense data -- needs to be updated in database.rules.json firebase backend
 export const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
 
 /** AXIOS Instance */

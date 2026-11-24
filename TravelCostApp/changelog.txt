@@ -7,11 +7,15 @@ Formatting rules (not shown in-app; see .cursor/skills/update-budget-app/changel
 
 __Newest Changes:
 
-1.3.005q
-- Fixed budget numbers getting cut off in trip history
+1.3.005r!
+- Fix excessive data usage: stop repeated full trip downloads
 - Bugfixes and performance improvements
 
 __Other Changes:
+
+1.3.005q
+- Fixed budget numbers getting cut off in trip history
+- Bugfixes and performance improvements
 
 1.3.005p
 - New drag-and-drop category reorder on Category Pick

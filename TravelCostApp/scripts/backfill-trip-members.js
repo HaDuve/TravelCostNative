@@ -10,11 +10,12 @@
  *   - uids that own an Expense node (`trips/<tripId>/<uid>/expenses`)
  *   - users whose `tripHistory` or `currentTrip` names the trip
  *
- * Usage (from TravelCostApp/, signed in with `firebase login`):
- *   firebase database:get /users > /tmp/users.json
- *   firebase database:get /trips > /tmp/trips.json
+ * Production runs go through scripts/rtdb-rollout.sh, which backs up the
+ * database, runs this, asks for confirmation and applies the update.
+ *
+ * Usage:
+ *   node scripts/backfill-trip-members.js --backup /tmp/database.json > /tmp/members-update.json
  *   node scripts/backfill-trip-members.js /tmp/users.json /tmp/trips.json > /tmp/members-update.json
- *   firebase database:update / /tmp/members-update.json
  *
  * The output is a multi-path update ({"trips/<tripId>/members/<uid>": true}).
  * It only adds memberships and never removes any, so it is safe to re-run.
@@ -137,18 +138,29 @@ function readJson(path) {
   return text.length === 0 ? null : JSON.parse(text);
 }
 
-if (require.main === module) {
-  const [usersPath, tripsPath] = process.argv.slice(2);
-  if (!usersPath || !tripsPath) {
-    console.error(
-      "Usage: node scripts/backfill-trip-members.js <users.json> <trips.json>"
-    );
-    process.exit(1);
-  }
-  const { update, stats } = buildTripMembersUpdate(
-    readJson(usersPath),
-    readJson(tripsPath)
+function usage() {
+  console.error(
+    "Usage: node scripts/backfill-trip-members.js <users.json> <trips.json>\n" +
+      "       node scripts/backfill-trip-members.js --backup <database.json>"
   );
+  process.exit(1);
+}
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  let users;
+  let trips;
+  if (args[0] === "--backup") {
+    if (!args[1]) usage();
+    const root = readJson(args[1]) || {};
+    users = root.users ?? null;
+    trips = root.trips ?? null;
+  } else {
+    if (!args[0] || !args[1]) usage();
+    users = readJson(args[0]);
+    trips = readJson(args[1]);
+  }
+  const { update, stats } = buildTripMembersUpdate(users, trips);
   process.stdout.write(JSON.stringify(update, null, 2) + "\n");
   console.error(JSON.stringify(stats));
 }

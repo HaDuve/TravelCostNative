@@ -422,7 +422,8 @@ export async function getAllExpensesData(tripid: string) {
 
   const rawExpenses: ExpenseData[] = lastUpdateWasToday
     ? cachedExpenses
-    : await getAllExpenses(tripid);
+    : // Full list: a delta here would be cached as the day's complete ledger.
+      await getAllExpenses(tripid, undefined, false);
   const expenses = rawExpenses.map(normalizeExpensePaidBack);
   if (!lastUpdateWasToday) {
     // update cache

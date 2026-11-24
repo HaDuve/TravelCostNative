@@ -105,7 +105,7 @@ import { getRate } from "../../util/currencyExchange";
 - Serial runs (debugging order-dependent issues): `pnpm test --runInBand`
 - Do **not** use `pnpm test -- --runInBand` — the extra `--` makes Jest treat `--runInBand` as a path pattern (`No tests found`).
 - CI requirement: pull requests must pass `pnpm test` (see `.github/workflows/test.yml`)
-- Database rules: `pnpm test:rules` (from `TravelCostApp/`) runs `rules-tests/` against the Realtime Database emulator (needs Java 21+). Each app path in `util/` must allow signed-in access and deny anonymous access.
+- Database rules: `pnpm test:rules` (from `TravelCostApp/`) runs `rules-tests/` against the Realtime Database emulator (needs Java 21+). Trip paths are limited to trip members, users to their own node, and anonymous access is denied. See [rtdb-rules.md](./rtdb-rules.md).
 - Package manager: [package-manager.md](./package-manager.md)
 
 ## Tracer-bullet examples

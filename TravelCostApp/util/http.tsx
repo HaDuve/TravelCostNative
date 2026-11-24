@@ -195,25 +195,20 @@ export async function storeExpense(
   uid: string,
   expenseData: ExpenseData
 ) {
-  try {
-    return await withAuthToken("storeExpense", async (authToken) => {
-      // Add serverTimestamp to expense data
-      const expenseDataWithTimestamp = {
-        ...toExpenseOnline(expenseData),
-        [SERVER_TIMESTAMP_FIELD]: Date.now(),
-      };
+  return await withAuthToken("storeExpense", async (authToken) => {
+    // Add serverTimestamp to expense data
+    const expenseDataWithTimestamp = {
+      ...toExpenseOnline(expenseData),
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
 
-      const response = await axios.post(
-        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
-        expenseDataWithTimestamp
-      );
-      const id: string = response.data.name;
-      return id;
-    });
-  } catch (error) {
-    if (!isAuthFailureError(error)) safeLogError(error);
-    throw error;
-  }
+    const response = await axios.post(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
+      expenseDataWithTimestamp
+    );
+    const id: string = response.data.name;
+    return id;
+  });
 }
 
 export async function storeExpenseWithId(
@@ -222,24 +217,19 @@ export async function storeExpenseWithId(
   id: string,
   expenseData: ExpenseData
 ) {
-  try {
-    await withAuthToken("storeExpenseWithId", async (authToken) => {
-      // Add serverTimestamp to expense data
-      const expenseDataWithTimestamp = {
-        ...toExpenseOnline(expenseData),
-        [SERVER_TIMESTAMP_FIELD]: Date.now(),
-      };
+  await withAuthToken("storeExpenseWithId", async (authToken) => {
+    // Add serverTimestamp to expense data
+    const expenseDataWithTimestamp = {
+      ...toExpenseOnline(expenseData),
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
 
-      await axios.put(
-        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-        expenseDataWithTimestamp
-      );
-    });
-    return id;
-  } catch (error) {
-    if (!isAuthFailureError(error)) safeLogError(error);
-    throw error;
-  }
+    await axios.put(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+      expenseDataWithTimestamp
+    );
+  });
+  return id;
 }
 
 const processExpenseResponse = (data: any): ExpenseData[] => {
@@ -367,10 +357,11 @@ async function fetchExpensesWithUIDsOnce(
 
       expenses.push(...userExpenses);
     } catch (error) {
+      // withAuthToken already logged it.
       if (isAuthFailureError(error)) {
-        authFailure ??= error as AuthFailureError;
-      } else {
-        safeLogError(error);
+        // Every other Traveller's request would fail the same way.
+        authFailure = error as AuthFailureError;
+        break;
       }
       anyUidFailed = true;
       firstError ??= error;
@@ -481,7 +472,7 @@ export async function fetchExpenses(
     loadingCallback?.onComplete?.();
     return expenses;
   } catch (error) {
-    if (!isAuthFailureError(error)) safeLogError(error);
+    // withAuthToken already logged it.
     loadingCallback?.onComplete?.();
     // An auth failure is reported, not shown as an empty ledger.
     if (isAuthFailureError(error)) throw error;
@@ -503,23 +494,18 @@ export async function updateExpense(
   id: string,
   expenseData: ExpenseData
 ) {
-  try {
-    return await withAuthToken("updateExpense", (authToken) => {
-      // Add serverTimestamp to expense data
-      const expenseDataWithTimestamp = {
-        ...toExpenseOnline(expenseData),
-        [SERVER_TIMESTAMP_FIELD]: Date.now(),
-      };
+  return await withAuthToken("updateExpense", (authToken) => {
+    // Add serverTimestamp to expense data
+    const expenseDataWithTimestamp = {
+      ...toExpenseOnline(expenseData),
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
 
-      return axios.put(
-        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-        expenseDataWithTimestamp
-      );
-    });
-  } catch (error) {
-    if (!isAuthFailureError(error)) safeLogError(error);
-    throw error;
-  }
+    return axios.put(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+      expenseDataWithTimestamp
+    );
+  });
 }
 
 /**
@@ -530,45 +516,35 @@ export async function updateExpense(
  * @returns A Promise that resolves to the response from the server.
  */
 export async function deleteExpense(tripid: string, uid: string, id: string) {
-  try {
-    // Soft delete: mark as deleted instead of removing
-    const deletionData = {
-      isDeleted: true,
-      [SERVER_TIMESTAMP_FIELD]: Date.now(),
-    };
+  // Soft delete: mark as deleted instead of removing
+  const deletionData = {
+    isDeleted: true,
+    [SERVER_TIMESTAMP_FIELD]: Date.now(),
+  };
 
-    return await withAuthToken("deleteExpense", (authToken) =>
-      axios.patch(
-        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-        deletionData
-      )
-    );
-  } catch (error) {
-    if (!isAuthFailureError(error)) safeLogError(error);
-    throw error;
-  }
+  return await withAuthToken("deleteExpense", (authToken) =>
+    axios.patch(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+      deletionData
+    )
+  );
 }
 
 /**
  * Restores a soft-deleted expense on a trip.
  */
 export async function restoreExpense(tripid: string, uid: string, id: string) {
-  try {
-    const restoreData = {
-      isDeleted: false,
-      [SERVER_TIMESTAMP_FIELD]: Date.now(),
-    };
+  const restoreData = {
+    isDeleted: false,
+    [SERVER_TIMESTAMP_FIELD]: Date.now(),
+  };
 
-    return await withAuthToken("restoreExpense", (authToken) =>
-      axios.patch(
-        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-        restoreData
-      )
-    );
-  } catch (error) {
-    if (!isAuthFailureError(error)) safeLogError(error);
-    throw error;
-  }
+  return await withAuthToken("restoreExpense", (authToken) =>
+    axios.patch(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+      restoreData
+    )
+  );
 }
 
 /**

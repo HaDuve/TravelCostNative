@@ -44,12 +44,51 @@ function isStale(generation: number): boolean {
 }
 
 /**
+ * Error codes from the Token Service / Identity Toolkit that are answered with
+ * 400 but are temporary: the stored credentials may still be good.
+ */
+const TRANSIENT_AUTH_ERROR_CODES = [
+  "TOO_MANY_ATTEMPTS_TRY_LATER",
+  "QUOTA_EXCEEDED",
+];
+
+/**
+ * True when the Token Service or Identity Toolkit definitively rejected the
+ * stored credentials (for example INVALID_REFRESH_TOKEN, TOKEN_EXPIRED,
+ * INVALID_PASSWORD, USER_DISABLED, USER_NOT_FOUND): a 400 or 401 response.
+ * Network errors, timeouts, 5xx and 403 (such as API_KEY_SERVICE_BLOCKED, a
+ * project misconfiguration) are not: they say nothing about the credentials.
+ */
+export function isDefinitiveCredentialRejection(error: unknown): boolean {
+  const response = (
+    error as {
+      response?: { status?: number; data?: { error?: { message?: unknown } } };
+    }
+  )?.response;
+  if (response?.status !== 400 && response?.status !== 401) return false;
+  const message = String(response.data?.error?.message ?? "");
+  return !TRANSIENT_AUTH_ERROR_CODES.some((code) => message.startsWith(code));
+}
+
+/**
+ * Generation whose stored credentials were all definitively rejected. While
+ * it matches the current generation, the stored credentials count as gone, so
+ * an auth failure sends the Traveller to the login screen. A new sign-in
+ * (storeAuthData) or sign-out bumps the generation and clears this.
+ */
+let rejectedCredentialsGeneration: number | null = null;
+
+type CredentialAttempt =
+  | { ok: true; token: string }
+  | { ok: false; outcome: "absent" | "rejected" | "failed" };
+
+/**
  * Refresh Firebase ID token using refresh token
  */
 async function refreshIdToken(
   refreshToken: string,
   generation: number
-): Promise<string | null> {
+): Promise<CredentialAttempt> {
   try {
     const url = `https://securetoken.googleapis.com/v1/token?key=${API_KEY}`;
     const response = await axios.post(url, {
@@ -60,7 +99,7 @@ async function refreshIdToken(
     const { access_token, expires_in, refresh_token } = response.data;
 
     if (isStale(generation)) {
-      return null;
+      return { ok: false, outcome: "failed" };
     }
 
     // Write the rotated refresh token first: if a later write fails, the
@@ -79,11 +118,14 @@ async function refreshIdToken(
     // Update authentication token for immediate use
     setAxiosAccessToken(access_token);
 
-    return access_token;
+    return { ok: true, token: access_token };
   } catch (error) {
     console.error("[FIREBASE-AUTH] Failed to refresh token:", error);
     safeLogError(error);
-    return null;
+    return {
+      ok: false,
+      outcome: isDefinitiveCredentialRejection(error) ? "rejected" : "failed",
+    };
   }
 }
 
@@ -119,6 +161,7 @@ async function resolveAfterRejection(
 
 /** True while a refresh token or password credentials remain stored. */
 export async function hasStoredCredentials(): Promise<boolean> {
+  if (rejectedCredentialsGeneration === authGeneration) return false;
   const refreshToken = await secureStoreGetItem("refreshToken");
   if (refreshToken) return true;
   const email = await secureStoreGetItem("ENCM");
@@ -182,21 +225,37 @@ async function refreshOrReauthenticate(
   generation: number
 ): Promise<string | null> {
   const refreshToken = await secureStoreGetItem("refreshToken");
+  let refreshOutcome: "absent" | "rejected" | "failed" = "absent";
   if (refreshToken) {
-    const newToken = await refreshIdToken(refreshToken, generation);
-    if (newToken || isStale(generation)) {
-      return newToken;
-    }
+    const refreshed = await refreshIdToken(refreshToken, generation);
+    if (refreshed.ok === true) return refreshed.token;
+    if (isStale(generation)) return null;
+    refreshOutcome = refreshed.outcome;
   }
 
   // If refresh failed, try to re-authenticate
-  return await reAuthenticate(generation);
+  const signedIn = await reAuthenticate(generation);
+  if (signedIn.ok === true) return signedIn.token;
+
+  // Every stored credential was definitively rejected (or missing): they
+  // count as gone, so the next auth failure routes to the login screen.
+  // A network failure on either path keeps them.
+  const noneUsable =
+    refreshOutcome !== "failed" &&
+    signedIn.outcome !== "failed" &&
+    (refreshOutcome === "rejected" || signedIn.outcome === "rejected");
+  if (noneUsable && !isStale(generation)) {
+    rejectedCredentialsGeneration = generation;
+  }
+  return null;
 }
 
 /**
  * Re-authenticate using stored email/password
  */
-async function reAuthenticate(generation: number): Promise<string | null> {
+async function reAuthenticate(
+  generation: number
+): Promise<CredentialAttempt> {
   try {
     const email = await secureStoreGetItem("ENCM");
     const password = await secureStoreGetItem("ENCP");
@@ -205,7 +264,7 @@ async function reAuthenticate(generation: number): Promise<string | null> {
       console.error(
         "[FIREBASE-AUTH] No stored credentials for re-authentication"
       );
-      return null;
+      return { ok: false, outcome: "absent" };
     }
 
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
@@ -219,7 +278,7 @@ async function reAuthenticate(generation: number): Promise<string | null> {
       response.data;
 
     if (isStale(generation)) {
-      return null;
+      return { ok: false, outcome: "failed" };
     }
 
     // Store all auth data
@@ -234,11 +293,14 @@ async function reAuthenticate(generation: number): Promise<string | null> {
     // Update authentication token for immediate use
     setAxiosAccessToken(idToken);
 
-    return idToken;
+    return { ok: true, token: idToken };
   } catch (error) {
     console.error("[FIREBASE-AUTH] Re-authentication failed:", error);
     safeLogError(error);
-    return null;
+    return {
+      ok: false,
+      outcome: isDefinitiveCredentialRejection(error) ? "rejected" : "failed",
+    };
   }
 }
 

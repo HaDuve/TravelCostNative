@@ -2,6 +2,9 @@ import { getAllExpenses, unTouchTraveler } from "../../util/http";
 
 import { ExpenseContextType } from "../../store/expenses-context";
 import safeLogError from "../../util/error";
+import { isAuthFailureError } from "../../util/auth-failure";
+import Toast from "react-native-toast-message";
+import { i18n } from "../../i18n/i18n";
 
 export async function fetchAndSetExpenses(
   showRefIndicator: boolean,
@@ -38,7 +41,17 @@ export async function fetchAndSetExpenses(
       // via the useEffect in expenses-context.tsx that watches expensesState changes
     }
   } catch (error) {
-    safeLogError(error);
+    if (isAuthFailureError(error)) {
+      // Already logged under [AUTH-FAILURE]. Tell the Traveller the list may
+      // be out of date instead of failing silently.
+      Toast.show({
+        type: "error",
+        text1: i18n.t("error"),
+        text2: i18n.t("toastAuthSyncFailed"),
+      });
+    } else {
+      safeLogError(error);
+    }
     // Ensure sync state is reset on error
     expensesCtx.setIsSyncing(false);
   }

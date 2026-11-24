@@ -23,6 +23,8 @@ A trip member is a uid with `trips/<tripId>/members/<uid> = true`. The trip id w
 
 ## Commands
 
+`firebase-tools` is not an app dependency. The scripts run a pinned version with `pnpm dlx firebase-tools@15.5.1`. Use the same for the manual commands below (`firebase …` stands for `pnpm dlx firebase-tools@15.5.1 …`, after `pnpm dlx firebase-tools@15.5.1 login`). The rules tests also need Java 21+.
+
 From `TravelCostApp/`:
 
 ```bash

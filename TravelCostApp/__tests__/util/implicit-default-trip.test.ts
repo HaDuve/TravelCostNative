@@ -133,7 +133,8 @@ describe("ensureImplicitDefaultActiveTrip", () => {
         totalBudget: "0",
         dailyBudget: "0",
         tripName: "",
-      })
+      }),
+      "u1"
     );
     expect(putTravelerInTrip).toHaveBeenCalledWith("trip-implicit-1", {
       uid: "u1",

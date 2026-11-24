@@ -257,9 +257,10 @@ export async function testFirebaseAuth(): Promise<{
       return { success: false, error: "No valid token available" };
     }
 
-    // Test with server info endpoint (now requires auth)
+    // Test with a server config leaf (requires auth; `server` itself is not
+    // readable as a whole because it holds feedback)
     const response = await axios.get(
-      `${BACKEND_URL}/server.json?auth=${token}`,
+      `${BACKEND_URL}/server/VEXO.json?auth=${token}`,
       {
         timeout: 10000,
       }

@@ -65,7 +65,7 @@ export type EnsureImplicitDefaultActiveTripDeps = {
   tripCurrency: string;
   categories?: Category[] | string | null;
   existingTripHistory?: string[] | null;
-  storeTrip: (tripData: TripData) => Promise<string>;
+  storeTrip: (tripData: TripData, creatorUid: string) => Promise<string>;
   putTravelerInTrip: (
     tripid: string,
     traveller: Traveller
@@ -97,7 +97,7 @@ export async function ensureImplicitDefaultActiveTrip(
     deps.tripCurrency,
     deps.categories
   );
-  const tripid = await deps.storeTrip(tripData);
+  const tripid = await deps.storeTrip(tripData, deps.uid);
   const tripWithId: TripData = { ...tripData, tripid };
   const nextHistory = mergeTripHistoryWithNewTrip(
     deps.existingTripHistory,

@@ -55,7 +55,8 @@ describe("createImplicitDefaultForUser", () => {
     });
 
     expect(storeTrip).toHaveBeenCalledWith(
-      expect.objectContaining({ isImplicitDefault: true, tripCurrency: "USD" })
+      expect.objectContaining({ isImplicitDefault: true, tripCurrency: "USD" }),
+      "u1"
     );
     expect(updateTripHistory).toHaveBeenCalledWith("u1", "trip-implicit-1");
     expect(setTripHistory).toHaveBeenCalledWith([

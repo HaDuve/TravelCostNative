@@ -418,7 +418,7 @@ const TripForm = ({ navigation, route }) => {
     if (currentCategories)
       tripData.categories = JSON.stringify(currentCategories);
 
-    const tripid = await storeTrip(tripData);
+    const tripid = await storeTrip(tripData, uid);
     updateTripNameInAllTripsCache(tripid, tripData.tripName ?? "");
 
     // Track trip creation

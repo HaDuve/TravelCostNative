@@ -273,15 +273,40 @@ export interface SyncLoadingCallback {
   onComplete?: () => void;
 }
 
-export async function fetchExpensesWithUIDs(
+// Single-flight: concurrent callers (online-setup retries, RecentExpenses
+// polling, trip history) share one ledger download instead of stacking them.
+const inFlightLedgerFetches = new Map<string, Promise<ExpenseData[]>>();
+
+export function fetchExpensesWithUIDs(
   tripid: string,
   uidlist: string[],
   useDelta = true,
   loadingCallback?: SyncLoadingCallback
-) {
+): Promise<ExpenseData[]> {
+  const key = `${tripid}|${(uidlist ?? []).join(",")}|${useDelta}`;
+  const pending = inFlightLedgerFetches.get(key);
+  if (pending) return pending;
+  const run = fetchExpensesWithUIDsOnce(
+    tripid,
+    uidlist,
+    useDelta,
+    loadingCallback
+  ).finally(() => inFlightLedgerFetches.delete(key));
+  inFlightLedgerFetches.set(key, run);
+  return run;
+}
+
+async function fetchExpensesWithUIDsOnce(
+  tripid: string,
+  uidlist: string[],
+  useDelta = true,
+  loadingCallback?: SyncLoadingCallback
+): Promise<ExpenseData[]> {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
   let latestTimestamp = 0;
+  let anyUidFailed = false;
+  let firstError: unknown;
 
   // Notify sync start
   loadingCallback?.onStart?.();
@@ -328,15 +353,22 @@ export async function fetchExpensesWithUIDs(
 
       expenses.push(...userExpenses);
     } catch (error) {
+      anyUidFailed = true;
+      firstError ??= error;
       safeLogError(error);
     }
   }
-  if (latestTimestamp > 0) {
+  // A failed full replace throws below and must not move lastFetch. Delta polls
+  // keep advancing, otherwise one permanently failing Traveller would pin
+  // lastFetch and every poll would re-download everything since then.
+  if (latestTimestamp > 0 && (useDelta || !anyUidFailed)) {
     setLastFetchTimestamp(tripid, latestTimestamp);
   }
 
   // Notify sync completion
   loadingCallback?.onComplete?.();
+  // A full replace must not apply a partial ledger.
+  if (anyUidFailed && !useDelta) throw firstError;
   return expenses;
 }
 

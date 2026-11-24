@@ -4,6 +4,7 @@ import type { Traveller } from "./traveler";
 import { ACTIVE_TRIP_ID_KEY } from "./active-trip-id";
 import { hydrateTrip } from "./hydrate-trip";
 import { normalizeTravellers } from "./normalize-travellers";
+import safeLogError from "./error";
 
 export type ActivateTripDeps = {
   uid: string;
@@ -71,7 +72,15 @@ export async function activateTrip(
   let committed = false;
   try {
     await deps.secureStoreSetItem(ACTIVE_TRIP_ID_KEY, tripid);
-    await deps.updateUser(deps.uid, { currentTrip: tripid });
+    try {
+      // Server currentTrip is only a mirror of the authoritative secure id.
+      // A failed PATCH must not discard the ledger just downloaded: callers
+      // retry failed activations, so a fatal mirror error re-downloads every
+      // Traveller's expenses in a loop.
+      await deps.updateUser(deps.uid, { currentTrip: tripid });
+    } catch (mirrorError) {
+      safeLogError(mirrorError, "activate-trip.ts");
+    }
     await deps.setCurrentTrip(tripid, hydratedTrip);
     await deps.saveTripDataInStorage(hydratedTrip);
     await deps.saveTravellersInStorage(roster);

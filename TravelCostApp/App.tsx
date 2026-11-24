@@ -1,5 +1,11 @@
 import React from "react";
-import { useContext, useEffect, useState, useLayoutEffect } from "react";
+import {
+  useContext,
+  useEffect,
+  useState,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { View, Keyboard, Platform, AppState } from "react-native";
 import {
   SafeAreaProvider,
@@ -72,6 +78,11 @@ import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import CriticalUpdateHost from "./components/UI/CriticalUpdateHost";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
+import {
+  canAttemptOnlineSetup,
+  initialOnlineSetupBackoff,
+  recordOnlineSetupFailure,
+} from "./util/online-setup-backoff";
 import { isForeground } from "./util/appState";
 import { getFocusedRouteName } from "./util/focused-route-name";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
@@ -86,10 +97,7 @@ import {
 } from "./components/Rating/firstStartUtil";
 import RatingModal from "./screens/RatingModal";
 import NetworkContextProvider from "./store/network-context";
-import {
-  secureStoreGetItem,
-  secureStoreSetItem,
-} from "./store/secure-storage";
+import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
@@ -113,10 +121,7 @@ import {
   VexoUserContext,
 } from "./util/vexo-tracking";
 import { VexoEvents } from "./util/vexo-constants";
-import {
-  activateTrip,
-  activateTripFromLastKnown,
-} from "./util/activate-trip";
+import { activateTrip, activateTripFromLastKnown } from "./util/activate-trip";
 import { getActiveTripId } from "./util/active-trip-id";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./store/mmkv";
 import { Traveller } from "./util/traveler";
@@ -383,7 +388,9 @@ function Navigation() {
     },
   };
 
-  const syncFocusedRoute = (state: Parameters<typeof getFocusedRouteName>[0]) => {
+  const syncFocusedRoute = (
+    state: Parameters<typeof getFocusedRouteName>[0],
+  ) => {
     setFocusedRouteName(getFocusedRouteName(state));
   };
 
@@ -425,7 +432,7 @@ function Home() {
   const expenses = expCtx.expenses;
   const hasExp = expenses?.length > 0;
   const hasExpensesWithSplit = expenses?.some(
-    (exp: ExpenseData) => exp.splitList?.length > 0
+    (exp: ExpenseData) => exp.splitList?.length > 0,
   );
   const validSplitSummary = hasExp && hasExpensesWithSplit;
 
@@ -495,11 +502,11 @@ function Home() {
         />
       )}
       {validSplitSummary && (
-      <BottomTabs.Screen
-        name="Financial"
-        component={SplitSummaryScreen}
-        layout={({ children }) => <UnmountOnBlur>{children}</UnmountOnBlur>}
-        options={{
+        <BottomTabs.Screen
+          name="Financial"
+          component={SplitSummaryScreen}
+          layout={({ children }) => <UnmountOnBlur>{children}</UnmountOnBlur>}
+          options={{
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
             tabBarLabel: i18n.t("financialTab"),
@@ -546,6 +553,9 @@ function Root() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
   const [onlineSetupDone, setOnlineSetupDone] = useState(false);
+  const onlineSetupBackoff = useRef(initialOnlineSetupBackoff());
+  // Set before the first await so a slow tick can't start a second full setup.
+  const onlineSetupInFlight = useRef(false);
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -560,34 +570,48 @@ function Root() {
           await sendOfflineQueue(
             userCtx.isSendingOfflineQueueMutex,
             userCtx.setIsSendingOfflineQueueMutex,
-            { updateExpenseId: expensesCtx.updateExpenseId }
+            { updateExpenseId: expensesCtx.updateExpenseId },
           );
         };
         asyncQueue();
 
         const delayedOnlineSetup = async () => {
-          if (!onlineSetupDone) {
-            const { isFastEnough } = await isConnectionFastEnough();
-            if (isFastEnough) {
-              const storedUid = await secureStoreGetItem("uid");
-              if (!storedUid) return;
-              const checkUser = await fetchUser(storedUid);
-              if (!checkUser) return;
-              const locale = checkUser.locale;
-              if (!locale) {
-                checkUser.locale = i18n.locale;
-                await updateUser(storedUid, checkUser);
+          if (
+            !onlineSetupDone &&
+            !onlineSetupInFlight.current &&
+            canAttemptOnlineSetup(onlineSetupBackoff.current, Date.now())
+          ) {
+            onlineSetupInFlight.current = true;
+            try {
+              const { isFastEnough } = await isConnectionFastEnough();
+              if (isFastEnough) {
+                const storedUid = await secureStoreGetItem("uid");
+                if (!storedUid) return;
+                const checkUser = await fetchUser(storedUid);
+                if (!checkUser) return;
+                const locale = checkUser.locale;
+                if (!locale) {
+                  checkUser.locale = i18n.locale;
+                  await updateUser(storedUid, checkUser);
+                }
+                // Authoritative Active trip id is secure storage (not server guesswork).
+                const tripid = await getActiveTripId();
+                if (!tripid) return;
+                try {
+                  setOnlineSetupDone(true);
+                  await activateTrip(tripid, activateTripDeps(storedUid));
+                  await onlineSetup(checkUser, tripid, storedUid);
+                } catch (error) {
+                  safeLogError(error, "App.tsx delayedOnlineSetup");
+                  onlineSetupBackoff.current = recordOnlineSetupFailure(
+                    onlineSetupBackoff.current,
+                    Date.now(),
+                  );
+                  setOnlineSetupDone(false);
+                }
               }
-              // Authoritative Active trip id is secure storage (not server guesswork).
-              const tripid = await getActiveTripId();
-              if (!tripid) return;
-              try {
-                setOnlineSetupDone(true);
-                await activateTrip(tripid, activateTripDeps(storedUid));
-                await onlineSetup(checkUser, tripid, storedUid);
-              } catch (error) {
-                setOnlineSetupDone(false);
-              }
+            } finally {
+              onlineSetupInFlight.current = false;
             }
           }
         };
@@ -596,7 +620,7 @@ function Root() {
       }
     },
     DEBUG_POLLING_INTERVAL * 1.7,
-    false
+    false,
   );
 
   const showModalIfNeeded = async () => {
@@ -629,13 +653,13 @@ function Root() {
   async function onlineSetup(
     checkUser: UserData,
     storedTripId: string,
-    storedUid: string
+    storedUid: string,
   ) {
     if (!storedTripId || storedTripId.length < 2) {
       return;
     }
-    await loadKeys();
     try {
+      await loadKeys();
       await userCtx.addUserName(checkUser);
       await userCtx.loadCatListFromAsyncInCtx(storedTripId);
       await touchMyTraveler(storedTripId, storedUid);
@@ -648,16 +672,16 @@ function Root() {
     isOfflineMode: boolean,
     storedToken: string,
     storedUid: string,
-    storedTripId: string
+    storedTripId: string,
   ) {
     if (!isOfflineMode) {
       return null;
     }
     try {
       await userCtx.loadUserNameFromStorage();
-      const lastKnownTrip = getMMKVObject(MMKV_KEYS.CURRENT_TRIP) as
-        | TripData
-        | null;
+      const lastKnownTrip = getMMKVObject(
+        MMKV_KEYS.CURRENT_TRIP,
+      ) as TripData | null;
       if (!lastKnownTrip) {
         // No cached trip payload — fall back to storage loaders rather than
         // hydrating an empty shell through the activate seam.
@@ -682,8 +706,8 @@ function Root() {
           },
           // Omit server mirror — offline must not call updateUser.
           (({ updateUser: _skip, ...rest }) => rest)(
-            activateTripDeps(storedUid)
-          )
+            activateTripDeps(storedUid),
+          ),
         );
       }
       await userCtx.loadCatListFromAsyncInCtx("async");
@@ -712,8 +736,8 @@ function Root() {
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(
             () => reject(new Error("loadKeys timeout after 5 seconds")),
-            5000
-          )
+            5000,
+          ),
         );
 
         const keys = (await Promise.race([

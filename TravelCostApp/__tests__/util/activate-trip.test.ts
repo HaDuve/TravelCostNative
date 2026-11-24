@@ -186,4 +186,38 @@ describe("activateTrip", () => {
     expect(expensesState).toEqual(fullLedger);
     expect(expensesState).toHaveLength(3);
   });
+
+  it("keeps the downloaded ledger when the server currentTrip mirror PATCH fails", async () => {
+    let secureCurrentTripId: string | null = "trip-a";
+    let expensesState: ExpenseData[] = [];
+    const ledger = [expense("e-x1", "ramen"), expense("e-x2", "hotel")];
+
+    await expect(
+      activateTrip("trip-x", {
+        uid: "u1",
+        fetchTrip: async () => tripX(),
+        getTravellers: async () => [{ uid: "u1", userName: "Alice" }],
+        getAllExpenses: async () => ledger,
+        updateUser: async () => {
+          throw new Error("error while updating user");
+        },
+        secureStoreGetItem: async () => secureCurrentTripId,
+        secureStoreSetItem: async (key, value) => {
+          if (key === "currentTripId") secureCurrentTripId = value;
+        },
+        setCurrentTrip: async () => {},
+        saveTripDataInStorage: async () => {},
+        saveTravellersInStorage: async () => {},
+        setExpenses: (expenses) => {
+          expensesState = expenses;
+        },
+        setExpensesCache: () => {},
+        setFreshlyCreatedTo: async () => {},
+      })
+    ).resolves.toMatchObject({ tripid: "trip-x" });
+
+    expect(secureCurrentTripId).toBe("trip-x");
+    expect(expensesState).toEqual(ledger);
+  });
 });
+

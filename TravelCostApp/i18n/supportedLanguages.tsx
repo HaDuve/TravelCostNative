@@ -238,6 +238,7 @@ const en = {
 
   // Login and Signup Screen
   noConnection: "No internet connection",
+  toastAuthSyncFailed: "Could not sync expenses because of a sign-in problem. Your changes are kept on this device.",
   checkConnectionError: "Please check your internet connection and try again",
   exceptionError: "Exceptional Error",
   authError: "Authentication failed!",
@@ -934,6 +935,7 @@ const de = {
 
   // Login and Signup Screen
   noConnection: "Keine Internetverbindung",
+  toastAuthSyncFailed: "Ausgaben konnten wegen eines Anmeldeproblems nicht synchronisiert werden. Deine Änderungen bleiben auf diesem Gerät gespeichert.",
   checkConnectionError:
     "Bitte überprüfe deine Internetverbindung und versuche es erneut",
   exceptionError: "Außergewöhnlicher Fehler",
@@ -1665,6 +1667,7 @@ const fr = {
 
   // Login and Signup Screen
   noConnection: "Pas de connexion internet",
+  toastAuthSyncFailed: "Impossible de synchroniser les dépenses à cause d'un problème de connexion au compte. Vos modifications restent sur cet appareil.",
   checkConnectionError:
     "Veuillez vérifier votre connexion internet et réessayer",
   exceptionError: "Erreur exceptionnelle",
@@ -2386,6 +2389,7 @@ const ru = {
 
   // Login and Signup Screen
   noConnection: "Отсутствует подключение к интернету",
+  toastAuthSyncFailed: "Не удалось синхронизировать расходы из-за проблемы со входом в аккаунт. Ваши изменения сохранены на этом устройстве.",
   checkConnectionError:
     "Пожалуйста, проверьте ваше интернет-соединение и попробуйте еще раз",
   exceptionError: "Исключительная ошибка",

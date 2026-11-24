@@ -1,3 +1,5 @@
+import { isAuthFailureError } from "./auth-failure";
+
 const DEFAULT_DELAYS_MS = [1000, 2000, 4000];
 
 function sleep(ms: number): Promise<void> {
@@ -16,6 +18,9 @@ export async function withRetries<T>(
     try {
       return await fn();
     } catch (error) {
+      // Retrying cannot fix a missing or rejected token: fail fast so the
+      // caller can queue the item.
+      if (isAuthFailureError(error)) throw error;
       lastError = error;
       if (attempt < maxAttempts - 1) {
         await sleep(delaysMs[attempt] ?? delaysMs[delaysMs.length - 1]);

@@ -16,7 +16,7 @@ TravelCostApp/
 │   ├── src/
 │   │   └── index.ts          # Main functions file
 │   └── lib/                  # Compiled JavaScript (auto-generated)
-└── .rules                    # Database security rules
+└── database.rules.json       # Database security rules (see rtdb-rules.md)
 ```
 
 ## Prerequisites

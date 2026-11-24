@@ -33,3 +33,12 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Set up Java for the Database emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Run database rules tests
+        run: pnpm test:rules

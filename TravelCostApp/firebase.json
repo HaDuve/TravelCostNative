@@ -12,6 +12,12 @@
     }
   ],
   "database": {
-    "rules": ".rules"
+    "rules": "database.rules.json"
+  },
+  "emulators": {
+    "database": {
+      "host": "127.0.0.1",
+      "port": 9000
+    }
   }
 }

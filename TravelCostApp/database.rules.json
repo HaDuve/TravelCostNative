@@ -1,15 +1,42 @@
 {
   "rules": {
-    ".read": "auth != null",
-    ".write": "auth != null",
+    "server": {
+      "$key": {
+        ".read": "auth != null"
+      },
+      "feedback": {
+        "$feedbackId": {
+          ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid"
+        }
+      }
+    },
     "trips": {
       "$tripId": {
+        ".read": "auth != null && data.child('members').child(auth.uid).val() === true",
+        ".write": "auth != null && (data.child('members').child(auth.uid).val() === true || (!data.exists() && newData.child('members').child(auth.uid).val() === true))",
+        "members": {
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid && newData.val() === true && root.child('trips').child($tripId).exists()"
+          }
+        },
+        "tripName": {
+          ".read": "auth != null"
+        },
         "$userId": {
           "expenses": {
             ".indexOn": [
               "serverTimestamp"
             ]
           }
+        }
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && $uid === auth.uid",
+        ".write": "auth != null && $uid === auth.uid",
+        "userName": {
+          ".read": "auth != null"
         }
       }
     }

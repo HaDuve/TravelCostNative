@@ -25,6 +25,7 @@ import { getActiveTripId } from "./active-trip-id";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
 import { getValidIdToken } from "./firebase-auth";
+import { secureStoreGetItem } from "../store/secure-storage";
 import {
   getLastFetchTimestamp,
   setLastFetchTimestamp,
@@ -72,8 +73,27 @@ export const dataResponseTime = (func) => {
   };
 };
 
+/**
+ * Config keys the app reads from `server/`. Each is fetched as its own leaf:
+ * `server/feedback` sits next to them and is not readable by Travellers, so
+ * the whole `server` node cannot be read in one request.
+ */
+export const SERVER_CONFIG_KEYS = [
+  "REVCAT_G",
+  "REVCAT_A",
+  "OPENAI",
+  "EXCHANGE",
+  "FREEEXCHANGE",
+  "BRAN",
+  "VEXO",
+] as const;
+
+export type ServerConfigKey = (typeof SERVER_CONFIG_KEYS)[number];
+
 // fetch server info
-export const fetchServerInfo = async () => {
+export const fetchServerInfo = async (): Promise<Partial<
+  Record<ServerConfigKey, string>
+> | null> => {
   try {
     const authToken = await getValidIdToken();
     if (!authToken) {
@@ -81,17 +101,21 @@ export const fetchServerInfo = async () => {
       return null;
     }
 
-    const response = await axios.get(
-      `${BACKEND_URL}/server.json?auth=${authToken}`,
-      {
-        timeout: AXIOS_TIMOUT_LONG,
-      }
+    const responses = await Promise.all(
+      SERVER_CONFIG_KEYS.map((key) =>
+        axios.get(`${BACKEND_URL}/server/${key}.json?auth=${authToken}`, {
+          timeout: AXIOS_TIMOUT_LONG,
+        })
+      )
     );
 
-    // Process the response data here
-    if (!response) throw new Error("No response from server");
-    const data = response?.data;
-    if (!data) throw new Error("No data on the server");
+    const data: Partial<Record<ServerConfigKey, string>> = {};
+    SERVER_CONFIG_KEYS.forEach((key, index) => {
+      const value = responses[index]?.data;
+      if (value != null) data[key] = value;
+    });
+    if (Object.keys(data).length === 0)
+      throw new Error("No data on the server");
     return data;
   } catch (error) {
     safeLogError(error);
@@ -99,7 +123,6 @@ export const fetchServerInfo = async () => {
   }
 };
 
-// fetch categories function from /trips/tripid/categories
 export async function fetchCategories(tripid: string) {
   try {
     const authToken = await getValidIdToken();
@@ -634,8 +657,31 @@ export async function fetchUser(uid: string) {
   }
 }
 
-export async function storeTrip(tripData: TripData) {
+/**
+ * Trip membership is the access check in the database rules: only uids under
+ * `trips/<tripid>/members` can read or write a trip. Holding the trip id (the
+ * invite link) lets a signed-in user add themselves, so joining by invite keeps
+ * working.
+ */
+const ensuredTripMemberships = new Set<string>();
+
+function tripMembershipKey(tripid: string, uid: string) {
+  return `${tripid}/${uid}`;
+}
+
+/** Test seam: forget which memberships were written this session. */
+export function resetEnsuredTripMemberships() {
+  ensuredTripMemberships.clear();
+}
+
+/**
+ * Creates a trip. The creating Traveller is written to `members` in the same
+ * request: the database rules only let a signed-in user create a trip that
+ * lists them as a member.
+ */
+export async function storeTrip(tripData: TripData, creatorUid: string) {
   try {
+    if (!creatorUid) throw new Error("storeTrip requires the creator's uid");
     const authToken = await getValidIdToken();
     if (!authToken) {
       console.warn("[HTTP] No valid auth token for storeTrip");
@@ -644,9 +690,10 @@ export async function storeTrip(tripData: TripData) {
 
     const response = await axios.post(
       `${BACKEND_URL}/trips.json?auth=${authToken}`,
-      tripData
+      { ...tripData, members: { [creatorUid]: true } }
     );
     const id = response.data.name;
+    if (id) ensuredTripMemberships.add(tripMembershipKey(id, creatorUid));
     return id;
   } catch (error) {
     throw new Error("error while storing trip");
@@ -675,9 +722,45 @@ export async function updateTrip(tripid: string, tripData: TripData) {
   }
 }
 
+/**
+ * Writes `trips/<tripid>/members/<uid> = true` once per app session. Called
+ * before a trip is loaded, so a Traveller whose membership predates the
+ * `members` index (or was missed by the backfill) regains access on their own.
+ * Returns false instead of throwing; the following read reports the failure.
+ */
+export async function ensureTripMembership(
+  tripid: string,
+  uid?: string
+): Promise<boolean> {
+  if (!tripid) return false;
+  try {
+    const memberUid = uid || (await secureStoreGetItem("uid"));
+    if (!memberUid) return false;
+    const key = tripMembershipKey(tripid, memberUid);
+    if (ensuredTripMemberships.has(key)) return true;
+
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for ensureTripMembership");
+      return false;
+    }
+
+    await axios.put(
+      `${BACKEND_URL}/trips/${tripid}/members/${memberUid}.json?auth=${authToken}`,
+      true
+    );
+    ensuredTripMemberships.add(key);
+    return true;
+  } catch (error) {
+    safeLogError(error);
+    return false;
+  }
+}
+
 export async function fetchTrip(tripid: string): Promise<TripData> {
   if (!tripid) return null;
   try {
+    await ensureTripMembership(tripid);
     const authToken = await getValidIdToken();
     if (!authToken) {
       console.warn("[HTTP] No valid auth token for fetchTrip");
@@ -962,13 +1045,14 @@ export async function fetchUserName(userId: string): Promise<string> {
       return null;
     }
 
+    // Only `userName` is readable on another user's node.
     const response = await axios.get(
-      `${BACKEND_URL}/users/${userId}.json?auth=${authToken}`,
+      `${BACKEND_URL}/users/${userId}/userName.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
     );
-    return response.data.userName;
+    return response.data;
   } catch (error) {
     safeLogError(error);
   }

@@ -14,7 +14,9 @@ import {
   resolveJoinImplicitDefaultDecision,
 } from "../util/join-implicit-default";
 import {
+  ensureTripMembership,
   fetchTrip,
+  fetchTripName,
   getAllExpenses,
   storeTripHistory,
   updateUser,
@@ -26,7 +28,7 @@ import {
 } from "../util/http";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
-import { TripContext, TripData } from "../store/trip-context";
+import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import Input from "../components/Auth/Input";
 import { i18n } from "../i18n/i18n";
@@ -70,7 +72,6 @@ const JoinTrip = ({ navigation, route }) => {
   let tripid = route.params ? route.params.id : "";
   const [clickedOnLink, setClickedOnLink] = useState(tripid ? true : false);
   const [joinTripid, setJoinTripid] = useState("");
-  const [tripdata, setTripdata] = useState<TripData>({});
   const [tripName, setTripName] = useState("");
   const [freshLink, setFreshLink] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
@@ -89,10 +90,10 @@ const JoinTrip = ({ navigation, route }) => {
       setFreshLink(false);
       let tripName = "";
       try {
-        const trip = await fetchTrip(tripID);
-        tripName = trip?.tripName;
-        setTripName(trip?.tripName);
-        setTripdata(trip ?? {});
+        // Before joining, only the trip name is readable (database rules).
+        tripName = await fetchTripName(tripID);
+        if (!tripName) throw new Error("trip not found");
+        setTripName(tripName);
         setClickedOnLink(true);
       } catch (e) {
         Alert.alert(
@@ -161,6 +162,11 @@ const JoinTrip = ({ navigation, route }) => {
 
       tripid = joinTripid || tripid;
 
+      // Membership grants read access to the trip; write it before any read.
+      if (!(await ensureTripMembership(tripid, uid))) {
+        throw new Error("could not join trip");
+      }
+
       // if fresh store history else update
       if (userCtx.freshlyCreated) {
         await storeTripHistory(uid, [tripid]);
@@ -187,7 +193,6 @@ const JoinTrip = ({ navigation, route }) => {
       try {
         await activateTrip(tripid, {
           uid,
-          tripData: tripdata,
           previousTripSnapshot: tripCtx.getcurrentTrip(),
           previousExpensesSnapshot: expenseCtx.expenses,
           fetchTrip,
@@ -239,7 +244,6 @@ const JoinTrip = ({ navigation, route }) => {
   }
 
   async function joinLinkHandler() {
-    setTripdata({});
     setTripName("");
     if (joinTripid?.length > 25) {
       // find the tripid from long string

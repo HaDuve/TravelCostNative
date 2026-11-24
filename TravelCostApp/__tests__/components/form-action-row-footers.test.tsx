@@ -16,6 +16,8 @@ jest.mock("../../util/http", () => ({
   })),
   updateTripHistory: jest.fn(),
   updateTrip: jest.fn(),
+  fetchTripName: jest.fn(async () => "Beach budget"),
+  ensureTripMembership: jest.fn(async () => true),
   getAllExpenses: jest.fn(async () => []),
   getTravellers: jest.fn(async () => [{ uid: "u1", userName: "Alice" }]),
   putTravelerInTrip: jest.fn(),

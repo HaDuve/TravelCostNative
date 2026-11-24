@@ -98,6 +98,35 @@ let inFlightTokenRequest: {
 } | null = null;
 
 /**
+ * Token to retry with after RTDB rejected `rejectedToken` (401/403). Reuses a
+ * token another caller already stored; otherwise shares one refresh for this
+ * account generation.
+ */
+export function refreshIdTokenAfterRejection(
+  rejectedToken: string
+): Promise<string | null> {
+  return resolveAfterRejection(rejectedToken);
+}
+
+async function resolveAfterRejection(
+  rejectedToken: string
+): Promise<string | null> {
+  const generation = authGeneration;
+  const storedToken = await secureStoreGetItem("token");
+  if (storedToken && storedToken !== rejectedToken) return storedToken;
+  return sharedRefresh(generation);
+}
+
+/** True while a refresh token or password credentials remain stored. */
+export async function hasStoredCredentials(): Promise<boolean> {
+  const refreshToken = await secureStoreGetItem("refreshToken");
+  if (refreshToken) return true;
+  const email = await secureStoreGetItem("ENCM");
+  const password = await secureStoreGetItem("ENCP");
+  return !!email && !!password;
+}
+
+/**
  * Get valid Firebase ID token, refreshing if necessary.
  * A still-valid token is returned directly. Only the refresh and re-auth
  * branch is shared between concurrent callers of the same account.

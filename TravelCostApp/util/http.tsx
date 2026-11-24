@@ -26,6 +26,8 @@ import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
 import { getValidIdToken } from "./firebase-auth";
 import { secureStoreGetItem } from "../store/secure-storage";
+import { withAuthToken } from "./authed-request";
+import { AuthFailureError, isAuthFailureError } from "./auth-failure";
 import {
   getLastFetchTimestamp,
   setLastFetchTimestamp,
@@ -194,26 +196,22 @@ export async function storeExpense(
   expenseData: ExpenseData
 ) {
   try {
-    const authToken = await getValidIdToken();
-    if (!authToken) {
-      console.warn("[HTTP] No valid auth token for storeExpense");
-      return null;
-    }
+    return await withAuthToken("storeExpense", async (authToken) => {
+      // Add serverTimestamp to expense data
+      const expenseDataWithTimestamp = {
+        ...toExpenseOnline(expenseData),
+        [SERVER_TIMESTAMP_FIELD]: Date.now(),
+      };
 
-    // Add serverTimestamp to expense data
-    const expenseDataWithTimestamp = {
-      ...toExpenseOnline(expenseData),
-      [SERVER_TIMESTAMP_FIELD]: Date.now(),
-    };
-
-    const response = await axios.post(
-      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
-      expenseDataWithTimestamp
-    );
-    const id: string = response.data.name;
-    return id;
+      const response = await axios.post(
+        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
+        expenseDataWithTimestamp
+      );
+      const id: string = response.data.name;
+      return id;
+    });
   } catch (error) {
-    safeLogError(error);
+    if (!isAuthFailureError(error)) safeLogError(error);
     throw error;
   }
 }
@@ -225,25 +223,21 @@ export async function storeExpenseWithId(
   expenseData: ExpenseData
 ) {
   try {
-    const authToken = await getValidIdToken();
-    if (!authToken) {
-      safeLogError("[HTTP] No valid auth token for storeExpenseWithId");
-      throw new Error("No valid auth token for storeExpenseWithId");
-    }
+    await withAuthToken("storeExpenseWithId", async (authToken) => {
+      // Add serverTimestamp to expense data
+      const expenseDataWithTimestamp = {
+        ...toExpenseOnline(expenseData),
+        [SERVER_TIMESTAMP_FIELD]: Date.now(),
+      };
 
-    // Add serverTimestamp to expense data
-    const expenseDataWithTimestamp = {
-      ...toExpenseOnline(expenseData),
-      [SERVER_TIMESTAMP_FIELD]: Date.now(),
-    };
-
-    await axios.put(
-      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-      expenseDataWithTimestamp
-    );
+      await axios.put(
+        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+        expenseDataWithTimestamp
+      );
+    });
     return id;
   } catch (error) {
-    safeLogError(error);
+    if (!isAuthFailureError(error)) safeLogError(error);
     throw error;
   }
 }
@@ -330,33 +324,30 @@ async function fetchExpensesWithUIDsOnce(
   let latestTimestamp = 0;
   let anyUidFailed = false;
   let firstError: unknown;
+  let authFailure: AuthFailureError | undefined;
 
   // Notify sync start
   loadingCallback?.onStart?.();
 
-  const authToken = await getValidIdToken();
-  if (!authToken) {
-    loadingCallback?.onComplete?.();
-    return [];
-  }
-
   // check devices sync status (only fetch new data)
   const lastFetch = getLastFetchTimestamp(tripid);
   const isFirstFetch = lastFetch === 0;
+  const shouldFilter = useDelta && !isFirstFetch;
 
   for (let i = 0; i < uidlist.length; i++) {
     const uid = uidlist[i];
     try {
-      let userExpenses: ExpenseData[] = [];
-      const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`;
-      const allDataUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
-      const shouldFilter = useDelta && !isFirstFetch;
-      const url = shouldFilter ? serverFilteredUrl : allDataUrl;
-
-      const response = await axios.get(url, {
-        timeout: AXIOS_TIMOUT_LONG,
-      });
-      userExpenses = processExpenseResponse(response.data);
+      const response = await withAuthToken(
+        "fetchExpensesWithUIDs",
+        (authToken) => {
+          const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`;
+          const allDataUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+          return axios.get(shouldFilter ? serverFilteredUrl : allDataUrl, {
+            timeout: AXIOS_TIMOUT_LONG,
+          });
+        }
+      );
+      const userExpenses = processExpenseResponse(response.data);
 
       if (userExpenses.length > 0) {
         // Hybrid approach: Use serverTimestamp (preferred) with editedTimestamp fallback for backward compatibility
@@ -376,11 +367,22 @@ async function fetchExpensesWithUIDsOnce(
 
       expenses.push(...userExpenses);
     } catch (error) {
+      if (isAuthFailureError(error)) {
+        authFailure ??= error as AuthFailureError;
+      } else {
+        safeLogError(error);
+      }
       anyUidFailed = true;
       firstError ??= error;
-      safeLogError(error);
     }
   }
+
+  // An auth failure is reported, never shown as an empty ledger, and moves nothing.
+  if (authFailure) {
+    loadingCallback?.onComplete?.();
+    throw authFailure;
+  }
+
   // A failed full replace throws below and must not move lastFetch. Delta polls
   // keep advancing, otherwise one permanently failing Traveller would pin
   // lastFetch and every poll would re-download everything since then.
@@ -451,27 +453,15 @@ export async function fetchExpenses(
 
     const lastFetch = getLastFetchTimestamp(tripid);
     const isFirstFetch = lastFetch === 0;
+    const shouldFilter = useDelta && !isFirstFetch;
 
-    const authToken = await getValidIdToken();
-    if (!authToken) {
-      return [];
-    }
-
-    let expenses: ExpenseData[] = [];
-
-    if (useDelta && !isFirstFetch) {
-      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`;
-      const response = await axios.get(url, {
-        timeout: AXIOS_TIMOUT_LONG,
-      });
-      expenses = processExpenseResponse(response.data);
-    } else {
-      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
-      const response = await axios.get(url, {
-        timeout: AXIOS_TIMOUT_LONG,
-      });
-      expenses = processExpenseResponse(response.data);
-    }
+    const response = await withAuthToken("fetchExpenses", (authToken) => {
+      const url = shouldFilter
+        ? `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`
+        : `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+      return axios.get(url, { timeout: AXIOS_TIMOUT_LONG });
+    });
+    const expenses: ExpenseData[] = processExpenseResponse(response.data);
 
     if (expenses.length > 0) {
       // Hybrid approach: Use serverTimestamp (preferred) with editedTimestamp fallback for backward compatibility
@@ -491,8 +481,10 @@ export async function fetchExpenses(
     loadingCallback?.onComplete?.();
     return expenses;
   } catch (error) {
-    safeLogError(error);
+    if (!isAuthFailureError(error)) safeLogError(error);
     loadingCallback?.onComplete?.();
+    // An auth failure is reported, not shown as an empty ledger.
+    if (isAuthFailureError(error)) throw error;
     return [];
   }
 }
@@ -512,25 +504,21 @@ export async function updateExpense(
   expenseData: ExpenseData
 ) {
   try {
-    const authToken = await getValidIdToken();
-    if (!authToken) {
-      console.warn("[HTTP] No valid auth token for updateExpense");
-      return null;
-    }
+    return await withAuthToken("updateExpense", (authToken) => {
+      // Add serverTimestamp to expense data
+      const expenseDataWithTimestamp = {
+        ...toExpenseOnline(expenseData),
+        [SERVER_TIMESTAMP_FIELD]: Date.now(),
+      };
 
-    // Add serverTimestamp to expense data
-    const expenseDataWithTimestamp = {
-      ...toExpenseOnline(expenseData),
-      [SERVER_TIMESTAMP_FIELD]: Date.now(),
-    };
-
-    const response = await axios.put(
-      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-      expenseDataWithTimestamp
-    );
-    return response;
+      return axios.put(
+        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+        expenseDataWithTimestamp
+      );
+    });
   } catch (error) {
-    safeLogError(error);
+    if (!isAuthFailureError(error)) safeLogError(error);
+    throw error;
   }
 }
 
@@ -543,25 +531,21 @@ export async function updateExpense(
  */
 export async function deleteExpense(tripid: string, uid: string, id: string) {
   try {
-    const authToken = await getValidIdToken();
-    if (!authToken) {
-      console.warn("[HTTP] No valid auth token for deleteExpense");
-      return null;
-    }
-
     // Soft delete: mark as deleted instead of removing
     const deletionData = {
       isDeleted: true,
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 
-    const response = await axios.patch(
-      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-      deletionData
+    return await withAuthToken("deleteExpense", (authToken) =>
+      axios.patch(
+        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+        deletionData
+      )
     );
-    return response;
   } catch (error) {
-    safeLogError(error);
+    if (!isAuthFailureError(error)) safeLogError(error);
+    throw error;
   }
 }
 
@@ -570,24 +554,20 @@ export async function deleteExpense(tripid: string, uid: string, id: string) {
  */
 export async function restoreExpense(tripid: string, uid: string, id: string) {
   try {
-    const authToken = await getValidIdToken();
-    if (!authToken) {
-      console.warn("[HTTP] No valid auth token for restoreExpense");
-      return null;
-    }
-
     const restoreData = {
       isDeleted: false,
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 
-    const response = await axios.patch(
-      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
-      restoreData,
+    return await withAuthToken("restoreExpense", (authToken) =>
+      axios.patch(
+        `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+        restoreData
+      )
     );
-    return response;
   } catch (error) {
-    safeLogError(error);
+    if (!isAuthFailureError(error)) safeLogError(error);
+    throw error;
   }
 }
 

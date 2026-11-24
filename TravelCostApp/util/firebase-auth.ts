@@ -34,10 +34,14 @@ async function refreshIdToken(refreshToken: string): Promise<string | null> {
       refresh_token: refreshToken,
     });
 
-    const { access_token, expires_in } = response.data;
+    const { access_token, expires_in, refresh_token } = response.data;
 
     // Store the new token and expiration
     await secureStoreSetItem("token", access_token);
+    if (refresh_token) {
+      // The Token Service may rotate the refresh token; keep the latest one
+      await secureStoreSetItem("refreshToken", refresh_token);
+    }
     await secureStoreSetItem(
       "tokenExpiry",
       (Date.now() + parseInt(expires_in) * 1000).toString()
@@ -55,9 +59,25 @@ async function refreshIdToken(refreshToken: string): Promise<string | null> {
 }
 
 /**
- * Get valid Firebase ID token, refreshing if necessary
+ * In-flight token retrieval shared by concurrent callers, so that when the
+ * token expires only one refresh (or password sign-in) hits the network.
  */
-export async function getValidIdToken(): Promise<string | null> {
+let inFlightTokenRequest: Promise<string | null> | null = null;
+
+/**
+ * Get valid Firebase ID token, refreshing if necessary.
+ * Concurrent callers share one in-flight refresh or sign-in.
+ */
+export function getValidIdToken(): Promise<string | null> {
+  if (!inFlightTokenRequest) {
+    inFlightTokenRequest = resolveValidIdToken().finally(() => {
+      inFlightTokenRequest = null;
+    });
+  }
+  return inFlightTokenRequest;
+}
+
+async function resolveValidIdToken(): Promise<string | null> {
   try {
     const currentToken = await secureStoreGetItem("token");
     const tokenExpiry = await secureStoreGetItem("tokenExpiry");

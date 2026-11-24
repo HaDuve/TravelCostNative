@@ -426,3 +426,46 @@ describe("server", () => {
     expect(await readAdmin("/server/feedback/fb-1/feedbackString")).toBe("Great app");
   });
 });
+
+describe("legacy trips after the membership backfill", () => {
+  const { buildTripMembersUpdate } = require("../scripts/backfill-trip-members");
+
+  const LEGACY = {
+    trips: {
+      legacy: {
+        tripName: "Old trip",
+        travellers: { "-Npushkey": { uid: "old-alice", userName: "Alice" } },
+        "old-bob": { expenses: { e1: { amount: 3, serverTimestamp: 1 } } },
+      },
+    },
+    users: {
+      "old-carol": { userName: "Carol", tripHistory: ["legacy"] },
+    },
+  };
+
+  beforeEach(async () => {
+    await testEnv.clearDatabase();
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.database().ref("/").set(LEGACY);
+    });
+  });
+
+  test("before the backfill, legacy Travellers are locked out", async () => {
+    await assertFails(dbAs("old-alice").ref("/trips/legacy/travellers").once("value"));
+  });
+
+  test("after the backfill, every legacy Traveller reads the ledger and others do not", async () => {
+    const { update } = buildTripMembersUpdate(LEGACY.users, LEGACY.trips);
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.database().ref("/").update(update);
+    });
+
+    for (const uid of ["old-alice", "old-bob", "old-carol"]) {
+      await assertSucceeds(
+        dbAs(uid).ref("/trips/legacy/old-bob/expenses").once("value")
+      );
+    }
+    await assertFails(dbAs(OUTSIDER_UID).ref("/trips/legacy/travellers").once("value"));
+    expect(await readAdmin("/trips/legacy/tripName")).toBe("Old trip");
+  });
+});

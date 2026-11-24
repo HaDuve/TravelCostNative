@@ -35,32 +35,34 @@ pnpm test:rules
 pnpm deploy:rules
 ```
 
-To roll back, restore the previous rules file and deploy it:
-
-```bash
-git checkout <previous-commit> -- database.rules.json && pnpm deploy:rules
-```
+To roll back to the rules from before #426 (signed-in only), run `scripts/rtdb-rollout.sh rollback`. It deploys that rules file from git without touching your working tree.
 
 Older app versions read `server` as a whole. After the deploy that read fails, and they fall back to the config keys they have already cached.
 
 ## Rolling out trip-membership rules (#426)
 
-1. Ship the app update (OTA) that writes `members`. Wait until it has reached most active devices. Older app versions do not write membership. After the deploy, they can still use trips that have a membership, but they cannot create or join trips.
-2. Backfill `members` for existing trips from Traveller rosters, Expense owners and users' trip history:
+`scripts/rtdb-rollout.sh` runs every production step, from `TravelCostApp/` on an up-to-date `main`. Each step that changes production shows what it will do and asks first.
+
+1. Publish the app update (OTA) that writes `members` (`/update-budget-app`). The `1.3.005r!` entry is critical, so it force-applies. Wait until most active devices have it. Older app versions can still use trips they are a member of after the deploy, but cannot create or join trips.
+2. Log in and run the read-only checks (clean `main`, Java 21+, firebase login, token refresh allowed, anonymous access refused):
    ```bash
-   firebase database:get /users > /tmp/users.json
+   pnpm dlx firebase-tools@15.5.1 login
    ```
    ```bash
-   firebase database:get /trips > /tmp/trips.json
+   scripts/rtdb-rollout.sh preflight
    ```
+3. Back up the database and backfill memberships from Traveller rosters, Expense owners and users' trip history. This only adds; re-running is safe:
    ```bash
-   node scripts/backfill-trip-members.js /tmp/users.json /tmp/trips.json > /tmp/members-update.json
+   scripts/rtdb-rollout.sh backfill
    ```
-   Review the summary on stderr and spot-check the output, then apply:
+4. Deploy: this runs preflight, a fresh backfill and the emulator tests, shows the rules, deploys, and verifies anonymous access is refused:
    ```bash
-   firebase database:update / /tmp/members-update.json
+   scripts/rtdb-rollout.sh deploy
    ```
-   The backfill only adds memberships, so it is safe to re-run just before the deploy.
-3. Deploy with `pnpm deploy:rules`.
-4. Watch it: run `firebase database:profile` and check the Permission Denied counts and the `[AUTH-FAILURE]` logs for 48 h.
-5. If Travellers are locked out, roll back (see above), re-run the backfill, and investigate.
+5. Watch for 48 h: Permission Denied counts in `pnpm dlx firebase-tools@15.5.1 database:profile`, the `[AUTH-FAILURE]` logs, and the RTDB downloads graph.
+6. If Travellers are locked out:
+   ```bash
+   scripts/rtdb-rollout.sh rollback
+   ```
+
+Backups and update files are kept in `~/rtdb-rollout/<timestamp>/`.

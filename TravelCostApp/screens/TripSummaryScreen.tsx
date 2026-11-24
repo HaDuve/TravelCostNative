@@ -200,9 +200,15 @@ const TripSummaryScreen = ({ navigation }) => {
       currency = tripData.tripCurrency;
       totalBudget += Number(tripData.totalBudget);
 
-      const expenses = isContextTrip
-        ? expCtx.expenses
-        : await getAllExpensesData(trip.tripid);
+      let expenses: ExpenseData[] | null = null;
+      try {
+        expenses = isContextTrip
+          ? expCtx.expenses
+          : await getAllExpensesData(trip.tripid);
+      } catch (error) {
+        // A failed full read skips this trip instead of aborting the summary.
+        safeLogError(error);
+      }
 
       if (!expenses) {
         safeLogError(

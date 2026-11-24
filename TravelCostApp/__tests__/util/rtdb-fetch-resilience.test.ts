@@ -74,20 +74,20 @@ describe("fetchExpensesWithUIDs", () => {
     expect(getLastFetchTimestamp(TRIP)).toBe(0);
   });
 
-  it("delta fetch tolerates a failing Traveller without advancing past it", async () => {
+  it("a permanently failing Traveller does not pin lastFetch on delta polls", async () => {
     const { db } = setup();
     const http = require("../../util/http");
     await http.fetchExpensesWithUIDs(TRIP, [ME, OTHER], false);
     const { getLastFetchTimestamp } = require("../../util/last-fetch-timestamp");
     const before = getLastFetchTimestamp(TRIP);
+    const exp = db.root.trips[TRIP][ME].expenses;
+    exp["-new"] = { ...Object.values(exp)[0], serverTimestamp: before + 1000, editedTimestamp: String(before + 1000) };
     const realGet = db.axiosImpl.get;
     db.axiosImpl.get = async (url: string) => {
-      if (url.includes(`/${OTHER}/expenses`)) throw new Error("timeout");
+      if (url.includes(`/${OTHER}/expenses`)) throw new Error("denied");
       return realGet(url);
     };
-    await expect(
-      http.fetchExpensesWithUIDs(TRIP, [ME, OTHER], true)
-    ).resolves.toBeDefined();
-    expect(getLastFetchTimestamp(TRIP)).toBe(before);
+    await http.fetchExpensesWithUIDs(TRIP, [ME, OTHER], true);
+    expect(getLastFetchTimestamp(TRIP)).toBe(before + 1000);
   });
 });

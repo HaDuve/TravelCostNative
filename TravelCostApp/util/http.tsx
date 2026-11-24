@@ -358,8 +358,10 @@ async function fetchExpensesWithUIDsOnce(
       safeLogError(error);
     }
   }
-  // One lastFetch per trip: never advance it past a Traveller we failed to read.
-  if (latestTimestamp > 0 && !anyUidFailed) {
+  // A failed full replace throws below and must not move lastFetch. Delta polls
+  // keep advancing, otherwise one permanently failing Traveller would pin
+  // lastFetch and every poll would re-download everything since then.
+  if (latestTimestamp > 0 && (useDelta || !anyUidFailed)) {
     setLastFetchTimestamp(tripid, latestTimestamp);
   }
 

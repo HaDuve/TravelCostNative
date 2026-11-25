@@ -150,4 +150,33 @@ describe("split history for delete and undo", () => {
 
     expect(historyOf(deleteExpenseOnlineOffline as jest.Mock)).toHaveLength(0);
   });
+
+  it("deleting and undoing one day of a range labels both entries with the whole range", async () => {
+    const trip = makeTrip(["Alice", "Bob"]);
+    const days = addExpense(
+      trip,
+      buildExpense(trip, { amount: 30, whoPaid: "Alice", description: "Hostel" }),
+      { dates: [day(1), day(2), day(3)], rangeId: "r1" }
+    );
+    const ctx = expenseCtxFor(trip);
+    await deleteUserExpenses({
+      tripid: "t1",
+      targets: collectUserDeleteTargets("t1", trip.expenses, [days[1].id as string]).filter(
+        (t) => t.id === days[1].id
+      ),
+      isOnline: true,
+      expenseCtx: ctx,
+      history: {
+        expenses: ctx.expenses,
+        tripCurrency: trip.tripCurrency,
+        isPaidTimestamp: trip.isPaidTimestamp,
+        author,
+      },
+    });
+    await userUndo();
+
+    const range = { rangeId: "r1", startDate: "2026-01-01", endDate: "2026-01-03" };
+    expect(historyOf(deleteExpenseOnlineOffline as jest.Mock)[0].range).toEqual(range);
+    expect(historyOf(restoreExpenseOnlineOffline as jest.Mock)[0].range).toEqual(range);
+  });
 });

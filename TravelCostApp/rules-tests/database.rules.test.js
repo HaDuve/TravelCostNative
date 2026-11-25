@@ -567,6 +567,12 @@ describe("split history", () => {
     ["a day without a date", { days: [{ balanceChanges: [{ userName: "A", amount: 1 }] }] }],
     ["a day without balance changes", { days: [{ date: "2026-01-01" }] }],
     ["days that are not a list", { days: "many" }],
+    ["a day with a malformed date", { days: [{ date: "tomorrow", balanceChanges: [{ userName: "A", amount: 1 }] }] }],
+    ["a day with an empty balance change list", { days: [{ date: "2026-01-01", balanceChanges: [] }] }],
+    ["a day whose balance change has no amount", { days: [{ date: "2026-01-01", balanceChanges: [{ userName: "A" }] }] }],
+    ["a day whose balance change has a non-numeric amount", { days: [{ date: "2026-01-01", balanceChanges: [{ userName: "A", amount: "5" }] }] }],
+    ["a day whose balance change carries extra fields", { days: [{ date: "2026-01-01", balanceChanges: [{ userName: "A", amount: 1, x: 1 }] }] }],
+    ["a day with extra fields", { days: [{ date: "2026-01-01", extra: 1, balanceChanges: [{ userName: "A", amount: 1 }] }] }],
   ])("rejects an entry with %s", async (_label, overrides) => {
     const bad = JSON.parse(
       JSON.stringify(historyEntry(NEW_ID, MEMBER_UID, { ...groupedRange(), ...overrides }))

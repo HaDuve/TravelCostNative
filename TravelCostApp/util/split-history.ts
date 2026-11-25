@@ -112,8 +112,18 @@ export function balanceChangeBetween(
   return changes.sort((a, b) => b.amount - a.amount);
 }
 
-const dayKey = (expense: ExpenseData): string =>
-  new Date((expense.date ?? expense.startDate) as Date | string).toISOString().slice(0, 10);
+/**
+ * The expense's LOCAL calendar day as `YYYY-MM-DD` (the modal renders it as a
+ * local day), or null when it has no valid date; never throws.
+ */
+const dayKey = (expense: ExpenseData): string | null => {
+  const raw = expense.date ?? expense.startDate;
+  if (raw === undefined || raw === null) return null;
+  const d = new Date(raw as Date | string);
+  if (Number.isNaN(d.getTime())) return null;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 /** Groups a change to several **Ranged expense** days; null when it is not one. */
 function describeRangedChange(
@@ -129,7 +139,8 @@ function describeRangedChange(
     ...involved,
     ...siblings.filter((e) => !e.isDeleted),
   ].filter((e) => e.rangeId === rangeId);
-  const dates = inRange.map(dayKey).sort();
+  const dates = inRange.map(dayKey).filter((d): d is string => d !== null).sort();
+  if (dates.length === 0) return null;
   const distinct = new Set(involved.map((e) => e.id ?? dayKey(e)));
   return {
     range: { rangeId, startDate: dates[0], endDate: dates[dates.length - 1] },
@@ -143,7 +154,12 @@ function balanceChangesByDay(
   tripCurrency: string,
   isPaidTimestamp?: number
 ): { days: SplitHistoryDay[]; total: BalanceChange[] } {
-  const dates = [...new Set([...before, ...after].map(dayKey))].sort();
+  // Expenses without a valid date cannot be bucketed into a day: skipped.
+  const dates = [
+    ...new Set(
+      [...before, ...after].map(dayKey).filter((d): d is string => d !== null)
+    ),
+  ].sort();
   const days: SplitHistoryDay[] = [];
   const totals = new Map<string, number>();
   for (const date of dates) {

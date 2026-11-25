@@ -37,6 +37,8 @@ type PendingUndoDelete = {
   /** The deleted expenses, kept so undo can write its history entry. */
   deleted?: ExpenseData[];
   history?: DeleteHistoryContext;
+  /** The trip's expenses at delete time, so undo labels a range with its full extent. */
+  siblings?: ExpenseData[];
 };
 
 export interface UserDeleteExpenseContext {
@@ -109,6 +111,7 @@ function registerPendingUndoDelete(
   targets: UserDeleteExpenseTarget[],
   deleted?: ExpenseData[],
   history?: DeleteHistoryContext,
+  siblings?: ExpenseData[],
 ): string {
   clearPendingUndoDelete();
   dismissToastClearsUndo = true;
@@ -121,6 +124,7 @@ function registerPendingUndoDelete(
     targets,
     deleted,
     history,
+    siblings,
   };
   undoExpiryTimer = setTimeout(() => {
     clearPendingUndoDelete();
@@ -191,6 +195,7 @@ export async function deleteUserExpenses({
           description: deleted[0].description,
           before: deleted,
           after: [],
+          rangeSiblings: knownExpenses,
           tripCurrency: history.tripCurrency,
           isPaidTimestamp: history.isPaidTimestamp,
           author: history.author,
@@ -232,7 +237,7 @@ export async function deleteUserExpenses({
     return;
   }
 
-  const actionId = registerPendingUndoDelete(tripid, targets, deleted, history);
+  const actionId = registerPendingUndoDelete(tripid, targets, deleted, history, knownExpenses);
   showDeletedExpenseToast(actionId, () => {
     dismissToastClearsUndo = false;
     return undoUserExpenseDelete({
@@ -264,7 +269,7 @@ export async function undoUserExpenseDelete({
     return;
   }
 
-  const { targets, tripid, deleted, history } = pendingUndoDelete!;
+  const { targets, tripid, deleted, history, siblings } = pendingUndoDelete!;
   clearPendingUndoDelete();
   Toast.hide();
 
@@ -275,6 +280,7 @@ export async function undoUserExpenseDelete({
           description: deleted[0].description,
           before: [],
           after: deleted,
+          rangeSiblings: siblings,
           tripCurrency: history.tripCurrency,
           isPaidTimestamp: history.isPaidTimestamp,
           author: history.author,

@@ -124,6 +124,10 @@ async function syncRangedInPlaceUpdates(
           rangeSiblings: history.expenses,
         })
       : null;
+  // The grouped entry rides on the FIRST queued update only (one entry per user
+  // action). Known limitation: if that item fails permanently, the group's
+  // history entry is lost while the other days' updates still apply; the Split
+  // Summary itself is always recomputed from the Expenses.
   for (const [index, { id, expenseData }] of updates.entries()) {
     const item: OfflineQueueManageExpenseItem = {
       type: "update",

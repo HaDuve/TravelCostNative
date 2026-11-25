@@ -35,6 +35,8 @@ import type {
 } from "../../util/split-history";
 
 const MODAL_SCREEN_MARGIN = 16;
+/** Modal chrome above the list: padding (2 x 12) + header (44) + gap (12) + safe slack. */
+const MODAL_CHROME_HEIGHT = 112;
 
 const KIND_COPY_KEYS: Record<SplitHistoryKind, string> = {
   added: "splitHistoryAdded",
@@ -201,6 +203,8 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   // Explicit pixel width: AppModal wraps content in a shrink-wrapped Pressable,
   // so a percentage width has nothing to resolve against and text overflows.
+  const modalMaxHeight = screenHeight * 0.85;
+  const listMaxHeight = Math.max(modalMaxHeight - MODAL_CHROME_HEIGHT, 160);
   const contentWidth = Math.min(
     screenWidth - MODAL_SCREEN_MARGIN * 2,
     MODAL_MAX_WIDTH,
@@ -276,7 +280,7 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
           maxWidth: contentWidth,
           marginHorizontal: 0,
           // Pixel height: a percentage has nothing to resolve against here.
-          maxHeight: screenHeight * 0.85,
+          maxHeight: modalMaxHeight,
         },
       ]}
     >
@@ -307,7 +311,10 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
           initialNumToRender={SPLIT_HISTORY_PAGE_SIZE}
           onEndReachedThreshold={0.5}
           onEndReached={onEndReached}
-          style={styles.list}
+          style={[styles.list, { maxHeight: listMaxHeight }]}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator
+          nestedScrollEnabled
           ListEmptyComponent={
             showEmpty ? (
               <View testID="split-history-empty" style={styles.empty}>
@@ -383,11 +390,15 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   list: { flexGrow: 0, flexShrink: 1 },
+  listContent: { paddingBottom: dynamicScale(4, true) },
   row: {
-    paddingVertical: dynamicScale(10, true),
-    paddingHorizontal: dynamicScale(8, false, 0.5),
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: GlobalStyles.colors.gray300,
+    marginBottom: dynamicScale(10, true),
+    paddingVertical: dynamicScale(12, true),
+    paddingHorizontal: dynamicScale(14, false, 0.5),
+    borderRadius: dynamicScale(14, false, 0.5),
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: GlobalStyles.colors.gray500,
+    backgroundColor: "#FFFFFF",
   },
   kind: {
     fontSize: dynamicScale(13, false, 0.5),

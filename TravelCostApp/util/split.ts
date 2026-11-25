@@ -642,30 +642,27 @@ function sumUpSamePairs(openSplits) {
   return listOfSums;
 }
 
-function cancelDifferences(openSplits) {
-  let listOfSums = [...openSplits];
-  listOfSums.forEach((split) => {
-    /* list contains the element we're looking for */
-    const index = listOfSums.findIndex((e) => {
-      return e.userName === split.whoPaid && e.whoPaid === split.userName;
-    });
-    if (index !== -1) {
-      // same amount
-      if (split.amount === listOfSums[index].amount) {
-        split.amount = 0;
-        listOfSums.splice(index, 1);
-      }
-      // difference
-      if (split.amount > listOfSums[index].amount) {
-        split.amount -= listOfSums[index].amount;
-        split.amount = Number(split.amount.toFixed(2));
-        listOfSums.splice(index, 1);
-      }
+export function cancelDifferences(openSplits) {
+  // Net each pair of opposite directions into a single Balance. Independent of
+  // list order (an earlier in-place splice/filter version dropped Balances
+  // depending on the order Expenses were added).
+  const byPair = new Map();
+  for (const e of openSplits) {
+    byPair.set(`${e.userName}\u0000${e.whoPaid}`, e);
+  }
+  const result = [];
+  for (const split of openSplits) {
+    const opposite = byPair.get(`${split.whoPaid}\u0000${split.userName}`);
+    if (!opposite) {
+      if (split.amount !== 0) result.push({ ...split });
+      continue;
     }
-    listOfSums = listOfSums.filter((item) => item.amount !== 0);
-  });
-
-  return listOfSums;
+    const diff = Number((split.amount - opposite.amount).toFixed(2));
+    if (diff > 0) {
+      result.push({ ...split, amount: diff });
+    }
+  }
+  return result;
 }
 
 export function sameNumber(a: number, b: number, minDiff = 0.02) {

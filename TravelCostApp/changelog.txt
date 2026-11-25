@@ -12,6 +12,9 @@ __Newest Changes:
 - Improved security: shared budgets are only visible to their travellers
 - Fixed expenses not syncing after staying signed in for a long time
 - Expenses are kept and synced later when sign-in fails
+- New change history in Split Summary, grouped by day
+- Improved editing expenses in Split Summary
+- Added password autofill on sign-in and sign-up
 - You are asked to log in again when your login is no longer valid
 - Bugfixes and performance improvements
 

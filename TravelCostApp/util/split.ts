@@ -469,14 +469,44 @@ export function travellerToDropdown(
   return [...listOfLabelValues];
 }
 
+/**
+ * Expense currency units per Trip currency unit for one Expense, from its own
+ * amount vs already-converted calcAmount. 1 when no conversion applies or the
+ * inputs are invalid (avoids Infinity/NaN).
+ *
+ * Derived from amount/calcAmount rather than the stored `split.rate`: both are
+ * stamped from the same submit-time rate (see applySubmitRate), but `split.rate`
+ * is absent on Splits of older Expenses, while amount/calcAmount is always
+ * present. Nothing here can throw: it is only Number() coercion, comparisons and
+ * one division, and every zero/NaN/non-finite input maps to rate 1, so the old
+ * try/catch was removed.
+ */
+function expenseRateToTripCurrency(
+  expense: ExpenseData,
+  expenseCurrency: string,
+  tripCurrency: string
+): number {
+  if (expenseCurrency === tripCurrency) return 1;
+  const calcAmount = Number(expense.calcAmount);
+  const amount = Number(expense.amount);
+  if (!calcAmount || Number.isNaN(calcAmount) || !amount || Number.isNaN(amount)) {
+    return 1;
+  }
+  const rate = amount / calcAmount;
+  if (!rate || !Number.isFinite(rate)) {
+    safeLogError(
+      new Error(`Invalid currency conversion rate for ${expenseCurrency}→${tripCurrency}`)
+    );
+    return 1;
+  }
+  return rate;
+}
+
 export function rollupOpenBalances(
   expenses: ExpenseData[],
   tripCurrency: string,
   tripIsPaidTimestamp?: number
 ): Split[] {
-  const rates: Record<string, number> = {};
-  rates[tripCurrency] = 1;
-
   let openSplits: Split[] = [];
   for (const exp of expenses) {
     const expense: ExpenseData = exp;
@@ -494,55 +524,17 @@ export function rollupOpenBalances(
       continue;
     }
 
+    // The conversion factor is per Expense (its own amount vs calcAmount), never
+    // shared between Expenses in the same Expense currency: each was entered at
+    // its own rate.
+    const rate = expenseRateToTripCurrency(expense, expenseCurrency, tripCurrency);
+
     for (const split of expense.splitList) {
       if (split.userName === expense.whoPaid) {
         continue;
       }
-
-      // Create a copy of the split object to avoid mutating the original
       const splitCopy: Split = { ...split };
-
-      // check if rate is already in rates
-      if (!rates[expenseCurrency]) {
-        try {
-          // When expense currency differs from trip currency, we convert split amounts into trip currency.
-          // The conversion factor comes from the expense's original amount vs its already-converted calcAmount.
-          const calcAmount = Number(expense.calcAmount);
-          const amount = Number(expense.amount);
-          if (
-            expenseCurrency === tripCurrency ||
-            !calcAmount ||
-            Number.isNaN(calcAmount) ||
-            !amount ||
-            Number.isNaN(amount)
-          ) {
-            // Either already trip currency, or conversion inputs are invalid (avoid Infinity/NaN).
-            rates[expenseCurrency] = 1;
-            splitCopy.amount = Number(Number(splitCopy.amount).toFixed(2));
-          } else {
-            const rate = amount / calcAmount;
-            if (!rate || Number.isNaN(rate) || !Number.isFinite(rate)) {
-              safeLogError(
-                new Error(
-                  `Invalid currency conversion rate for ${expenseCurrency}→${tripCurrency}`
-                )
-              );
-              rates[expenseCurrency] = 1;
-              splitCopy.amount = Number(Number(splitCopy.amount).toFixed(2));
-            } else {
-              rates[expenseCurrency] = rate;
-              splitCopy.amount = Number((splitCopy.amount / rate).toFixed(2));
-            }
-          }
-        } catch (error) {
-          safeLogError(error);
-        }
-      } else {
-        splitCopy.amount = Number(
-          (splitCopy.amount / rates[expenseCurrency]).toFixed(2)
-        );
-      }
-
+      splitCopy.amount = Number((Number(split.amount) / rate).toFixed(2));
       splitCopy.whoPaid = expense.whoPaid;
       openSplits.push(splitCopy);
     }

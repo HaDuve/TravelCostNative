@@ -18,6 +18,7 @@ function Input({
   textContentType,
   autoComplete,
   importantForAutofill,
+  testID,
 }) {
   const clearInput = value && value.length > 0 && (
     <TouchableOpacity
@@ -54,6 +55,7 @@ function Input({
           textContentType={textContentType}
           autoComplete={autoComplete}
           importantForAutofill={importantForAutofill}
+          testID={testID}
           cursorColor={GlobalStyles.colors.textColor}
           selectionColor={GlobalStyles.colors.primary700}
           placeholderTextColor={GlobalStyles.colors.textColor}
@@ -80,6 +82,7 @@ Input.propTypes = {
   textContentType: PropTypes.string,
   autoComplete: PropTypes.string,
   importantForAutofill: PropTypes.string,
+  testID: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

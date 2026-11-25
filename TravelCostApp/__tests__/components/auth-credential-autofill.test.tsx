@@ -1,5 +1,8 @@
 import * as React from "react";
-import { render } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { i18n } from "../../i18n/i18n";
 
 jest.mock("../../store/secure-storage", () => ({
   secureStoreGetItem: jest.fn(async () => null),
@@ -8,30 +11,28 @@ jest.mock("../../store/secure-storage", () => ({
 
 import AuthForm from "../../components/Auth/AuthForm";
 
-function renderForm(isLogin: boolean) {
-  return render(
+const secureStorage = require("../../store/secure-storage");
+
+function renderForm(isLogin: boolean, onSubmit = jest.fn()) {
+  const utils = render(
     <AuthForm
       isLogin={isLogin}
-      onSubmit={jest.fn()}
+      onSubmit={onSubmit}
       credentialsInvalid={{}}
       isConnected
     />
   );
-}
-
-function fieldsByKeyboard(utils: ReturnType<typeof renderForm>) {
-  const inputs = utils.UNSAFE_getAllByType(
-    require("react-native").TextInput
-  );
   return {
-    email: inputs.find((i) => i.props.keyboardType === "email-address"),
-    password: inputs.find((i) => i.props.secureTextEntry),
+    ...utils,
+    onSubmit,
+    email: utils.getByTestId("auth-email-input"),
+    password: utils.getByTestId("auth-password-input"),
   };
 }
 
 describe("sign-in credential autofill", () => {
   it("hints the OS to fill saved username and password on sign-in", () => {
-    const { email, password } = fieldsByKeyboard(renderForm(true));
+    const { email, password } = renderForm(true);
     expect(email.props.textContentType).toBe("username");
     expect(email.props.autoComplete).toBe("username");
     expect(email.props.importantForAutofill).toBe("yes");
@@ -41,7 +42,7 @@ describe("sign-in credential autofill", () => {
   });
 
   it("hints the OS to suggest a strong new password on sign-up", () => {
-    const { email, password } = fieldsByKeyboard(renderForm(false));
+    const { email, password } = renderForm(false);
     expect(email.props.textContentType).toBe("username");
     expect(email.props.autoComplete).toBe("username");
     expect(password.props.textContentType).toBe("newPassword");
@@ -49,17 +50,35 @@ describe("sign-in credential autofill", () => {
     expect(password.props.importantForAutofill).toBe("yes");
   });
 
-  it("keeps email and password mounted together as one credential pair", () => {
-    const { email, password } = fieldsByKeyboard(renderForm(true));
-    expect(email).toBeDefined();
-    expect(password).toBeDefined();
+  it("keeps the sign-up name field out of the credential pair", () => {
+    const { getByTestId } = renderForm(false);
+    expect(getByTestId("auth-name-input").props.textContentType).toBe("name");
   });
 
-  it("never persists the password in secure storage", () => {
-    const storage = require("../../store/secure-storage");
-    renderForm(true);
-    for (const call of storage.secureStoreSetItem.mock.calls) {
-      expect(call[0]).not.toMatch(/password/i);
+  it.each([true, false])(
+    "renders email and password together in one form (isLogin=%s)",
+    (isLogin) => {
+      const { email, password, queryByTestId } = renderForm(isLogin);
+      expect(email.props.secureTextEntry).toBeFalsy();
+      expect(password.props.secureTextEntry).toBe(true);
+      expect(queryByTestId("auth-name-input") !== null).toBe(!isLogin);
     }
+  );
+
+  it("never persists the password in secure storage or AsyncStorage", async () => {
+    const secret = "S3cret-Pass-Word!";
+    const asyncSet = jest.spyOn(AsyncStorage, "setItem");
+    const { email, password, getAllByText, onSubmit } = renderForm(true);
+    fireEvent.changeText(email, "me@example.com");
+    fireEvent.changeText(password, secret);
+    fireEvent.press(getAllByText(i18n.t("loginText")).slice(-1)[0]);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+
+    const writes = [
+      ...secureStorage.secureStoreSetItem.mock.calls,
+      ...asyncSet.mock.calls,
+    ];
+    expect(writes.length).toBeGreaterThan(0);
+    expect(JSON.stringify(writes)).not.toContain(secret);
   });
 });

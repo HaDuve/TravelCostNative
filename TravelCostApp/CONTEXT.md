@@ -110,6 +110,10 @@ _Avoid_: Open split (UI copy), debt (marketing copy)
 Per-expense status: the travellers’ shares for that expense have been reimbursed to whoever paid. Expenses not yet paid back still count toward open **Balances**. (Code field: `paidBack`.)
 _Avoid_: Paid (ambiguous with who paid upfront), isPaid (legacy field name), isPaidString (legacy enum name; use `paidBackStatus`)
 
+**Split history** (user-facing: "Change history"):
+The per-**Trip** log of changes that moved the Split Summary: **Expense** added, edited, deleted, undone, **Paid back**, or **Settlement**. Each entry records who made it, when, and the per-**Traveller** **Balance** change in the **Trip currency** (always summing to zero), never a snapshot of the expense. Append-only and shared by every Traveller on the trip; starts empty when the feature ships.
+_Avoid_: Audit log, activity feed, undo history (undo is one of the entries, not the log)
+
 **Who paid**:
 The traveller who fronted the money for an expense (before **Splits** allocate shares among travellers). Distinct from **Paid back** (whether shares have been reimbursed).
 _Avoid_: Payer, paid by (code field: `whoPaid`)

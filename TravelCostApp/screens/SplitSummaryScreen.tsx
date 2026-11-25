@@ -32,6 +32,10 @@ import {
 } from "../util/split";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
+import { AuthContext } from "../store/auth-context";
+import SplitHistoryModal from "../components/SplitSummary/SplitHistoryModal";
+import { appendSplitHistoryEntry } from "../util/http";
+import { buildSplitHistoryEntry } from "../util/split-history";
 import { ExpensesContext } from "../store/expenses-context";
 import {
   ExpenseData,
@@ -60,6 +64,8 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaidTimestamp,
   } = useContext(TripContext);
   const { userName } = useContext(UserContext);
+  const { uid } = useContext(AuthContext);
+  const [historyVisible, setHistoryVisible] = useState(false);
   const { expenses } = useContext(ExpensesContext);
   // avoid rerenders
   const [isFetching, setIsFetching] = useState(false);
@@ -256,7 +262,27 @@ const SplitSummaryScreen = ({ navigation }) => {
   const settleSplitsHandler = useCallback(async () => {
     setIsFetching(true);
     try {
+      const settledAt = Date.now();
+      const historyEntry = buildSplitHistoryEntry({
+        kind: "settlement",
+        description: "",
+        before: expenses,
+        after: expenses,
+        tripCurrency,
+        isPaidTimestamp,
+        afterIsPaidTimestamp: settledAt,
+        author: { uid, userName },
+        now: settledAt,
+      });
       await fetchAndSettleCurrentTrip();
+      if (historyEntry) {
+        try {
+          await appendSplitHistoryEntry(tripid, historyEntry);
+        } catch (historyError) {
+          // The Settlement itself is saved; a missing history row must not undo it.
+          safeLogError(historyError, "SplitSummaryScreen.tsx", 0);
+        }
+      }
       setSplits([]);
       setShowSimplify(false);
       setTitleText(titleTextOriginal);
@@ -279,7 +305,17 @@ const SplitSummaryScreen = ({ navigation }) => {
       });
     }
     setIsFetching(false);
-  }, [fetchAndSettleCurrentTrip, navigation, titleTextOriginal]);
+  }, [
+    fetchAndSettleCurrentTrip,
+    navigation,
+    titleTextOriginal,
+    expenses,
+    tripCurrency,
+    isPaidTimestamp,
+    uid,
+    userName,
+    tripid,
+  ]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -366,6 +402,13 @@ const SplitSummaryScreen = ({ navigation }) => {
                 },
               ]
             : []),
+          {
+            testID: "split-summary-history",
+            tier: "secondary" as const,
+            label: i18n.t("splitHistoryButton"),
+            icon: "time-outline",
+            onPress: () => setHistoryVisible(true),
+          },
           ...(!showSimplify
             ? [
                 {
@@ -531,6 +574,11 @@ const SplitSummaryScreen = ({ navigation }) => {
       >
         {splitSummaryContent}
       </ContentFrame>
+      <SplitHistoryModal
+        isVisible={historyVisible}
+        onClose={() => setHistoryVisible(false)}
+        tripid={tripid}
+      />
     </View>
   );
 };

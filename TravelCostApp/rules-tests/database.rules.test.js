@@ -11,6 +11,8 @@
  * - A signed-in non-member can read only the trip name, and can add only
  *   themselves to `members` (joining by invite link).
  * - Users read and write their own node; other users see only `userName`.
+ * - Split history lives at `splitHistory/<tripId>/<entryId>`: trip members
+ *   read it and may only append (create-only, author = caller, valid shape).
  * - `server/<config>` leaves are readable when signed in; `server/feedback`
  *   is create-only.
  * - Anonymous access is denied everywhere.
@@ -35,6 +37,23 @@ const OTHER_TRIP_ID = "trip-2";
 const MEMBER_UID = "user-a";
 const CO_MEMBER_UID = "user-b";
 const OUTSIDER_UID = "user-c";
+
+function historyEntry(id, byUid, overrides = {}) {
+  return {
+    id,
+    kind: "added",
+    description: "Dinner",
+    byUid,
+    byName: "Alex",
+    timestamp: 1700000000000,
+    tripCurrency: "EUR",
+    balanceChanges: [
+      { userName: "Alex", amount: 12.4 },
+      { userName: "Bea", amount: -12.4 },
+    ],
+    ...overrides,
+  };
+}
 
 const SEED = {
   server: {
@@ -77,6 +96,14 @@ const SEED = {
       tripName: "Porto",
       members: { [OUTSIDER_UID]: true },
       travellers: { [OUTSIDER_UID]: { uid: OUTSIDER_UID, userName: "Cem" } },
+    },
+  },
+  splitHistory: {
+    [TRIP_ID]: {
+      "0000000001000-aaaaaa": historyEntry("0000000001000-aaaaaa", MEMBER_UID),
+    },
+    [OTHER_TRIP_ID]: {
+      "0000000002000-bbbbbb": historyEntry("0000000002000-bbbbbb", OUTSIDER_UID),
     },
   },
   users: {
@@ -173,6 +200,9 @@ describe("anonymous access is denied", () => {
     "/server/VEXO",
     "/server/feedback",
     "/trips",
+    "/splitHistory",
+    `/splitHistory/${TRIP_ID}`,
+    `/splitHistory/${TRIP_ID}/0000000001000-aaaaaa`,
     `/trips/${TRIP_ID}`,
     `/trips/${TRIP_ID}/tripName`,
     `/users/${MEMBER_UID}`,
@@ -467,5 +497,95 @@ describe("legacy trips after the membership backfill", () => {
     }
     await assertFails(dbAs(OUTSIDER_UID).ref("/trips/legacy/travellers").once("value"));
     expect(await readAdmin("/trips/legacy/tripName")).toBe("Old trip");
+  });
+});
+
+describe("split history", () => {
+  const NEW_ID = "0000000003000-cccccc";
+  const historyRef = (db, tripId = TRIP_ID, id = NEW_ID) =>
+    db.ref(`/splitHistory/${tripId}/${id}`);
+
+  test("a member reads the history of their trip, including the paged key query", async () => {
+    await assertSucceeds(memberDb().ref(`/splitHistory/${TRIP_ID}`).once("value"));
+    const snap = await assertSucceeds(
+      memberDb()
+        .ref(`/splitHistory/${TRIP_ID}`)
+        .orderByKey()
+        .limitToLast(21)
+        .once("value")
+    );
+    expect(Object.keys(snap.val())).toEqual(["0000000001000-aaaaaa"]);
+  });
+
+  test("a co-member reads the same history", async () => {
+    await assertSucceeds(dbAs(CO_MEMBER_UID).ref(`/splitHistory/${TRIP_ID}`).once("value"));
+  });
+
+  test("a non-member cannot read the history, the list of trips' histories or one entry", async () => {
+    await assertFails(outsiderDb().ref(`/splitHistory/${TRIP_ID}`).once("value"));
+    await assertFails(
+      outsiderDb().ref(`/splitHistory/${TRIP_ID}/0000000001000-aaaaaa`).once("value")
+    );
+    await assertFails(outsiderDb().ref("/splitHistory").once("value"));
+    await assertFails(memberDb().ref("/splitHistory").once("value"));
+    await assertFails(memberDb().ref(`/splitHistory/${OTHER_TRIP_ID}`).once("value"));
+  });
+
+  test("a member appends an entry authored by themselves", async () => {
+    await assertSucceeds(historyRef(memberDb()).set(historyEntry(NEW_ID, MEMBER_UID)));
+    expect((await readAdmin(`/splitHistory/${TRIP_ID}/${NEW_ID}`)).byUid).toBe(MEMBER_UID);
+  });
+
+  test("a settlement entry without a description is accepted", async () => {
+    const { description, ...rest } = historyEntry(NEW_ID, MEMBER_UID, { kind: "settlement" });
+    await assertSucceeds(historyRef(memberDb()).set(rest));
+  });
+
+  test("a non-member cannot append to someone else's trip history", async () => {
+    await assertFails(historyRef(outsiderDb()).set(historyEntry(NEW_ID, OUTSIDER_UID)));
+  });
+
+  test("a member cannot append to another trip's history", async () => {
+    await assertFails(
+      historyRef(memberDb(), OTHER_TRIP_ID).set(historyEntry(NEW_ID, MEMBER_UID))
+    );
+  });
+
+  test("a member cannot sign an entry as another Traveller", async () => {
+    await assertFails(historyRef(memberDb()).set(historyEntry(NEW_ID, CO_MEMBER_UID)));
+  });
+
+  test("history is append-only: no overwrite, edit or delete of an existing entry", async () => {
+    const existing = "0000000001000-aaaaaa";
+    await assertFails(
+      historyRef(memberDb(), TRIP_ID, existing).set(
+        historyEntry(existing, MEMBER_UID, { description: "Changed" })
+      )
+    );
+    await assertFails(historyRef(memberDb(), TRIP_ID, existing).remove());
+    await assertFails(
+      historyRef(memberDb(), TRIP_ID, existing).update({ description: "Changed" })
+    );
+    await assertFails(memberDb().ref(`/splitHistory/${TRIP_ID}`).remove());
+    expect((await readAdmin(`/splitHistory/${TRIP_ID}/${existing}`)).description).toBe("Dinner");
+  });
+
+  test.each([
+    ["an unknown kind", { kind: "hacked" }],
+    ["an id that differs from its key", { id: "other" }],
+    ["a non-numeric timestamp", { timestamp: "now" }],
+    ["a missing currency", { tripCurrency: undefined }],
+    ["missing balance changes", { balanceChanges: undefined }],
+    ["a non-string description", { description: 5 }],
+  ])("rejects an entry with %s", async (_label, overrides) => {
+    const bad = JSON.parse(
+      JSON.stringify(historyEntry(NEW_ID, MEMBER_UID, overrides))
+    );
+    await assertFails(historyRef(memberDb()).set(bad));
+  });
+
+  test("a member still cannot reach history through the trip node", async () => {
+    await assertSucceeds(memberDb().ref(`/trips/${TRIP_ID}`).once("value"));
+    expect(await readAdmin(`/trips/${TRIP_ID}/splitHistory`)).toBeNull();
   });
 });

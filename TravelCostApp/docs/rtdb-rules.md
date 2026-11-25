@@ -10,11 +10,14 @@
 | `trips/<tripId>/tripName` | any signed-in user (join preview) | members |
 | `trips/<tripId>/members/<uid>` | members | members; any signed-in user can add **their own** uid with `true` (joining by invite) |
 | new `trips/<pushId>` | n/a | signed-in user, if the new trip lists them under `members` |
+| `splitHistory/<tripId>/<entryId>` (Split Summary change history) | members of `<tripId>` | members, **create only**: the entry must be new, authored by the caller (`byUid`), keyed by its own `id`, with a valid `kind` |
 | `users/<uid>` | that user | that user |
 | `users/<uid>/userName` | any signed-in user | that user |
 | `server/<configKey>` | any signed-in user | nobody (console/admin only) |
 | `server/feedback/<id>` | nobody | create only, with `uid` equal to the sender |
-| `/`, `/trips`, `/users`, `/server` as a whole | nobody | nobody |
+| `/`, `/trips`, `/users`, `/server`, `/splitHistory` as a whole | nobody | nobody |
+
+Split history sits beside `trips`, not under it, because the member write on `trips/<tripId>` cascades to everything below and could not be made append-only. Entries are never edited or deleted. Deleting a trip leaves its history behind, unreadable because the trip (and so its `members`) is gone.
 
 A trip member is a uid with `trips/<tripId>/members/<uid> = true`. The trip id works as the invite: anyone signed in who holds it can add themselves. The app writes membership when it:
 - creates a trip (`storeTrip` sends `members` in the create request),

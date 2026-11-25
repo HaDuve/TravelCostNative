@@ -7,6 +7,7 @@ import {
 
 import { Category } from "./category";
 import type { TripData } from "../types/trip";
+import type { SplitHistoryEntry } from "./split-history";
 import type { ExpenseData, ExpenseDataOnline } from "./expense";
 import {
   readPaidBackFromOnlineRecord,
@@ -506,6 +507,70 @@ export async function updateExpense(
       expenseDataWithTimestamp
     );
   });
+}
+
+/**
+ * Appends one split history entry to a trip:
+ * #### splitHistory/$tripid/$entryId.json
+ * PUT at the entry's own id, so a retry cannot duplicate it. The rules are
+ * create-only, so a retry of an entry that already landed is refused with
+ * an auth failure: that is fine and must never block the Expense sync.
+ */
+export async function appendSplitHistoryEntry(
+  tripid: string,
+  entry: SplitHistoryEntry
+): Promise<void> {
+  try {
+    await withAuthToken("appendSplitHistoryEntry", (authToken) =>
+      axios.put(
+        `${BACKEND_URL}/splitHistory/${tripid}/${entry.id}.json?auth=${authToken}`,
+        entry
+      )
+    );
+  } catch (error) {
+    // Create-only rules refuse a retry of an entry that already landed.
+    if (isAuthFailureError(error)) return;
+    throw error;
+  }
+}
+
+export const SPLIT_HISTORY_PAGE_SIZE = 20;
+
+export type SplitHistoryPage = {
+  /** Newest first. */
+  entries: SplitHistoryEntry[];
+  hasMore: boolean;
+};
+
+/**
+ * Reads one page of a trip's split history, newest first. Entry ids sort by
+ * time, so pages are cut by key: `beforeId` is the oldest id already shown.
+ */
+export async function fetchSplitHistoryPage(
+  tripid: string,
+  {
+    beforeId,
+    pageSize = SPLIT_HISTORY_PAGE_SIZE,
+  }: { beforeId?: string; pageSize?: number } = {}
+): Promise<SplitHistoryPage> {
+  // endAt is inclusive, so one extra row for the cursor; one more to know hasMore.
+  const limit = pageSize + 1 + (beforeId ? 1 : 0);
+  const range = beforeId ? `&endAt=${encodeURIComponent(JSON.stringify(beforeId))}` : "";
+  const data = await withAuthToken("fetchSplitHistoryPage", async (authToken) => {
+    const response = await axios.get(
+      `${BACKEND_URL}/splitHistory/${tripid}.json?auth=${authToken}&orderBy=${encodeURIComponent(
+        '"$key"'
+      )}&limitToLast=${limit}${range}`
+    );
+    return response.data as Record<string, SplitHistoryEntry> | null;
+  });
+  const newestFirst = Object.values(data ?? {})
+    .filter((entry) => entry && entry.id !== beforeId)
+    .sort((a, b) => (a.id < b.id ? 1 : -1));
+  return {
+    entries: newestFirst.slice(0, pageSize),
+    hasMore: newestFirst.length > pageSize,
+  };
 }
 
 /**

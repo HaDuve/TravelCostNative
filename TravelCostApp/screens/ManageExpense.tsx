@@ -5,6 +5,11 @@ import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 import IconButton from "../components/UI/IconButton";
 import { AuthContext } from "../store/auth-context";
+import { useSplitHistoryContext } from "../hooks/useSplitHistoryContext";
+import {
+  buildExpenseEditEntry,
+  buildSplitHistoryEntry,
+} from "../util/split-history";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { touchAllTravelers } from "../util/http";
@@ -80,6 +85,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
+  const splitHistory = useSplitHistoryContext();
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
 
@@ -120,7 +126,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           tripid,
           selectedExpense,
           isOnline,
-          expenseCtx
+          expenseCtx,
+          { history: splitHistory }
         );
       } catch (error) {
         Toast.show({
@@ -144,6 +151,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           ],
           isOnline,
           expenseCtx,
+          history: splitHistory,
         });
 
         trackEvent(VexoEvents.EXPENSE_DELETED, {
@@ -202,6 +210,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
                         ],
                         isOnline,
                         expenseCtx,
+                        history: splitHistory,
                       });
                     } catch (error) {
                       Toast.show({
@@ -242,6 +251,13 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
     expenseData.editedTimestamp = Date.now();
+    const historyEntry = buildSplitHistoryEntry({
+      kind: "added",
+      description: expenseData.description,
+      before: [],
+      after: [expenseData],
+      ...splitHistory,
+    });
     const item: OfflineQueueManageExpenseItem = {
       type: "add",
       expense: {
@@ -249,6 +265,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         uid: uid,
         expenseData: expenseData,
       },
+      ...(historyEntry ? { historyEntry } : {}),
     };
     const id = await storeExpenseOnlineOffline(item, isOnline);
     const expenseToAdd = { ...expenseData, id: id ?? "" };
@@ -263,6 +280,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     uid,
     isOnline,
     expenseCtx,
+    history: { ...splitHistory, expenses: expenseCtx.expenses },
   };
 
   const createRangedData = (expenseData: ExpenseData): Promise<void> => {
@@ -296,10 +314,21 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           id: editedExpenseId,
         },
       };
-      const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
       const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
-      const addSync = persistRangedExpenseAdd(instances, rangedPersistParams)
-        .syncPromise;
+      // One edit entry (old single expense -> new days) rides on the delete.
+      const replaceEntry = buildSplitHistoryEntry({
+        kind: "edited",
+        description: expenseData.description,
+        before: [selectedExpense],
+        after: instances,
+        ...splitHistory,
+      });
+      if (replaceEntry) item.historyEntry = replaceEntry;
+      const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
+      const addSync = persistRangedExpenseAdd(instances, {
+        ...rangedPersistParams,
+        history: undefined,
+      }).syncPromise;
       return Promise.all([deleteSync, addSync]).then(() => {});
     }
 
@@ -324,6 +353,11 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
   const editSingleData = async (expenseData: ExpenseData) => {
     expenseData.editedTimestamp = Date.now();
+    const historyEntry = buildExpenseEditEntry({
+      before: selectedExpense,
+      after: { ...expenseData, id: editedExpenseId },
+      ...splitHistory,
+    });
     const item: OfflineQueueManageExpenseItem = {
       type: "update",
       expense: {
@@ -332,6 +366,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         expenseData: expenseData,
         id: editedExpenseId,
       },
+      ...(historyEntry ? { historyEntry } : {}),
     };
     expenseCtx.updateExpense(editedExpenseId, expenseData);
     await updateExpenseOnlineOffline(item, isOnline);

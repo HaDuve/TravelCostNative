@@ -687,6 +687,19 @@ const en = {
   noOpenSplitsAllSettled:
     "No open balances — all expenses are paid back",
   noOpenSplits: "No open balances",
+  splitHistoryButton: "Change history",
+  splitHistoryTitle: "Change history",
+  splitHistoryEmpty:
+    "History starts now. From here on, every change to the Split Summary is listed here for all nomads on this budget.",
+  splitHistoryLoadMore: "Load more",
+  splitHistoryLoadError: "Could not load the change history.",
+  splitHistoryAdded: "Expense added",
+  splitHistoryEdited: "Expense edited",
+  splitHistoryDeleted: "Expense deleted",
+  splitHistoryUndone: "Delete undone",
+  splitHistoryPaidBack: "Paid back",
+  splitHistorySettlement: "Settlement",
+  splitHistoryBy: "by %{name}",
 };
 const de = {
   // special expense strings
@@ -1417,6 +1430,19 @@ const de = {
   noOpenSplitsAllSettled:
     "Keine offenen Salden — alle Ausgaben sind zurückgezahlt",
   noOpenSplits: "Keine offenen Salden",
+  splitHistoryButton: "Änderungsverlauf",
+  splitHistoryTitle: "Änderungsverlauf",
+  splitHistoryEmpty:
+    "Der Verlauf beginnt jetzt. Ab sofort wird hier jede Änderung der Aufteilungen für alle Nomaden dieses Budgets aufgelistet.",
+  splitHistoryLoadMore: "Mehr laden",
+  splitHistoryLoadError: "Der Änderungsverlauf konnte nicht geladen werden.",
+  splitHistoryAdded: "Ausgabe hinzugefügt",
+  splitHistoryEdited: "Ausgabe bearbeitet",
+  splitHistoryDeleted: "Ausgabe gelöscht",
+  splitHistoryUndone: "Löschen rückgängig gemacht",
+  splitHistoryPaidBack: "Zurückgezahlt",
+  splitHistorySettlement: "Budget beglichen",
+  splitHistoryBy: "von %{name}",
 };
 const fr = {
   // special expense strings
@@ -2144,6 +2170,19 @@ const fr = {
   noOpenSplitsAllSettled:
     "Aucun solde ouvert — toutes les dépenses sont remboursées",
   noOpenSplits: "Aucun solde ouvert",
+  splitHistoryButton: "Historique des modifications",
+  splitHistoryTitle: "Historique des modifications",
+  splitHistoryEmpty:
+    "L'historique commence maintenant. Désormais, chaque modification du résumé des dépenses apparaît ici pour tous les nomades de ce budget.",
+  splitHistoryLoadMore: "Charger plus",
+  splitHistoryLoadError: "Impossible de charger l'historique.",
+  splitHistoryAdded: "Dépense ajoutée",
+  splitHistoryEdited: "Dépense modifiée",
+  splitHistoryDeleted: "Dépense supprimée",
+  splitHistoryUndone: "Suppression annulée",
+  splitHistoryPaidBack: "Remboursé",
+  splitHistorySettlement: "Règlement",
+  splitHistoryBy: "par %{name}",
 };
 const ru = {
   // special expense strings
@@ -2869,5 +2908,18 @@ const ru = {
   noOpenSplitsAllSettled:
     "Нет открытых балансов — все расходы возмещены",
   noOpenSplits: "Нет открытых балансов",
+  splitHistoryButton: "История изменений",
+  splitHistoryTitle: "История изменений",
+  splitHistoryEmpty:
+    "История начинается сейчас. Отныне каждое изменение здесь видно всем номадам этого бюджета.",
+  splitHistoryLoadMore: "Загрузить ещё",
+  splitHistoryLoadError: "Не удалось загрузить историю изменений.",
+  splitHistoryAdded: "Расход добавлен",
+  splitHistoryEdited: "Расход изменён",
+  splitHistoryDeleted: "Расход удалён",
+  splitHistoryUndone: "Удаление отменено",
+  splitHistoryPaidBack: "Возвращено",
+  splitHistorySettlement: "Расчёт",
+  splitHistoryBy: "от %{name}",
 };
 export { en, de, fr, ru };

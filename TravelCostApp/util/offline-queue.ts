@@ -6,7 +6,9 @@ import {
   deleteExpense,
   restoreExpense,
   touchAllTravelers,
+  appendSplitHistoryEntry,
 } from "./http";
+import type { SplitHistoryEntry } from "./split-history";
 
 import { i18n } from "../i18n/i18n";
 
@@ -26,7 +28,18 @@ export interface OfflineQueueManageExpenseItem {
   timeStamp?: string;
   type: "add" | "update" | "delete" | "restore";
   expense: Expense;
+  /**
+   * Split history entry for this change. Written right after the Expense
+   * change, online or when the queue syncs. Appends are idempotent (the id
+   * is the RTDB key), so a retried item never duplicates its entry.
+   */
+  historyEntry?: SplitHistoryEntry;
 }
+
+const appendHistory = async (item: OfflineQueueManageExpenseItem) => {
+  if (!item.historyEntry) return;
+  await appendSplitHistoryEntry(item.expense.tripid, item.historyEntry);
+};
 
 const generateExpenseId = () =>
   Math.random().toString(36).substring(2, 15) +
@@ -120,13 +133,16 @@ const attemptStoreExpenseOnline = async (
       expenseId,
       item.expense.expenseData,
     );
+    await appendHistory(item);
     return expenseId;
   }
-  return storeExpense(
+  const id = await storeExpense(
     item.expense.tripid,
     item.expense.uid,
     item.expense.expenseData,
   );
+  await appendHistory(item);
+  return id;
 };
 
 const attemptUpdateExpenseOnline = async (
@@ -138,6 +154,7 @@ const attemptUpdateExpenseOnline = async (
     item.expense.id,
     item.expense.expenseData,
   );
+  await appendHistory(item);
 };
 
 const attemptDeleteExpenseOnline = async (
@@ -148,6 +165,7 @@ const attemptDeleteExpenseOnline = async (
     item.expense.uid,
     item.expense.id,
   );
+  await appendHistory(item);
 };
 
 /**
@@ -248,6 +266,8 @@ export const restoreExpenseOnlineOffline = async (
       );
       if (!response) {
         await pushQueueReturnRndID(item);
+      } else {
+        await appendHistory(item);
       }
     } catch (error) {
       await pushQueueReturnRndID(item);
@@ -466,6 +486,8 @@ export async function sendOfflineQueue(
             }
           }
 
+          await appendHistory(item);
+
           if (oldId && id && oldId !== id) {
             // change item.expense.id for every other item.type == "update" or "delete" in the queue
             for (let j = i + 1; j < offlineQueue?.length - i; j++) {
@@ -483,18 +505,21 @@ export async function sendOfflineQueue(
             item.expense.id,
             item.expense.expenseData,
           );
+          await appendHistory(item);
         } else if (item.type === "delete") {
           await deleteExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.id,
           );
+          await appendHistory(item);
         } else if (item.type === "restore") {
           await restoreExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.id,
           );
+          await appendHistory(item);
         } else {
           safeLogError("unknown offlineQ item type", "offline-queue.ts");
         }

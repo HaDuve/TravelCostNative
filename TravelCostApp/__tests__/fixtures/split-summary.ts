@@ -2,7 +2,10 @@ import {
   activeExpenses,
   expensesReducer,
 } from "../../store/expenses-context";
+import { applySubmitRate, persistExpenseEdit } from "../../util/edit-expense";
 import { expandRangedExpense } from "../../util/expand-ranged-expense";
+import { buildRangedExpenseDatesFromSpan } from "../../util/plan-ranged-expense-edit";
+import { resolveAlreadyDividedAmountByDays } from "../../util/expense-form-range";
 import {
   paidBackStatus,
   type ExpenseData,
@@ -110,6 +113,80 @@ export function addExpense(
     });
   }
   return added;
+}
+
+/** Adds a **Ranged expense** spanning `startDate`..`endDate` (inclusive days), like the submit path. */
+export function addRangedExpense(
+  trip: SplitSummaryTrip,
+  overrides: Partial<ExpenseData>,
+  startDate: Date,
+  endDate: Date,
+  rangeId = "r1"
+): ExpenseData[] {
+  const expense = buildExpense(trip, { ...overrides, startDate, endDate, date: startDate });
+  return addExpense(trip, expense, {
+    dates: buildRangedExpenseDatesFromSpan(startDate, endDate),
+    rangeId,
+  });
+}
+
+/** Store context slice the edit path (`persistExpenseEdit`) writes to. */
+export function editCtxFor(trip: SplitSummaryTrip) {
+  return {
+    get expenses() {
+      return activeExpenses(trip.expenses);
+    },
+    addExpense: (expense: ExpenseData) => {
+      trip.expenses = expensesReducer(trip.expenses, { type: "ADD", payload: expense });
+    },
+    updateExpense: (id: string, data: ExpenseData) => {
+      trip.expenses = expensesReducer(trip.expenses, { type: "UPDATE", payload: { id, data } });
+    },
+    deleteExpense: (id: string) => {
+      trip.expenses = expensesReducer(trip.expenses, { type: "DELETE", payload: id });
+    },
+  };
+}
+
+/** Fields the Expense form never submits (ids, range membership, sync stamps). */
+const NON_FORM_FIELDS = ["id", "rangeId", "editedTimestamp", "serverTimestamp", "isDeleted"] as const;
+
+/**
+ * Edits an Expense like ExpenseForm + ManageExpense: the form payload is the
+ * stored Expense with `changes` applied, then submit-time FX (`rate` = Trip
+ * currency per Expense currency unit) and `persistExpenseEdit`.
+ * For a **Ranged split** the stored values are per-day, as the form shows them.
+ */
+export async function editExpense(
+  trip: SplitSummaryTrip,
+  id: string,
+  changes: Partial<ExpenseData> & { alreadyDividedAmountByDays?: boolean },
+  { rate = 1, isOnline = true, replace = false } = {}
+): Promise<void> {
+  const selectedExpense = trip.expenses.find((e) => e.id === id)!;
+  const payload: ExpenseData & { alreadyDividedAmountByDays?: boolean } = {
+    ...(replace ? {} : selectedExpense),
+    ...changes,
+  } as ExpenseData & { alreadyDividedAmountByDays?: boolean };
+  for (const key of NON_FORM_FIELDS) delete payload[key];
+  payload.splitList = payload.splitList?.map((split) => ({ ...split }));
+  // Args mirror the form when editing: (isEditing = true, the stored
+  // duplOrSplit, isDuplicateFirstEdit = false). An explicit change overrides it.
+  payload.alreadyDividedAmountByDays =
+    changes.alreadyDividedAmountByDays ??
+    resolveAlreadyDividedAmountByDays(true, payload.duplOrSplit, false);
+  applySubmitRate(payload, rate);
+  let n = 0;
+  await persistExpenseEdit({
+    tripid: "t1",
+    uid: "u1",
+    isOnline,
+    expenseCtx: editCtxFor(trip),
+    selectedExpense,
+    selectedExpenseAuthorUid: selectedExpense.uid ?? "u1",
+    expenseData: payload,
+    newRangeId: () => `edit-range-${nextId++}-${n++}`,
+  });
 }
 
 /** Marks a single Expense **Paid back** (UPDATE action, as the UI does). */
@@ -241,4 +318,22 @@ export function expectSplitSummary(
       MINOR_UNIT * trip.travellers.length
     );
   }
+}
+
+/**
+ * Asserts the issue-#436 invariant: the Split Summary after editing equals the
+ * one from deleting the old Expense and adding the edited one from scratch,
+ * and both match the hand-computed expectation (which includes the zero-sum check).
+ */
+export function expectEditEqualsDeleteAndReAdd(
+  edited: SplitSummaryTrip,
+  reAdded: SplitSummaryTrip,
+  expected: ExpectedSplitSummary
+): void {
+  expectSplitSummary(reAdded, expected);
+  expectSplitSummary(edited, expected);
+  const a = computeSplitSummary(edited);
+  const b = computeSplitSummary(reAdded);
+  expectSameBalances(a.balances, b.balances, "edit vs delete+re-add");
+  expectSameBalances(a.simplified, b.simplified, "edit vs delete+re-add (simplified)");
 }

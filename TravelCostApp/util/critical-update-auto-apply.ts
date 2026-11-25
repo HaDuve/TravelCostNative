@@ -7,28 +7,28 @@ const SAFE_ROUTES = new Set([
   "Finder",
 ]);
 
-export function isSafeRouteForCriticalUpdateOverlay(
+export function isSafeRouteForCriticalUpdate(
   routeName: string | undefined | null
 ): boolean {
   if (!routeName) return false;
   return SAFE_ROUTES.has(routeName);
 }
 
-type ShouldShowCriticalUpdateOverlayInput = {
+type ShouldAutoApplyCriticalUpdateInput = {
   updateReady: boolean;
   isCritical: boolean;
   routeName: string | undefined | null;
 };
 
-/** Hard-block overlay only for critical OTAs on safe main-tab / Settings routes. */
-export function shouldShowCriticalUpdateOverlay({
+/** Auto-reload only for critical OTAs, and only off form routes (Draft restoration covers the rest). */
+export function shouldAutoApplyCriticalUpdate({
   updateReady,
   isCritical,
   routeName,
-}: ShouldShowCriticalUpdateOverlayInput): boolean {
+}: ShouldAutoApplyCriticalUpdateInput): boolean {
   return (
     updateReady &&
     isCritical &&
-    isSafeRouteForCriticalUpdateOverlay(routeName)
+    isSafeRouteForCriticalUpdate(routeName)
   );
 }

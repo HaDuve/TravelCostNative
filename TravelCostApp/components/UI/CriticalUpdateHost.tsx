@@ -1,9 +1,12 @@
-import React, { useEffect } from "react";
-import { AppState } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { AppState, StyleSheet, Text, View } from "react-native";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { GlobalStyles } from "../../constants/styles";
+import { i18n } from "../../i18n/i18n";
 import { useCriticalOta } from "../../store/critical-ota-context";
-import { shouldShowCriticalUpdateOverlay } from "../../util/critical-update-overlay-visibility";
-import CriticalUpdateOverlay from "./CriticalUpdateOverlay";
+import { shouldAutoApplyCriticalUpdate } from "../../util/critical-update-auto-apply";
 
 type CriticalUpdateHostProps = {
   /** Deepest focused route from NavigationContainer onStateChange / onReady. */
@@ -11,8 +14,9 @@ type CriticalUpdateHostProps = {
 };
 
 /**
- * Quietly checks/fetches OTAs on cold start and foreground.
- * Shows the critical hard-block overlay only on safe routes.
+ * Quietly checks/fetches OTAs on cold start and foreground. A fetched critical
+ * OTA reloads the app automatically, deferred while an expense form is open.
+ * Shows a short "Updating…" toast while reloading; no confirmation.
  *
  * Must not call useNavigationState here — this component is mounted as a
  * sibling of navigators under NavigationContainer (see App.tsx), and
@@ -21,6 +25,9 @@ type CriticalUpdateHostProps = {
 const CriticalUpdateHost = ({ focusedRouteName }: CriticalUpdateHostProps) => {
   const { updateReady, isCritical, requestCheckAndFetch, applyReload } =
     useCriticalOta();
+  const reloadStartedRef = useRef(false);
+  const [applying, setApplying] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     void requestCheckAndFetch();
@@ -36,15 +43,43 @@ const CriticalUpdateHost = ({ focusedRouteName }: CriticalUpdateHostProps) => {
     };
   }, [requestCheckAndFetch]);
 
-  const visible = shouldShowCriticalUpdateOverlay({
+  const shouldApply = shouldAutoApplyCriticalUpdate({
     updateReady,
     isCritical,
     routeName: focusedRouteName,
   });
 
+  useEffect(() => {
+    if (!shouldApply || reloadStartedRef.current) return;
+    // One attempt per session: a failing reload must not loop.
+    reloadStartedRef.current = true;
+    setApplying(true);
+    // Reset on resolve too: a reload that returns without restarting must not leave the toast stuck.
+    applyReload()
+      .catch(() => undefined)
+      .finally(() => setApplying(false));
+  }, [shouldApply, applyReload]);
+
+  if (!applying) return null;
   return (
-    <CriticalUpdateOverlay visible={visible} onReload={() => void applyReload()} />
+    <View style={[styles.toast, { top: insets.top + 12 }]} pointerEvents="none" testID="critical-update-toast">
+      <Text style={styles.text}>{i18n.t("criticalUpdateApplying")}</Text>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  toast: {
+    position: "absolute",
+    zIndex: 1000,
+    elevation: 1000,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: GlobalStyles.colors.primary500,
+  },
+  text: { color: GlobalStyles.colors.gray300, fontWeight: "600" },
+});
 
 export default CriticalUpdateHost;

@@ -3,11 +3,27 @@ import * as Localization from "expo-localization";
 
 import { getCurrencySymbol } from "./currencySymbol";
 
+const numberFormatCache = new Map<string, Intl.NumberFormat>();
+
+/** Intl.NumberFormat is slow to construct (very much so on Hermes): reuse per locale + options. */
+function getNumberFormat(
+  locale: string,
+  options: Intl.NumberFormatOptions,
+): Intl.NumberFormat {
+  const key = `${locale}|${JSON.stringify(options)}`;
+  let format = numberFormatCache.get(key);
+  if (!format) {
+    format = new Intl.NumberFormat(locale, options);
+    numberFormatCache.set(key, format);
+  }
+  return format;
+}
+
 export function formatExpenseWithCurrency(
   amount: number | string,
   currency?: string,
   options?: Intl.NumberFormatOptions,
-  localeOverride?: string
+  localeOverride?: string,
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {
@@ -43,7 +59,7 @@ export function formatExpenseWithCurrency(
 
   if (amount % 1 == 0) {
     try {
-      return new Intl.NumberFormat(locale, fractionOptions)
+      return getNumberFormat(locale, fractionOptions)
         .format(amount)
         .replace(currency, getCurrencySymbol(currency));
     } catch (error) {
@@ -51,7 +67,7 @@ export function formatExpenseWithCurrency(
     }
   } else {
     try {
-      return new Intl.NumberFormat(locale, formatOptions)
+      return getNumberFormat(locale, formatOptions)
         .format(amount)
         .replace(currency, getCurrencySymbol(currency));
     } catch (error) {
@@ -67,7 +83,7 @@ export function processTitleStringFilteredPiecharts(
     item: {
       sumCat: number;
     };
-  }
+  },
 ) {
   // period name can be translated or not
   const nonTranslatedPeriodNames = ["day", "week", "month", "year", "all"];
@@ -82,7 +98,7 @@ export function processTitleStringFilteredPiecharts(
     if (periodName.includes(nonTranslatedString)) {
       periodName = periodName.replace(
         nonTranslatedString,
-        i18n.t(dictionaryToTranslate[nonTranslatedString])
+        i18n.t(dictionaryToTranslate[nonTranslatedString]),
       );
     }
   });
@@ -127,7 +143,7 @@ function languageFromLocale(locale: string): string {
 
 function formatCompactMantissa(
   absAmount: number,
-  language: string
+  language: string,
 ): { mantissa: string; suffix: string } | null {
   let scaleEntry =
     COMPACT_SCALES.find(({ threshold }) => absAmount >= threshold) ?? null;
@@ -164,9 +180,11 @@ function currencySymbolGoesFirst(locale: string, currency: string): boolean {
     }).formatToParts(1);
     const currencyIndex = parts.findIndex((p) => p.type === "currency");
     const numberIndex = parts.findIndex(
-      (p) => p.type === "integer" || p.type === "decimal"
+      (p) => p.type === "integer" || p.type === "decimal",
     );
-    return currencyIndex !== -1 && numberIndex !== -1 && currencyIndex < numberIndex;
+    return (
+      currencyIndex !== -1 && numberIndex !== -1 && currencyIndex < numberIndex
+    );
   } catch {
     return languageFromLocale(locale) === "en";
   }
@@ -179,7 +197,7 @@ function currencySymbolGoesFirst(locale: string, currency: string): boolean {
 export function formatCompactExpenseWithCurrency(
   amount: number | string,
   currency?: string,
-  locale = "en"
+  locale = "en",
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {

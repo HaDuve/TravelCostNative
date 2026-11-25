@@ -58,15 +58,24 @@ function formatSentence(
   });
 }
 
+const whenFormatCache = new Map<string, Intl.DateTimeFormat | null>();
+
+/** One formatter per locale: building one per row stalls the JS thread on open. */
 function formatWhen(timestamp: number): string {
-  try {
-    return new Date(timestamp).toLocaleString(i18n.locale, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
-  } catch {
-    return new Date(timestamp).toISOString();
+  const locale = i18n.locale;
+  let format = whenFormatCache.get(locale);
+  if (format === undefined) {
+    try {
+      format = new Intl.DateTimeFormat(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    } catch {
+      format = null;
+    }
+    whenFormatCache.set(locale, format);
   }
+  return format ? format.format(timestamp) : new Date(timestamp).toISOString();
 }
 
 /** `YYYY-MM-DD` as a local calendar day, so it never shifts with the time zone. */
@@ -308,7 +317,9 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
           data={entries}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <HistoryRow entry={item} />}
-          initialNumToRender={SPLIT_HISTORY_PAGE_SIZE}
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={7}
           onEndReachedThreshold={0.5}
           onEndReached={onEndReached}
           style={[styles.list, { maxHeight: listMaxHeight }]}

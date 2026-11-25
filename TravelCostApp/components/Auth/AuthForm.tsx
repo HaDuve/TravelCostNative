@@ -179,7 +179,9 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
           keyboardType="email-address"
           isInvalid={emailIsInvalid}
           isInvalidInfoText={i18n.t("emailInvalidInfoText")}
-          textContentType="emailAddress"
+          textContentType="username"
+          autoComplete="username"
+          importantForAutofill="yes"
         />
 
         <Input
@@ -190,7 +192,9 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
           value={enteredPassword}
           isInvalid={passwordIsInvalid}
           isInvalidInfoText={i18n.t("passwordInvalidInfoText")}
-          textContentType="password"
+          textContentType={isLogin ? "password" : "newPassword"}
+          autoComplete={isLogin ? "password" : "new-password"}
+          importantForAutofill="yes"
         />
 
         <View style={styles.buttons}>

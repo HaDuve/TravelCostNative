@@ -38,7 +38,13 @@ export interface OfflineQueueManageExpenseItem {
 
 const appendHistory = async (item: OfflineQueueManageExpenseItem) => {
   if (!item.historyEntry) return;
-  await appendSplitHistoryEntry(item.expense.tripid, item.historyEntry);
+  // Best effort: the Expense is already written, so a failed history write
+  // must never fail the save (retry, duplicate Expense, stuck queue item).
+  try {
+    await appendSplitHistoryEntry(item.expense.tripid, item.historyEntry);
+  } catch (error) {
+    safeLogError(error, "offline-queue.ts appendHistory");
+  }
 };
 
 const generateExpenseId = () =>

@@ -509,12 +509,29 @@ export async function updateExpense(
   });
 }
 
+async function splitHistoryEntryExists(
+  tripid: string,
+  entryId: string
+): Promise<boolean> {
+  try {
+    const data = await withAuthToken("splitHistoryEntryExists", async (authToken) => {
+      const response = await axios.get(
+        `${BACKEND_URL}/splitHistory/${tripid}/${entryId}.json?auth=${authToken}`
+      );
+      return response.data;
+    });
+    return data != null;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Appends one split history entry to a trip:
  * #### splitHistory/$tripid/$entryId.json
  * PUT at the entry's own id, so a retry cannot duplicate it. The rules are
  * create-only, so a retry of an entry that already landed is refused with
- * an auth failure: that is fine and must never block the Expense sync.
+ * an auth failure, which is then treated as success. Other failures throw.
  */
 export async function appendSplitHistoryEntry(
   tripid: string,
@@ -528,8 +545,12 @@ export async function appendSplitHistoryEntry(
       )
     );
   } catch (error) {
-    // Create-only rules refuse a retry of an entry that already landed.
-    if (isAuthFailureError(error)) return;
+    // Create-only rules refuse a retry of an entry that already landed: that
+    // is success. Any other refusal (expired token, rules not deployed) means
+    // the entry is lost, so it is surfaced (callers log it), never swallowed.
+    if (isAuthFailureError(error) && (await splitHistoryEntryExists(tripid, entry.id))) {
+      return;
+    }
     throw error;
   }
 }

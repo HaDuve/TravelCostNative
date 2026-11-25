@@ -577,6 +577,19 @@ describe("split history", () => {
     ["a missing currency", { tripCurrency: undefined }],
     ["missing balance changes", { balanceChanges: undefined }],
     ["a non-string description", { description: 5 }],
+    ["an over-long description", { description: "x".repeat(501) }],
+    ["an over-long author name", { byName: "x".repeat(101) }],
+    ["an unknown extra field", { extra: "x" }],
+    ["a balance change without amount", { balanceChanges: [{ userName: "Alex" }] }],
+    ["a non-numeric balance change amount", { balanceChanges: [{ userName: "Alex", amount: "5" }] }],
+    ["a non-string balance change userName", { balanceChanges: [{ userName: 5, amount: 5 }] }],
+    ["an over-long balance change userName", { balanceChanges: [{ userName: "x".repeat(101), amount: 5 }] }],
+    ["an extra field on a balance change", { balanceChanges: [{ userName: "Alex", amount: 5, x: 1 }] }],
+    ["balance changes that are not a collection", { balanceChanges: "none" }],
+    [
+      "too many balance changes",
+      { balanceChanges: Array.from({ length: 101 }, (_, i) => ({ userName: `N${i}`, amount: 1 })) },
+    ],
   ])("rejects an entry with %s", async (_label, overrides) => {
     const bad = JSON.parse(
       JSON.stringify(historyEntry(NEW_ID, MEMBER_UID, overrides))

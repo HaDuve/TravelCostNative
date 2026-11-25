@@ -190,4 +190,44 @@ describe("SplitHistoryModal", () => {
     ) as Record<string, unknown>;
     expect(phoneStyle.width).toBe("100%");
   });
+
+  it("ignores a page that was still in flight when the modal was closed and reopened", async () => {
+    let resolveStale: (v: unknown) => void = () => {};
+    fetchPage
+      .mockImplementationOnce(() => new Promise((r) => (resolveStale = r)))
+      .mockResolvedValueOnce({ entries: [entry(2, "added", "Fresh")], hasMore: false });
+    const ui = (visible: boolean) => (
+      <LayoutContextProvider>
+        <SplitHistoryModal isVisible={visible} onClose={jest.fn()} tripid="t1" />
+      </LayoutContextProvider>
+    );
+    const screen = renderModal();
+
+    screen.rerender(ui(false));
+    screen.rerender(ui(true));
+    await screen.findByText("Fresh");
+    resolveStale({ entries: [entry(1, "added", "Stale")], hasMore: false });
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(fetchPage).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText("Stale")).toBeNull();
+    expect(screen.getByText("Fresh")).toBeTruthy();
+  });
+
+  it("tolerates a malformed history row instead of crashing the list", async () => {
+    const bad = { ...entry(1, "added", "Broken"), balanceChanges: undefined };
+    const badAmount = {
+      ...entry(2, "added", "NoAmount"),
+      balanceChanges: [{ userName: "Alice" }, null],
+    };
+    fetchPage.mockResolvedValueOnce({
+      entries: [badAmount, bad, entry(3, "added", "Fine")],
+      hasMore: false,
+    });
+    const screen = renderModal();
+
+    expect(await screen.findByText("Fine")).toBeTruthy();
+    expect(screen.getByText("Broken")).toBeTruthy();
+    expect(screen.getByText("NoAmount")).toBeTruthy();
+  });
 });

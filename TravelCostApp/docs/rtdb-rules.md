@@ -10,7 +10,7 @@
 | `trips/<tripId>/tripName` | any signed-in user (join preview) | members |
 | `trips/<tripId>/members/<uid>` | members | members; any signed-in user can add **their own** uid with `true` (joining by invite) |
 | new `trips/<pushId>` | n/a | signed-in user, if the new trip lists them under `members` |
-| `splitHistory/<tripId>/<entryId>` (Split Summary change history) | members of `<tripId>` | members, **create only**: the entry must be new, authored by the caller (`byUid`), keyed by its own `id`, with a valid `kind` |
+| `splitHistory/<tripId>/<entryId>` (Split Summary change history) | members of `<tripId>` | members, **create only**: the entry must be new, authored by the caller (`byUid`), keyed by its own `id`, with a valid `kind`, bounded string lengths (`byName`/`userName` 100, `description` 500), `balanceChanges` as a collection of at most 100 `{userName: string, amount: number}` elements, and no other fields |
 | `users/<uid>` | that user | that user |
 | `users/<uid>/userName` | any signed-in user | that user |
 | `server/<configKey>` | any signed-in user | nobody (console/admin only) |
@@ -18,6 +18,8 @@
 | `/`, `/trips`, `/users`, `/server`, `/splitHistory` as a whole | nobody | nobody |
 
 Split history sits beside `trips`, not under it, because the member write on `trips/<tripId>` cascades to everything below and could not be made append-only. Entries are never edited or deleted. Deleting a trip leaves its history behind, unreadable because the trip (and so its `members`) is gone.
+
+Limits of the history rules: rules cannot sum children, so "balance changes add up to zero" is not enforced there (the client computes it in integer cents; the history modal skips malformed rows rather than crashing). The 500-entry-per-trip cap is not enforceable either. Entry ids start with the writing device's clock, so ordering and the paging cursor trust device clocks. The balance deltas are computed from the writing device's local state at edit time (see `CONTEXT.md`, Split history).
 
 A trip member is a uid with `trips/<tripId>/members/<uid> = true`. The trip id works as the invite: anyone signed in who holds it can add themselves. The app writes membership when it:
 - creates a trip (`storeTrip` sends `members` in the create request),

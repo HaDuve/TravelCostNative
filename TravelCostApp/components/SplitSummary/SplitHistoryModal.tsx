@@ -47,6 +47,22 @@ function formatWhen(timestamp: number): string {
   }
 }
 
+/** Rows come from a shared database: skip anything that is not a well-formed change. */
+function validChanges(changes: unknown): BalanceChange[] {
+  const list = Array.isArray(changes)
+    ? changes
+    : changes && typeof changes === "object"
+      ? Object.values(changes)
+      : [];
+  return list.filter(
+    (c): c is BalanceChange =>
+      !!c &&
+      typeof (c as BalanceChange).userName === "string" &&
+      typeof (c as BalanceChange).amount === "number" &&
+      Number.isFinite((c as BalanceChange).amount)
+  );
+}
+
 const HistoryRow = React.memo(function HistoryRow({
   entry,
 }: {
@@ -63,7 +79,7 @@ const HistoryRow = React.memo(function HistoryRow({
           entry.timestamp
         )}`}
       </Text>
-      {entry.balanceChanges.map((change) => (
+      {validChanges(entry.balanceChanges).map((change) => (
         <Text
           key={change.userName}
           style={[
@@ -96,11 +112,15 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const loadingRef = useRef(false);
+  /** Bumped by every reset; a page fetched under an older token is stale. */
+  const requestTokenRef = useRef(0);
   const entriesRef = useRef<SplitHistoryEntry[]>([]);
 
   const loadPage = useCallback(
     async (reset: boolean) => {
-      if (loadingRef.current) return;
+      if (!reset && loadingRef.current) return;
+      if (reset) requestTokenRef.current += 1;
+      const token = requestTokenRef.current;
       loadingRef.current = true;
       setLoading(true);
       setFailed(false);
@@ -109,16 +129,20 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
         const page = await fetchSplitHistoryPage(tripid, {
           beforeId: current.length ? current[current.length - 1].id : undefined,
         });
+        if (token !== requestTokenRef.current) return;
         entriesRef.current = [...current, ...page.entries];
         setEntries(entriesRef.current);
         setHasMore(page.hasMore);
         setLoaded(true);
       } catch (error) {
+        if (token !== requestTokenRef.current) return;
         safeLogError(error, "SplitHistoryModal.tsx");
         setFailed(true);
       } finally {
-        loadingRef.current = false;
-        setLoading(false);
+        if (token === requestTokenRef.current) {
+          loadingRef.current = false;
+          setLoading(false);
+        }
       }
     },
     [tripid]

@@ -16,6 +16,9 @@ function Input({
   isInvalid,
   isInvalidInfoText,
   textContentType,
+  autoComplete,
+  importantForAutofill,
+  testID,
 }) {
   const clearInput = value && value.length > 0 && (
     <TouchableOpacity
@@ -50,6 +53,9 @@ function Input({
           onChangeText={onUpdateValue}
           value={value}
           textContentType={textContentType}
+          autoComplete={autoComplete}
+          importantForAutofill={importantForAutofill}
+          testID={testID}
           cursorColor={GlobalStyles.colors.textColor}
           selectionColor={GlobalStyles.colors.primary700}
           placeholderTextColor={GlobalStyles.colors.textColor}
@@ -74,6 +80,9 @@ Input.propTypes = {
   isInvalid: PropTypes.bool,
   isInvalidInfoText: PropTypes.string,
   textContentType: PropTypes.string,
+  autoComplete: PropTypes.string,
+  importantForAutofill: PropTypes.string,
+  testID: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

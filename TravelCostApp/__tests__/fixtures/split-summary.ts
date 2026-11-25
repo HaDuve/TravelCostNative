@@ -164,12 +164,14 @@ export async function editExpense(
   { rate = 1, isOnline = true, replace = false } = {}
 ): Promise<void> {
   const selectedExpense = trip.expenses.find((e) => e.id === id)!;
-  const payload: any = {
+  const payload: ExpenseData & { alreadyDividedAmountByDays?: boolean } = {
     ...(replace ? {} : selectedExpense),
     ...changes,
-  };
+  } as ExpenseData & { alreadyDividedAmountByDays?: boolean };
   for (const key of NON_FORM_FIELDS) delete payload[key];
   payload.splitList = payload.splitList?.map((split) => ({ ...split }));
+  // Args mirror the form when editing: (isEditing = true, the stored
+  // duplOrSplit, isDuplicateFirstEdit = false). An explicit change overrides it.
   payload.alreadyDividedAmountByDays =
     changes.alreadyDividedAmountByDays ??
     resolveAlreadyDividedAmountByDays(true, payload.duplOrSplit, false);

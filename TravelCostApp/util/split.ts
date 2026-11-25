@@ -473,6 +473,13 @@ export function travellerToDropdown(
  * Expense currency units per Trip currency unit for one Expense, from its own
  * amount vs already-converted calcAmount. 1 when no conversion applies or the
  * inputs are invalid (avoids Infinity/NaN).
+ *
+ * Derived from amount/calcAmount rather than the stored `split.rate`: both are
+ * stamped from the same submit-time rate (see applySubmitRate), but `split.rate`
+ * is absent on Splits of older Expenses, while amount/calcAmount is always
+ * present. Nothing here can throw: it is only Number() coercion, comparisons and
+ * one division, and every zero/NaN/non-finite input maps to rate 1, so the old
+ * try/catch was removed.
  */
 function expenseRateToTripCurrency(
   expense: ExpenseData,

@@ -23,12 +23,10 @@ import { collectUserDeleteTargets } from "./user-delete-expense";
  * Applies the submit-time **Expense currency** rate (Trip currency per
  * Expense currency unit) to a submitted Expense: derives `calcAmount`, stamps the
  * rate on every **Split** row, and clears the Split list for SELF Splits.
- * Mutates and returns `expenseData` (same as the Expense form submit path).
+ * Mutates `expenseData` in place (as the Expense form submit path always did)
+ * and returns nothing.
  */
-export function applySubmitRate(
-  expenseData: ExpenseData,
-  rate: number
-): ExpenseData {
+export function applySubmitRate(expenseData: ExpenseData, rate: number): void {
   expenseData.calcAmount = expenseData.amount / rate;
   expenseData.splitList?.forEach((split) => {
     split.rate = rate;
@@ -36,7 +34,6 @@ export function applySubmitRate(
   if (expenseData.splitType === "SELF") {
     expenseData.splitList = [];
   }
-  return expenseData;
 }
 
 export interface EditExpenseContext extends RangedExpensePersistContext {
@@ -60,14 +57,19 @@ export interface EditExpenseParams {
 }
 
 function spansMultipleDays(expenseData: ExpenseData): boolean {
+  // A missing start or end date means a single-day Expense (isSameDay returns
+  // false for a falsy date, which must not read as "spans multiple days").
+  if (!expenseData.startDate || !expenseData.endDate) return false;
   return !isSameDay(expenseData.endDate, expenseData.startDate);
 }
 
 /**
  * Saves an edited Expense. Every path leaves the trip equal to deleting the old
  * Expense (whole range) and adding the edited one from scratch.
- * Resolves with the still-pending sync of a **Ranged expense** edit, if any
- * (wrapped so awaiting this call does not wait for the sync).
+ * Resolves with `rangedSyncPromise`: `null` for a single-day edit (its sync was
+ * already awaited), or, for a **Ranged expense** edit, the still-pending sync,
+ * which is deliberately NOT awaited here (the UI stays responsive; the caller
+ * decides whether to await it, e.g. to notify Travellers afterwards).
  */
 export async function persistExpenseEdit(
   params: EditExpenseParams
@@ -130,7 +132,7 @@ function editRangedData(params: EditExpenseParams): Promise<void> {
       instances,
       rangedPersistParams
     ).syncPromise;
-    return Promise.all([deleteSync, addSync]).then(() => {});
+    return Promise.all([deleteSync, addSync]).then(() => undefined);
   }
 
   if (shouldReplaceRangedExpenseInstances(expensesInRange, expenseData)) {

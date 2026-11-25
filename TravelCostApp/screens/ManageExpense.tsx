@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
@@ -12,34 +12,18 @@ import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
 import { applySubmitRate, persistExpenseEdit } from "../util/edit-expense";
 import { expandRangedExpense } from "../util/expand-ranged-expense";
-import {
-  buildRangedExpenseDatesFromSpan,
-  planNonRangedToRangedInstances,
-  planRangedExpenseInPlaceUpdates,
-  planRangedExpenseReplacement,
-  shouldReplaceRangedExpenseInstances,
-} from "../util/plan-ranged-expense-edit";
+import { buildRangedExpenseDatesFromSpan } from "../util/plan-ranged-expense-edit";
 import { isPaidString } from "../util/expense";
 import {
-  deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
   storeExpenseOnlineOffline,
-  updateExpenseOnlineOffline,
 } from "../util/offline-queue";
-import {
-  collectUserDeleteTargets,
-  deleteUserExpenses,
-} from "../util/user-delete-expense";
-import {
-  persistRangedExpenseAdd,
-  persistRangedExpenseInPlaceEdit,
-  persistRangedExpenseReplace,
-} from "../util/ranged-expense-persist";
+import { deleteUserExpenses } from "../util/user-delete-expense";
+import { persistRangedExpenseAdd } from "../util/ranged-expense-persist";
 
 import { i18n } from "../i18n/i18n";
 
 import { getCatLocalized } from "../util/category";
-import PropTypes from "prop-types";
 import {
   deleteAllExpensesByRangedId,
   ExpenseData,

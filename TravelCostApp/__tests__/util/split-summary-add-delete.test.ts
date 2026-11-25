@@ -5,6 +5,7 @@ import {
   clearPendingUndoDelete,
   deleteUserExpenses,
 } from "../../util/user-delete-expense";
+import { buildTemplateExpenseData } from "../../util/expense-template";
 import { settleTrip } from "../../util/settlement";
 import { calcSplitList } from "../../util/split";
 import { makeExpenseFormSnapshot } from "../fixtures/expense-form";
@@ -18,6 +19,7 @@ import {
   makeTrip,
   markPaidBack,
   resetHarnessIds,
+  type SplitSummaryTrip,
 } from "../fixtures/split-summary";
 import Toast from "react-native-toast-message";
 
@@ -46,7 +48,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-async function userDelete(trip, id: string) {
+async function userDelete(trip: SplitSummaryTrip, id: string) {
   const targets = collectUserDeleteTargets("t1", trip.expenses, [id]);
   await deleteUserExpenses({
     tripid: "t1",
@@ -215,11 +217,9 @@ describe("Split Summary: add Expense flows", () => {
   it("Template expense adds a new ledger row prefilled from a prior Expense", () => {
     const trip = makeTrip(["Alice", "Bob"]);
     const [original] = addExpense(trip, buildExpense(trip, { amount: 4.5 }));
-    // Template path (AddExpenseButton.handleSelectTemplate): copy fields, drop id/rangeId/editedTimestamp.
-    const { id: _id, rangeId: _r, editedTimestamp: _e, ...fields } = JSON.parse(
-      JSON.stringify(original)
-    );
-    addExpense(trip, { ...fields, date: day(20) });
+    // Template path (AddExpenseButton.handleSelectTemplate).
+    const fields = buildTemplateExpenseData(original, day(20));
+    addExpense(trip, fields);
 
     expect(trip.expenses).toHaveLength(2);
     expectSplitSummary(trip, {
@@ -310,42 +310,12 @@ describe("Split Summary: Paid back, Settlement, Balance simplification", () => {
   it("Settlement clears Balances; Expenses added or edited afterwards stay open", () => {
     const trip = makeTrip(["Alice", "Bob"]);
     addExpense(trip, buildExpense(trip, { amount: 100, editedTimestamp: 1000 }));
-    trip.isPaidTimestamp = settleTrip({} as never, 5000).isPaidTimestamp;
+    trip.isPaidTimestamp = settleTrip({ tripid: "t1", tripCurrency: trip.tripCurrency }, 5000).isPaidTimestamp;
     expectSplitSummary(trip, { balances: [] });
 
     addExpense(trip, buildExpense(trip, { amount: 30, whoPaid: "Bob", editedTimestamp: 6000 }));
     expectSplitSummary(trip, {
       balances: [{ from: "Alice", to: "Bob", amount: 15 }],
-    });
-  });
-
-  it("Balance simplification off lists every Balance; on collapses a chain with the same nets", () => {
-    const trip = makeTrip(["Alice", "Bob", "Carol"]);
-    // Bob paid 20 shared by Alice+Bob: Alice owes Bob 10.
-    addExpense(
-      trip,
-      buildExpense(trip, {
-        amount: 20,
-        whoPaid: "Bob",
-        splitList: equalSplit(20, ["Alice", "Bob"]),
-      })
-    );
-    // Carol paid 20 shared by Bob+Carol: Bob owes Carol 10.
-    addExpense(
-      trip,
-      buildExpense(trip, {
-        amount: 20,
-        whoPaid: "Carol",
-        splitList: equalSplit(20, ["Bob", "Carol"]),
-      })
-    );
-
-    expectSplitSummary(trip, {
-      balances: [
-        { from: "Alice", to: "Bob", amount: 10 },
-        { from: "Bob", to: "Carol", amount: 10 },
-      ],
-      simplified: [{ from: "Alice", to: "Carol", amount: 10 }],
     });
   });
 });

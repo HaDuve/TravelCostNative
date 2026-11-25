@@ -84,4 +84,32 @@ describe("Open Balance rollup (rollupOpenBalances)", () => {
       ])
     );
   });
+
+  it.each([
+    ["zero", 0],
+    ["missing", undefined],
+    ["non-numeric", "abc"],
+  ])(
+    "uses rate 1 (no Infinity/NaN) for a foreign-currency Expense with %s calcAmount",
+    (_label, calcAmount) => {
+      const expenses = [
+        makeExpense({
+          whoPaid: "Alice",
+          amount: 110,
+          calcAmount: calcAmount as unknown as number,
+          currency: "USD",
+          splitList: [
+            { userName: "Alice", amount: 55 },
+            { userName: "Bob", amount: 55 },
+          ],
+        }),
+      ];
+
+      const openBalances = rollupOpenBalances(expenses, "EUR", 0);
+
+      expect(openBalances).toEqual([
+        expect.objectContaining({ userName: "Bob", whoPaid: "Alice", amount: 55 }),
+      ]);
+    }
+  );
 });

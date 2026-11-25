@@ -188,7 +188,7 @@ type Props = {
  */
 const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
   const layout = useLayoutProfile();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   // Explicit pixel width: AppModal wraps content in a shrink-wrapped Pressable,
   // so a percentage width has nothing to resolve against and text overflows.
   const contentWidth = Math.min(
@@ -261,7 +261,13 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
       contentTestID="split-history-content"
       contentStyle={[
         styles.content,
-        { width: contentWidth, maxWidth: contentWidth, marginHorizontal: 0 },
+        {
+          width: contentWidth,
+          maxWidth: contentWidth,
+          marginHorizontal: 0,
+          // Pixel height: a percentage has nothing to resolve against here.
+          maxHeight: screenHeight * 0.85,
+        },
       ]}
     >
       <ModalFrame layout={layout}>
@@ -335,7 +341,6 @@ export default SplitHistoryModal;
 
 const styles = StyleSheet.create({
   content: {
-    maxHeight: "85%",
     padding: dynamicScale(12, false, 0.5),
   },
   header: {
@@ -367,7 +372,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: GlobalStyles.colors.textColor,
   },
-  list: { flexGrow: 0 },
+  list: { flexGrow: 0, flexShrink: 1 },
   row: {
     paddingVertical: dynamicScale(10, true),
     paddingHorizontal: dynamicScale(8, false, 0.5),

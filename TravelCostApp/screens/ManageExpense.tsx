@@ -10,6 +10,7 @@ import { TripContext } from "../store/trip-context";
 import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
+import { applySubmitRate, persistExpenseEdit } from "../util/edit-expense";
 import { expandRangedExpense } from "../util/expand-ranged-expense";
 import {
   buildRangedExpenseDatesFromSpan,
@@ -280,63 +281,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     return persistRangedExpenseAdd(instances, rangedPersistParams).syncPromise;
   };
 
-  const editRangedData = (expenseData: ExpenseData): Promise<void> => {
-    const expensesInRange = expenseCtx.expenses.filter(
-      (expense) =>
-        expense.rangeId && expense.rangeId === selectedExpense?.rangeId
-    );
-
-    if (expensesInRange.length === 0) {
-      expenseCtx.deleteExpense(editedExpenseId);
-      const item: OfflineQueueManageExpenseItem = {
-        type: "delete",
-        expense: {
-          tripid: tripid,
-          uid: selectedExpenseAuthorUid,
-          id: editedExpenseId,
-        },
-      };
-      const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
-      const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
-      const addSync = persistRangedExpenseAdd(instances, rangedPersistParams)
-        .syncPromise;
-      return Promise.all([deleteSync, addSync]).then(() => {});
-    }
-
-    if (shouldReplaceRangedExpenseInstances(expensesInRange, expenseData)) {
-      const deleteTargets = collectUserDeleteTargets(tripid, expenseCtx.expenses, [
-        selectedExpense.id!,
-      ]);
-      const instances = planRangedExpenseReplacement(expenseData, newRangeId());
-      return persistRangedExpenseReplace(
-        deleteTargets,
-        instances,
-        rangedPersistParams,
-      ).syncPromise;
-    }
-
-    const updates = planRangedExpenseInPlaceUpdates(expenseData, expensesInRange);
-    return persistRangedExpenseInPlaceEdit(updates, {
-      ...rangedPersistParams,
-      uid: selectedExpenseAuthorUid,
-    }).syncPromise;
-  };
-
-  const editSingleData = async (expenseData: ExpenseData) => {
-    expenseData.editedTimestamp = Date.now();
-    const item: OfflineQueueManageExpenseItem = {
-      type: "update",
-      expense: {
-        tripid: tripid,
-        uid: selectedExpenseAuthorUid,
-        expenseData: expenseData,
-        id: editedExpenseId,
-      },
-    };
-    expenseCtx.updateExpense(editedExpenseId, expenseData);
-    await updateExpenseOnlineOffline(item, isOnline);
-  };
-
   async function confirmHandler(payload: ExpenseFormSubmitPayload): Promise<void> {
     const expenseData = payload;
     try {
@@ -353,36 +297,22 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         );
         return;
       }
-      const calcAmount = expenseData.amount / rate;
-      expenseData.calcAmount = calcAmount;
-
-      // if expenseData has a splitlist, add the rate to each split
-      if (expenseData.splitList && expenseData.splitList?.length > 0) {
-        expenseData.splitList.forEach((split) => {
-          split.rate = rate;
-        });
-      }
-
-      // if splitType is SELF, set splitList to empty array []
-      if (expenseData.splitType === "SELF") {
-        expenseData.splitList = [];
-      }
+      applySubmitRate(expenseData, rate);
 
       let rangedSyncPromise: Promise<void> | null = null;
 
       if (isEditing) {
-        // editing the expense
-        if (
-          expenseData.startDate.toString().slice(0, 10) !==
-            expenseData.endDate.toString().slice(0, 10) ||
-          selectedExpense.rangeId
-        ) {
-          // editing ranged Data
-          rangedSyncPromise = editRangedData(expenseData);
-        } else {
-          // editing normal expense (no-ranged)
-          await editSingleData(expenseData);
-        }
+        // editing the expense (single-day or ranged; see util/edit-expense)
+        ({ rangedSyncPromise } = await persistExpenseEdit({
+          tripid,
+          uid,
+          isOnline,
+          expenseCtx,
+          selectedExpense,
+          selectedExpenseAuthorUid,
+          expenseData,
+          newRangeId,
+        }));
 
         // Track expense edited
         trackEvent(VexoEvents.EXPENSE_EDITED, {

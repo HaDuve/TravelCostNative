@@ -59,6 +59,46 @@
               ".validate": "$change.matches(/^([0-9]|[1-9][0-9])$/) && newData.hasChildren(['userName', 'amount']) && newData.child('userName').isString() && newData.child('userName').val().length <= 100 && newData.child('amount').isNumber()",
               "userName": { ".validate": true },
               "amount": { ".validate": true },
+              "range": {
+            ".validate": "newData.hasChildren(['rangeId', 'startDate', 'endDate']) && newData.child('rangeId').isString() && newData.child('startDate').isString() && newData.child('endDate').isString()"
+          },
+          "days": {
+            ".validate": "newData.hasChildren()",
+            "$dayIndex": {
+              ".validate": "newData.hasChildren(['date', 'balanceChanges']) && newData.child('date').isString() && newData.child('date').val().matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
+              "date": { ".validate": true },
+              "balanceChanges": {
+                ".validate": "newData.hasChildren()",
+                "$change": {
+                  ".validate": "$change.matches(/^([0-9]|[1-9][0-9])$/) && newData.hasChildren(['userName', 'amount']) && newData.child('userName').isString() && newData.child('userName').val().length <= 100 && newData.child('amount').isNumber()",
+                  "userName": { ".validate": true },
+                  "amount": { ".validate": true },
+                  "$other": { ".validate": false }
+                }
+              },
+              "$other": { ".validate": false }
+            }
+          },
+          "$other": { ".validate": false }
+            }
+          },
+          "range": {
+            ".validate": "newData.hasChildren(['rangeId', 'startDate', 'endDate']) && newData.child('rangeId').isString() && newData.child('startDate').isString() && newData.child('endDate').isString()"
+          },
+          "days": {
+            ".validate": "newData.hasChildren()",
+            "$dayIndex": {
+              ".validate": "newData.hasChildren(['date', 'balanceChanges']) && newData.child('date').isString() && newData.child('date').val().matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
+              "date": { ".validate": true },
+              "balanceChanges": {
+                ".validate": "newData.hasChildren()",
+                "$change": {
+                  ".validate": "$change.matches(/^([0-9]|[1-9][0-9])$/) && newData.hasChildren(['userName', 'amount']) && newData.child('userName').isString() && newData.child('userName').val().length <= 100 && newData.child('amount').isNumber()",
+                  "userName": { ".validate": true },
+                  "amount": { ".validate": true },
+                  "$other": { ".validate": false }
+                }
+              },
               "$other": { ".validate": false }
             }
           },

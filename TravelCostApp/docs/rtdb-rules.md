@@ -10,7 +10,7 @@
 | `trips/<tripId>/tripName` | any signed-in user (join preview) | members |
 | `trips/<tripId>/members/<uid>` | members | members; any signed-in user can add **their own** uid with `true` (joining by invite) |
 | new `trips/<pushId>` | n/a | signed-in user, if the new trip lists them under `members` |
-| `splitHistory/<tripId>/<entryId>` (Split Summary change history) | members of `<tripId>` | members, **create only**: the entry must be new, authored by the caller (`byUid`), keyed by its own `id`, with a valid `kind`, bounded string lengths (`byName`/`userName` 100, `description` 500), `balanceChanges` as a collection of at most 100 `{userName: string, amount: number}` elements, and no other fields |
+| `splitHistory/<tripId>/<entryId>` (Split Summary change history) | members of `<tripId>` | members, **create only**: the entry must be new, authored by the caller (`byUid`), keyed by its own `id`, with a valid `kind`, bounded string lengths (`byName`/`userName` 100, `description` 500), `balanceChanges` as a collection of at most 100 `{userName: string, amount: number}` elements, an optional `range` (`rangeId`, `startDate`, `endDate`) and `days` (per-day lines of a grouped **Ranged expense** change), both validated for shape, and no other fields |
 | `users/<uid>` | that user | that user |
 | `users/<uid>/userName` | any signed-in user | that user |
 | `server/<configKey>` | any signed-in user | nobody (console/admin only) |

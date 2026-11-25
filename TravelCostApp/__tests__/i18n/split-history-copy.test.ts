@@ -13,6 +13,10 @@ const KEYS = [
   "splitHistoryPaidBack",
   "splitHistorySettlement",
   "splitHistoryBy",
+  "splitHistoryRange",
+  "splitHistoryRangeDay",
+  "splitHistoryShowDays",
+  "splitHistoryHideDays",
 ];
 
 describe("split history copy", () => {

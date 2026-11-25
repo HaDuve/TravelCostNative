@@ -7,7 +7,7 @@ import {
 } from "./offline-queue";
 import type { UserDeleteExpenseTarget } from "./user-delete-expense";
 import {
-  buildExpenseEditEntry,
+  buildExpensesEditEntry,
   buildSplitHistoryEntry,
   type SplitHistoryAuthor,
   type SplitHistoryEntry,
@@ -52,26 +52,12 @@ const assignClientIds = (instances: ExpenseData[], editedTimestamp: number) =>
 
 async function syncRangedAdds(
   expenses: ExpenseData[],
-  { tripid, uid, isOnline, history }: RangedExpensePersistParams,
-  /** Replace flow: one edit entry rides on the first add instead of one entry per day. */
-  firstItemEntry?: SplitHistoryEntry | null,
+  { tripid, uid, isOnline }: RangedExpensePersistParams,
+  /** One grouped entry for the whole range rides on the first add. */
+  groupedEntry: SplitHistoryEntry | null,
 ): Promise<void> {
   for (const [index, expenseData] of expenses.entries()) {
-    const historyEntry = firstItemEntry !== undefined
-      ? index === 0
-        ? firstItemEntry
-        : null
-      : history
-        ? buildSplitHistoryEntry({
-            kind: "added",
-            description: expenseData.description,
-            before: [],
-            after: [expenseData],
-            tripCurrency: history.tripCurrency,
-            isPaidTimestamp: history.isPaidTimestamp,
-            author: history.author,
-          })
-        : null;
+    const historyEntry = index === 0 ? groupedEntry : null;
     const item: OfflineQueueManageExpenseItem = {
       type: "add",
       expense: {
@@ -97,8 +83,21 @@ export function persistRangedExpenseAdd(
     params.expenseCtx.addExpense(expense);
   }
 
+  const { history } = params;
+  const addEntry = history
+    ? buildSplitHistoryEntry({
+        kind: "added",
+        description: prepared[0]?.description ?? "",
+        before: [],
+        after: prepared,
+        tripCurrency: history.tripCurrency,
+        isPaidTimestamp: history.isPaidTimestamp,
+        author: history.author,
+      })
+    : null;
+
   return {
-    syncPromise: syncRangedAdds(prepared, params),
+    syncPromise: syncRangedAdds(prepared, params, addEntry),
   };
 }
 
@@ -111,18 +110,25 @@ async function syncRangedInPlaceUpdates(
   updates: RangedExpenseInPlaceUpdate[],
   { tripid, uid, isOnline, history }: RangedExpensePersistParams,
 ): Promise<void> {
-  for (const { id, expenseData } of updates) {
-    const previous = history?.expenses.find((e) => e.id === id);
-    const historyEntry =
-      history && previous
-        ? buildExpenseEditEntry({
-            before: previous,
-            after: expenseData,
-            tripCurrency: history.tripCurrency,
-            isPaidTimestamp: history.isPaidTimestamp,
-            author: history.author,
-          })
-        : null;
+  // One entry for the whole edit (grouped when it touches several days).
+  const updateIds = new Set(updates.map((u) => u.id));
+  const previous = history?.expenses.filter((e) => e.id && updateIds.has(e.id));
+  const editEntry =
+    history && previous?.length
+      ? buildExpensesEditEntry({
+          before: previous,
+          after: updates.map((u) => ({ ...u.expenseData, id: u.id })),
+          tripCurrency: history.tripCurrency,
+          isPaidTimestamp: history.isPaidTimestamp,
+          author: history.author,
+          rangeSiblings: history.expenses,
+        })
+      : null;
+  // The grouped entry rides on the FIRST queued update only (one entry per user
+  // action). Known limitation: if that item fails permanently, the group's
+  // history entry is lost while the other days' updates still apply; the Split
+  // Summary itself is always recomputed from the Expenses.
+  for (const [index, { id, expenseData }] of updates.entries()) {
     const item: OfflineQueueManageExpenseItem = {
       type: "update",
       expense: {
@@ -131,7 +137,7 @@ async function syncRangedInPlaceUpdates(
         id,
         expenseData,
       },
-      ...(historyEntry ? { historyEntry } : {}),
+      ...(index === 0 && editEntry ? { historyEntry: editEntry } : {}),
     };
     await updateExpenseWithRetryAndQueue(item, isOnline);
   }
@@ -201,7 +207,7 @@ export function persistRangedExpenseReplace(
   return {
     syncPromise: (async () => {
       await syncRangedDeletes(deleteTargets, params.isOnline);
-      await syncRangedAdds(prepared, params, history ? replaceEntry : undefined);
+      await syncRangedAdds(prepared, params, replaceEntry);
     })(),
   };
 }

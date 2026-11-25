@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import PropTypes from "prop-types";
 
 import AppModal from "../UI/AppModal";
@@ -15,6 +15,7 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { MODAL_MAX_WIDTH } from "../../util/modal-frame-layout";
 import type {
   BalanceChange,
+  SplitHistoryRange,
   SplitHistoryEntry,
   SplitHistoryKind,
 } from "../../util/split-history";
@@ -47,6 +48,25 @@ function formatWhen(timestamp: number): string {
   }
 }
 
+/** `YYYY-MM-DD` as a local calendar day, so it never shifts with the time zone. */
+function formatDay(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  try {
+    return new Date(y, m - 1, d).toLocaleDateString(i18n.locale, {
+      dateStyle: "medium",
+    });
+  } catch {
+    return date;
+  }
+}
+
+function formatRange(range: SplitHistoryRange): string {
+  return i18n.t("splitHistoryRange", {
+    start: formatDay(range.startDate),
+    end: formatDay(range.endDate),
+  });
+}
+
 /** Rows come from a shared database: skip anything that is not a well-formed change. */
 function validChanges(changes: unknown): BalanceChange[] {
   const list = Array.isArray(changes)
@@ -68,11 +88,20 @@ const HistoryRow = React.memo(function HistoryRow({
 }: {
   entry: SplitHistoryEntry;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const days = entry.days;
   return (
     <View testID={`split-history-entry-${entry.id}`} style={styles.row}>
       <Text style={styles.kind}>{i18n.t(KIND_COPY_KEYS[entry.kind])}</Text>
       {!!entry.description && (
         <Text style={styles.description}>{entry.description}</Text>
+      )}
+      {!!entry.range && (
+        <Text style={styles.range}>
+          {days
+            ? formatRange(entry.range)
+            : i18n.t("splitHistoryRangeDay", { range: formatRange(entry.range) })}
+        </Text>
       )}
       <Text style={styles.meta}>
         {`${i18n.t("splitHistoryBy", { name: entry.byName })} · ${formatWhen(
@@ -90,6 +119,41 @@ const HistoryRow = React.memo(function HistoryRow({
           {formatChange(change, entry.tripCurrency)}
         </Text>
       ))}
+      {!!days?.length && (
+        <>
+          <Pressable
+            testID={`split-history-toggle-${entry.id}`}
+            accessibilityRole="button"
+            onPress={() => setExpanded((open) => !open)}
+            style={styles.toggle}
+          >
+            <Text style={styles.toggleText}>
+              {i18n.t(expanded ? "splitHistoryHideDays" : "splitHistoryShowDays")}
+            </Text>
+          </Pressable>
+          {expanded &&
+            days.map((day) => (
+              <View
+                key={day.date}
+                testID={`split-history-day-${entry.id}-${day.date}`}
+                style={styles.day}
+              >
+                <Text style={styles.dayDate}>{formatDay(day.date)}</Text>
+                {day.balanceChanges.map((change) => (
+                  <Text
+                    key={change.userName}
+                    style={[
+                      styles.dayChange,
+                      change.amount < 0 ? styles.changeNegative : styles.changePositive,
+                    ]}
+                  >
+                    {formatChange(change, entry.tripCurrency)}
+                  </Text>
+                ))}
+              </View>
+            ))}
+        </>
+      )}
     </View>
   );
 });
@@ -278,6 +342,25 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray700,
     marginBottom: dynamicScale(4, true),
   },
+  range: {
+    fontSize: dynamicScale(14, false, 0.5),
+    color: GlobalStyles.colors.textColor,
+  },
+  toggle: { paddingVertical: dynamicScale(6, true) },
+  toggleText: {
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "600",
+    color: GlobalStyles.colors.primary500,
+  },
+  day: {
+    paddingLeft: dynamicScale(10, false, 0.5),
+    paddingVertical: dynamicScale(3, true),
+  },
+  dayDate: {
+    fontSize: dynamicScale(13, false, 0.5),
+    color: GlobalStyles.colors.gray700,
+  },
+  dayChange: { fontSize: dynamicScale(14, false, 0.5) },
   change: { fontSize: dynamicScale(15, false, 0.5) },
   changePositive: { color: GlobalStyles.colors.textColor },
   changeNegative: { color: GlobalStyles.colors.errorGrayed },

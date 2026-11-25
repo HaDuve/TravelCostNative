@@ -697,6 +697,10 @@ const en = {
   splitHistoryPaidBack: "Paid back",
   splitHistorySettlement: "Settlement",
   splitHistoryBy: "by %{name}",
+  splitHistoryRange: "%{start} – %{end}",
+  splitHistoryRangeDay: "Day of %{range}",
+  splitHistoryShowDays: "Show days",
+  splitHistoryHideDays: "Hide days",
 };
 const de = {
   // special expense strings
@@ -1437,6 +1441,10 @@ const de = {
   splitHistoryPaidBack: "Zurückgezahlt",
   splitHistorySettlement: "Budget beglichen",
   splitHistoryBy: "von %{name}",
+  splitHistoryRange: "%{start} – %{end}",
+  splitHistoryRangeDay: "Tag aus %{range}",
+  splitHistoryShowDays: "Tage anzeigen",
+  splitHistoryHideDays: "Tage ausblenden",
 };
 const fr = {
   // special expense strings
@@ -2174,6 +2182,10 @@ const fr = {
   splitHistoryPaidBack: "Remboursé",
   splitHistorySettlement: "Règlement",
   splitHistoryBy: "par %{name}",
+  splitHistoryRange: "%{start} – %{end}",
+  splitHistoryRangeDay: "Jour de %{range}",
+  splitHistoryShowDays: "Afficher les jours",
+  splitHistoryHideDays: "Masquer les jours",
 };
 const ru = {
   // special expense strings
@@ -2909,5 +2921,9 @@ const ru = {
   splitHistoryPaidBack: "Возвращено",
   splitHistorySettlement: "Расчёт",
   splitHistoryBy: "от %{name}",
+  splitHistoryRange: "%{start} – %{end}",
+  splitHistoryRangeDay: "День из %{range}",
+  splitHistoryShowDays: "Показать дни",
+  splitHistoryHideDays: "Скрыть дни",
 };
 export { en, de, fr, ru };

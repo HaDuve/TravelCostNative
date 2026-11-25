@@ -199,8 +199,16 @@ function expectSameBalances(
     pairs: e.map(sortKey),
   });
   a.forEach((b, i) => {
-    expect({ label, pair: sortKey(b), within: Math.abs(b.amount - e[i].amount) <= MINOR_UNIT + 1e-9 })
-      .toEqual({ label, pair: sortKey(b), within: true });
+    const diff = Math.abs(b.amount - e[i].amount);
+    try {
+      expect(diff).toBeLessThanOrEqual(MINOR_UNIT + 1e-9);
+    } catch (err) {
+      // Prefix the matcher failure with which Balance differs.
+      (err as Error).message =
+        `${label} ${sortKey(b)}: got ${b.amount}, expected ${e[i].amount}\n` +
+        (err as Error).message;
+      throw err;
+    }
   });
 }
 

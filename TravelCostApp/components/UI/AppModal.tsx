@@ -42,21 +42,22 @@ const AppModal = ({
       onRequestClose={onClose}
       testID={testID}
     >
-      <Pressable
-        style={styles.modalOverlay}
-        onPress={onClose}
-        testID={backdropTestID}
-        accessibilityRole="button"
-      >
-        <Pressable onPress={(event) => event.stopPropagation()}>
-          <View
-            testID={contentTestID}
-            style={[styles.modalContainer, contentStyle]}
-          >
-            {children}
-          </View>
-        </Pressable>
-      </Pressable>
+      {/* Backdrop is a sibling, not a wrapper: a Pressable/responder around the
+          content would claim the touch and stop inner lists from scrolling. */}
+      <View style={styles.modalOverlay}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={onClose}
+          testID={backdropTestID}
+          accessibilityRole="button"
+        />
+        <View
+          testID={contentTestID}
+          style={[styles.modalContainer, contentStyle]}
+        >
+          {children}
+        </View>
+      </View>
     </Modal>
   );
 };

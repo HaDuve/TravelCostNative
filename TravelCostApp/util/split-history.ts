@@ -42,7 +42,28 @@ export interface SplitHistoryEntry {
   timestamp: number;
   tripCurrency: string;
   balanceChanges: BalanceChange[];
+  /** Set when the change touches a **Ranged expense** (one day or all of it). */
+  range?: SplitHistoryRange;
+  /**
+   * Set on a grouped entry: one change to several days of a **Ranged expense**
+   * shown as one row, expandable to these per-day lines. A change to a single
+   * day has `range` but no `days`.
+   */
+  days?: SplitHistoryDay[];
 }
+
+/**
+ * The **Ranged expense** a change belongs to. Dates are calendar days
+ * (`YYYY-MM-DD`) covering the whole range, not only the days that changed.
+ */
+export type SplitHistoryRange = {
+  rangeId: string;
+  startDate: string;
+  endDate: string;
+};
+
+/** One day of a grouped entry; the days add up to the entry's `balanceChanges`. */
+export type SplitHistoryDay = { date: string; balanceChanges: BalanceChange[] };
 
 export type SplitHistoryAuthor = { uid: string; userName: string };
 
@@ -91,6 +112,60 @@ export function balanceChangeBetween(
   return changes.sort((a, b) => b.amount - a.amount);
 }
 
+const dayKey = (expense: ExpenseData): string =>
+  new Date((expense.date ?? expense.startDate) as Date | string).toISOString().slice(0, 10);
+
+/** Groups a change to several **Ranged expense** days; null when it is not one. */
+function describeRangedChange(
+  before: ExpenseData[],
+  after: ExpenseData[],
+  siblings: ExpenseData[]
+): { range: SplitHistoryRange; grouped: boolean } | null {
+  const involved = [...before, ...after];
+  const anchor = [...after, ...before].find((e) => e.rangeId);
+  if (!anchor?.rangeId) return null;
+  const rangeId = anchor.rangeId;
+  const inRange = [
+    ...involved,
+    ...siblings.filter((e) => !e.isDeleted),
+  ].filter((e) => e.rangeId === rangeId);
+  const dates = inRange.map(dayKey).sort();
+  const distinct = new Set(involved.map((e) => e.id ?? dayKey(e)));
+  return {
+    range: { rangeId, startDate: dates[0], endDate: dates[dates.length - 1] },
+    grouped: distinct.size > 1,
+  };
+}
+
+function balanceChangesByDay(
+  before: ExpenseData[],
+  after: ExpenseData[],
+  tripCurrency: string,
+  isPaidTimestamp?: number
+): { days: SplitHistoryDay[]; total: BalanceChange[] } {
+  const dates = [...new Set([...before, ...after].map(dayKey))].sort();
+  const days: SplitHistoryDay[] = [];
+  const totals = new Map<string, number>();
+  for (const date of dates) {
+    const balanceChanges = balanceChangeBetween(
+      before.filter((e) => dayKey(e) === date),
+      after.filter((e) => dayKey(e) === date),
+      tripCurrency,
+      isPaidTimestamp
+    );
+    if (balanceChanges.length === 0) continue;
+    days.push({ date, balanceChanges });
+    for (const c of balanceChanges) {
+      totals.set(c.userName, (totals.get(c.userName) ?? 0) + Math.round(c.amount * 100));
+    }
+  }
+  const total = [...totals]
+    .filter(([, cents]) => cents !== 0)
+    .map(([userName, cents]) => ({ userName, amount: cents / 100 }))
+    .sort((a, b) => b.amount - a.amount);
+  return { days, total };
+}
+
 export function buildSplitHistoryEntry({
   kind,
   description,
@@ -101,6 +176,7 @@ export function buildSplitHistoryEntry({
   afterIsPaidTimestamp,
   author,
   now = Date.now(),
+  rangeSiblings = [],
 }: {
   kind: SplitHistoryKind;
   description: string;
@@ -114,14 +190,28 @@ export function buildSplitHistoryEntry({
   afterIsPaidTimestamp?: number;
   author: SplitHistoryAuthor;
   now?: number;
+  /** The trip's expenses, so a change to one day knows its whole range. */
+  rangeSiblings?: ExpenseData[];
 }): SplitHistoryEntry | null {
-  const balanceChanges = balanceChangeBetween(
-    before,
-    after,
-    tripCurrency,
-    isPaidTimestamp,
-    afterIsPaidTimestamp ?? isPaidTimestamp
-  );
+  const ranged =
+    afterIsPaidTimestamp === undefined
+      ? describeRangedChange(before, after, rangeSiblings)
+      : null;
+  let balanceChanges: BalanceChange[];
+  let days: SplitHistoryDay[] | undefined;
+  if (ranged?.grouped) {
+    const byDay = balanceChangesByDay(before, after, tripCurrency, isPaidTimestamp);
+    balanceChanges = byDay.total;
+    days = byDay.days;
+  } else {
+    balanceChanges = balanceChangeBetween(
+      before,
+      after,
+      tripCurrency,
+      isPaidTimestamp,
+      afterIsPaidTimestamp ?? isPaidTimestamp
+    );
+  }
   if (balanceChanges.length === 0) return null;
   return {
     id: newSplitHistoryId(now),
@@ -132,6 +222,8 @@ export function buildSplitHistoryEntry({
     timestamp: now,
     tripCurrency,
     balanceChanges,
+    ...(ranged ? { range: ranged.range } : {}),
+    ...(days ? { days } : {}),
   };
 }
 
@@ -142,10 +234,7 @@ export function buildSplitHistoryEntry({
 export function buildExpenseEditEntry({
   before,
   after,
-  tripCurrency,
-  isPaidTimestamp,
-  author,
-  now,
+  ...rest
 }: {
   before: ExpenseData;
   after: ExpenseData;
@@ -153,18 +242,47 @@ export function buildExpenseEditEntry({
   isPaidTimestamp?: number;
   author: SplitHistoryAuthor;
   now?: number;
+  rangeSiblings?: ExpenseData[];
 }): SplitHistoryEntry | null {
-  const wasOpen =
-    getEffectivePaidBack(before, isPaidTimestamp) !== paidBackStatus.paid;
-  const nowPaid = getEffectivePaidBack(after, isPaidTimestamp) === paidBackStatus.paid;
+  return buildExpensesEditEntry({ before: [before], after: [after], ...rest });
+}
+
+/**
+ * Entry for several edited days of one **Ranged expense**, grouped as one
+ * entry. **Paid back** when every day moved from open to paid back.
+ */
+export function buildExpensesEditEntry({
+  before,
+  after,
+  tripCurrency,
+  isPaidTimestamp,
+  author,
+  now,
+  rangeSiblings,
+}: {
+  before: ExpenseData[];
+  after: ExpenseData[];
+  tripCurrency: string;
+  isPaidTimestamp?: number;
+  author: SplitHistoryAuthor;
+  now?: number;
+  rangeSiblings?: ExpenseData[];
+}): SplitHistoryEntry | null {
+  const wasOpen = before.every(
+    (e) => getEffectivePaidBack(e, isPaidTimestamp) !== paidBackStatus.paid
+  );
+  const nowPaid = after.every(
+    (e) => getEffectivePaidBack(e, isPaidTimestamp) === paidBackStatus.paid
+  );
   return buildSplitHistoryEntry({
     kind: wasOpen && nowPaid ? "paidBack" : "edited",
-    description: after.description,
-    before: [before],
-    after: [after],
+    description: after[0]?.description ?? before[0]?.description ?? "",
+    before,
+    after,
     tripCurrency,
     isPaidTimestamp,
     author,
     now,
+    rangeSiblings,
   });
 }

@@ -174,6 +174,77 @@ describe("SplitHistoryModal", () => {
     expect(fetchPage).not.toHaveBeenCalled();
   });
 
+  describe("Ranged expense entries", () => {
+    const day = (d: number) => `2026-01-${String(d).padStart(2, "0")}`;
+    const rangedEntry = (n: number, extra: Partial<SplitHistoryEntry> = {}): SplitHistoryEntry => ({
+      ...entry(n, "edited", "Rent"),
+      balanceChanges: [
+        { userName: "Alice", amount: 30 },
+        { userName: "Bob", amount: -30 },
+      ],
+      range: { rangeId: "r1", startDate: day(1), endDate: day(3) },
+      days: [1, 2, 3].map((d) => ({
+        date: day(d),
+        balanceChanges: [
+          { userName: "Alice", amount: 10 },
+          { userName: "Bob", amount: -10 },
+        ],
+      })),
+      ...extra,
+    });
+
+    it("shows a grouped change as one row with the range and combined Balance change, days collapsed", async () => {
+      fetchPage.mockResolvedValueOnce({ entries: [rangedEntry(1)], hasMore: false });
+      const screen = renderModal();
+
+      const row = await screen.findByTestId(`split-history-entry-${entry(1).id}`);
+      expect(within(row).getByText("Rent")).toBeTruthy();
+      expect(within(row).getByText(/Jan 1, 2026 – Jan 3, 2026/)).toBeTruthy();
+      expect(within(row).getByText(/Alice \+€30/)).toBeTruthy();
+      expect(within(row).queryByTestId(`split-history-day-${entry(1).id}-${day(2)}`)).toBeNull();
+      expect(screen.getAllByTestId(/^split-history-entry-/)).toHaveLength(1);
+    });
+
+    it("expands to the per-day lines, which add up to the group total", async () => {
+      fetchPage.mockResolvedValueOnce({ entries: [rangedEntry(1)], hasMore: false });
+      const screen = renderModal();
+      await screen.findByTestId(`split-history-entry-${entry(1).id}`);
+
+      fireEvent.press(screen.getByTestId(`split-history-toggle-${entry(1).id}`));
+
+      for (const d of [1, 2, 3]) {
+        const line = screen.getByTestId(`split-history-day-${entry(1).id}-${day(d)}`);
+        expect(within(line).getByText(/Alice \+€10/)).toBeTruthy();
+      }
+      expect(screen.getByText("Hide days")).toBeTruthy();
+
+      fireEvent.press(screen.getByTestId(`split-history-toggle-${entry(1).id}`));
+      expect(screen.queryByTestId(`split-history-day-${entry(1).id}-${day(1)}`)).toBeNull();
+    });
+
+    it("labels a single-day edit with the range it belongs to and offers no day lines", async () => {
+      fetchPage.mockResolvedValueOnce({
+        entries: [rangedEntry(1, { days: undefined })],
+        hasMore: false,
+      });
+      const screen = renderModal();
+
+      const row = await screen.findByTestId(`split-history-entry-${entry(1).id}`);
+      expect(within(row).getByText(/Day of Jan 1, 2026 – Jan 3, 2026/)).toBeTruthy();
+      expect(screen.queryByTestId(`split-history-toggle-${entry(1).id}`)).toBeNull();
+    });
+
+    it("counts a grouped row as one of the page's 20 rows", async () => {
+      const grouped = Array.from({ length: 20 }, (_, i) => rangedEntry(45 - i));
+      fetchPage.mockResolvedValueOnce({ entries: grouped, hasMore: true });
+      const screen = renderModal();
+
+      await screen.findByTestId(`split-history-entry-${entry(45).id}`);
+      expect(listedIds(screen)).toHaveLength(20);
+      expect(screen.getByTestId("split-history-load-more")).toBeTruthy();
+    });
+  });
+
   it("caps the modal width on tablets and fills the phone width", async () => {
     fetchPage.mockResolvedValue({ entries: [entry(1)], hasMore: false });
     const tablet = renderModal({}, { width: 1194, height: 834 });

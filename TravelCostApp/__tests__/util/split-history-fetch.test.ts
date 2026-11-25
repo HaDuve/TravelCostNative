@@ -100,6 +100,28 @@ describe("fetchSplitHistoryPage", () => {
   });
 });
 
+describe("page size and grouped Ranged expense entries", () => {
+  const grouped = (n: number): SplitHistoryEntry => ({
+    ...entry(n),
+    range: { rangeId: "r1", startDate: "2026-01-01", endDate: "2026-01-30" },
+    days: Array.from({ length: 30 }, (_, d) => ({
+      date: `2026-01-${String(d + 1).padStart(2, "0")}`,
+      balanceChanges: [
+        { userName: "Alice", amount: 1 },
+        { userName: "Bob", amount: -1 },
+      ],
+    })),
+  });
+
+  it("counts a 30-day grouped entry as one row of the page", async () => {
+    serve(Array.from({ length: 25 }, (_, i) => grouped(i + 1)));
+    const page = await fetchSplitHistoryPage("trip-1");
+    expect(page.entries).toHaveLength(SPLIT_HISTORY_PAGE_SIZE);
+    expect(page.hasMore).toBe(true);
+    expect(page.entries[0].days).toHaveLength(30);
+  });
+});
+
 describe("appendSplitHistoryEntry", () => {
   it("puts the entry at its own id under the trip's history", async () => {
     (axios.put as jest.Mock).mockResolvedValue({});

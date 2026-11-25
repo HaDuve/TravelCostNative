@@ -45,7 +45,16 @@
         ".read": "auth != null && root.child('trips').child($tripId).child('members').child(auth.uid).val() === true",
         "$entryId": {
           ".write": "auth != null && root.child('trips').child($tripId).child('members').child(auth.uid).val() === true && !data.exists() && newData.exists()",
-          ".validate": "newData.hasChildren(['id', 'kind', 'byUid', 'byName', 'timestamp', 'tripCurrency', 'balanceChanges']) && newData.child('id').val() === $entryId && newData.child('byUid').val() === auth.uid && newData.child('kind').isString() && newData.child('kind').val().matches(/^(added|edited|deleted|undone|paidBack|settlement)$/) && newData.child('byName').isString() && newData.child('timestamp').isNumber() && newData.child('tripCurrency').isString() && (!newData.child('description').exists() || newData.child('description').isString())"
+          ".validate": "newData.hasChildren(['id', 'kind', 'byUid', 'byName', 'timestamp', 'tripCurrency', 'balanceChanges']) && newData.child('id').val() === $entryId && newData.child('byUid').val() === auth.uid && newData.child('kind').isString() && newData.child('kind').val().matches(/^(added|edited|deleted|undone|paidBack|settlement)$/) && newData.child('byName').isString() && newData.child('timestamp').isNumber() && newData.child('tripCurrency').isString() && (!newData.child('description').exists() || newData.child('description').isString())",
+          "range": {
+            ".validate": "newData.hasChildren(['rangeId', 'startDate', 'endDate']) && newData.child('rangeId').isString() && newData.child('startDate').isString() && newData.child('endDate').isString()"
+          },
+          "days": {
+            ".validate": "newData.hasChildren()",
+            "$dayIndex": {
+              ".validate": "newData.hasChildren(['date', 'balanceChanges']) && newData.child('date').isString()"
+            }
+          }
         }
       }
     }

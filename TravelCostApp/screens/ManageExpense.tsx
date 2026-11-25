@@ -357,6 +357,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       before: selectedExpense,
       after: { ...expenseData, id: editedExpenseId },
       ...splitHistory,
+      rangeSiblings: expenseCtx.expenses,
     });
     const item: OfflineQueueManageExpenseItem = {
       type: "update",

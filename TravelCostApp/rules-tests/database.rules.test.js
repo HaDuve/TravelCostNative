@@ -541,6 +541,39 @@ describe("split history", () => {
     await assertSucceeds(historyRef(memberDb()).set(rest));
   });
 
+  const groupedRange = () => ({
+    range: { rangeId: "r1", startDate: "2026-01-01", endDate: "2026-01-02" },
+    days: [
+      { date: "2026-01-01", balanceChanges: [{ userName: "Alice", amount: 5 }] },
+      { date: "2026-01-02", balanceChanges: [{ userName: "Alice", amount: 5 }] },
+    ],
+  });
+
+  test("a member appends a grouped Ranged expense entry and a single-day entry labelled with its range", async () => {
+    await assertSucceeds(
+      historyRef(memberDb()).set(historyEntry(NEW_ID, MEMBER_UID, groupedRange()))
+    );
+    const { days, ...single } = groupedRange();
+    const otherId = "0000000004000-dddddd";
+    await assertSucceeds(
+      historyRef(memberDb(), TRIP_ID, otherId).set(historyEntry(otherId, MEMBER_UID, single))
+    );
+  });
+
+  test.each([
+    ["a range without an end date", { range: { rangeId: "r1", startDate: "2026-01-01" } }],
+    ["a non-string range id", { range: { rangeId: 7, startDate: "a", endDate: "b" } }],
+    ["a range that is not an object", { range: "2026-01-01" }],
+    ["a day without a date", { days: [{ balanceChanges: [{ userName: "A", amount: 1 }] }] }],
+    ["a day without balance changes", { days: [{ date: "2026-01-01" }] }],
+    ["days that are not a list", { days: "many" }],
+  ])("rejects an entry with %s", async (_label, overrides) => {
+    const bad = JSON.parse(
+      JSON.stringify(historyEntry(NEW_ID, MEMBER_UID, { ...groupedRange(), ...overrides }))
+    );
+    await assertFails(historyRef(memberDb()).set(bad));
+  });
+
   test("a non-member cannot append to someone else's trip history", async () => {
     await assertFails(historyRef(outsiderDb()).set(historyEntry(NEW_ID, OUTSIDER_UID)));
   });

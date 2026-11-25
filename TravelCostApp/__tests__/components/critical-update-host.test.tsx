@@ -59,6 +59,7 @@ describe("CriticalUpdateHost", () => {
   it("reloads without interaction when a critical update is ready", async () => {
     mockUpdateReady = true;
     mockIsCritical = true;
+    mockApplyReload.mockReturnValue(new Promise(() => undefined));
     const screen = renderWithAppProviders(
       <CriticalUpdateHost focusedRouteName="Overview" />,
       { wrapNavigation: false }
@@ -106,6 +107,35 @@ describe("CriticalUpdateHost", () => {
     screen.rerender(<CriticalUpdateHost focusedRouteName="Overview" />);
     await waitFor(() => {
       expect(mockApplyReload).toHaveBeenCalledTimes(1);
+    });
+    screen.rerender(<CriticalUpdateHost focusedRouteName="Settings" />);
+    expect(mockApplyReload).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears the toast when the reload resolves without restarting, without retrying", async () => {
+    mockUpdateReady = true;
+    mockIsCritical = true;
+    const screen = renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="Overview" />,
+      { wrapNavigation: false }
+    );
+    await waitFor(() => {
+      expect(screen.queryByTestId("critical-update-toast")).toBeNull();
+    });
+    screen.rerender(<CriticalUpdateHost focusedRouteName="Settings" />);
+    expect(mockApplyReload).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears the toast and does not retry when the reload rejects", async () => {
+    mockUpdateReady = true;
+    mockIsCritical = true;
+    mockApplyReload.mockRejectedValue(new Error("reload failed"));
+    const screen = renderWithAppProviders(
+      <CriticalUpdateHost focusedRouteName="Overview" />,
+      { wrapNavigation: false }
+    );
+    await waitFor(() => {
+      expect(screen.queryByTestId("critical-update-toast")).toBeNull();
     });
     screen.rerender(<CriticalUpdateHost focusedRouteName="Settings" />);
     expect(mockApplyReload).toHaveBeenCalledTimes(1);

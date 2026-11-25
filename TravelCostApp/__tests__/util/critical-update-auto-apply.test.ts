@@ -26,7 +26,7 @@ describe("isSafeRouteForCriticalUpdate", () => {
 });
 
 describe("shouldAutoApplyCriticalUpdate", () => {
-  it("shows only when a critical update is ready on a safe route", () => {
+  it("applies only when a critical update is ready on a safe route", () => {
     expect(
       shouldAutoApplyCriticalUpdate({
         updateReady: true,
@@ -46,24 +46,7 @@ describe("shouldAutoApplyCriticalUpdate", () => {
     ).toBe(false);
   });
 
-  it("shows after leaving a form when the critical update is already ready", () => {
-    expect(
-      shouldAutoApplyCriticalUpdate({
-        updateReady: true,
-        isCritical: true,
-        routeName: "ManageExpense",
-      })
-    ).toBe(false);
-    expect(
-      shouldAutoApplyCriticalUpdate({
-        updateReady: true,
-        isCritical: true,
-        routeName: "Overview",
-      })
-    ).toBe(true);
-  });
-
-  it("never shows for non-critical or missing updates", () => {
+  it("never applies for non-critical or missing updates", () => {
     expect(
       shouldAutoApplyCriticalUpdate({
         updateReady: true,

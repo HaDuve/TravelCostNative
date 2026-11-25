@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AppState, StyleSheet, Text, View } from "react-native";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
 import { useCriticalOta } from "../../store/critical-ota-context";
@@ -25,6 +27,7 @@ const CriticalUpdateHost = ({ focusedRouteName }: CriticalUpdateHostProps) => {
     useCriticalOta();
   const reloadStartedRef = useRef(false);
   const [applying, setApplying] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     void requestCheckAndFetch();
@@ -51,12 +54,15 @@ const CriticalUpdateHost = ({ focusedRouteName }: CriticalUpdateHostProps) => {
     // One attempt per session: a failing reload must not loop.
     reloadStartedRef.current = true;
     setApplying(true);
-    applyReload().catch(() => setApplying(false));
+    // Reset on resolve too: a reload that returns without restarting must not leave the toast stuck.
+    applyReload()
+      .catch(() => undefined)
+      .finally(() => setApplying(false));
   }, [shouldApply, applyReload]);
 
   if (!applying) return null;
   return (
-    <View style={styles.toast} pointerEvents="none" testID="critical-update-toast">
+    <View style={[styles.toast, { top: insets.top + 12 }]} pointerEvents="none" testID="critical-update-toast">
       <Text style={styles.text}>{i18n.t("criticalUpdateApplying")}</Text>
     </View>
   );
@@ -65,14 +71,15 @@ const CriticalUpdateHost = ({ focusedRouteName }: CriticalUpdateHostProps) => {
 const styles = StyleSheet.create({
   toast: {
     position: "absolute",
-    top: 60,
+    zIndex: 1000,
+    elevation: 1000,
     alignSelf: "center",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
     backgroundColor: GlobalStyles.colors.primary500,
   },
-  text: { color: "white", fontWeight: "600" },
+  text: { color: GlobalStyles.colors.gray300, fontWeight: "600" },
 });
 
 export default CriticalUpdateHost;

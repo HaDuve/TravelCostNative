@@ -642,15 +642,17 @@ function sumUpSamePairs(openSplits) {
   return listOfSums;
 }
 
-function cancelDifferences(openSplits) {
+export function cancelDifferences(openSplits) {
   // Net each pair of opposite directions into a single Balance. Independent of
   // list order (an earlier in-place splice/filter version dropped Balances
   // depending on the order Expenses were added).
+  const byPair = new Map();
+  for (const e of openSplits) {
+    byPair.set(`${e.userName}\u0000${e.whoPaid}`, e);
+  }
   const result = [];
   for (const split of openSplits) {
-    const opposite = openSplits.find(
-      (e) => e.userName === split.whoPaid && e.whoPaid === split.userName
-    );
+    const opposite = byPair.get(`${split.whoPaid}\u0000${split.userName}`);
     if (!opposite) {
       if (split.amount !== 0) result.push({ ...split });
       continue;

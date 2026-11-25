@@ -133,11 +133,23 @@ describe("appendSplitHistoryEntry", () => {
     expect((axios.put as jest.Mock).mock.calls[0][1]).toEqual(e);
   });
 
-  it("does not fail the Expense sync when the create-only rules refuse a retry", async () => {
+  it("treats a refusal as success when the entry already landed (create-only retry)", async () => {
+    const { withAuthToken } = jest.requireMock("../../util/authed-request");
+    const e = entry(1);
+    withAuthToken.mockRejectedValueOnce(new AuthFailureError("appendSplitHistoryEntry"));
+    (axios.get as jest.Mock).mockReset();
+    (axios.get as jest.Mock).mockResolvedValueOnce({ data: e });
+
+    await expect(appendSplitHistoryEntry("trip-1", e)).resolves.toBeUndefined();
+    expect((axios.get as jest.Mock).mock.calls[0][0]).toContain(`/splitHistory/trip-1/${e.id}.json`);
+  });
+
+  it("surfaces a refusal when the entry did not land (expired token, undeployed rules)", async () => {
     const { withAuthToken } = jest.requireMock("../../util/authed-request");
     withAuthToken.mockRejectedValueOnce(new AuthFailureError("appendSplitHistoryEntry"));
+    (axios.get as jest.Mock).mockResolvedValueOnce({ data: null });
 
-    await expect(appendSplitHistoryEntry("trip-1", entry(1))).resolves.toBeUndefined();
+    await expect(appendSplitHistoryEntry("trip-1", entry(1))).rejects.toThrow("AUTH-FAILURE");
   });
 
   it("lets network errors through so the Expense change is retried from the queue", async () => {

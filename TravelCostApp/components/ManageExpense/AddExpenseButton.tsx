@@ -19,7 +19,7 @@ import {
 import { expensesForTemplateSelection } from "../../util/template-expense-pool";
 import uniqBy from "lodash.uniqby";
 import { dynamicScale } from "../../util/scalingUtil";
-import { safelyParseJSON } from "../../util/jsonParse";
+import { buildTemplateExpenseData } from "../../util/expense-template";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import ExpenseTemplatePickerModal from "./ExpenseTemplatePickerModal";
@@ -84,7 +84,7 @@ const AddExpenseButton = ({ navigation }) => {
     (item: ExpenseData) => {
       let data: ExpenseData;
       try {
-        data = safelyParseJSON(JSON.stringify(item));
+        data = buildTemplateExpenseData(item);
       } catch {
         return;
       }
@@ -97,12 +97,6 @@ const AddExpenseButton = ({ navigation }) => {
         templateCurrency: data.currency,
       });
 
-      data.date = new Date().toISOString();
-      data.startDate = new Date().toISOString();
-      data.endDate = new Date().toISOString();
-      delete data.id;
-      delete data.rangeId;
-      delete data.editedTimestamp;
       navigation.navigate("ManageExpense", {
         pickedCat: data.category,
         tempValues: { ...data },

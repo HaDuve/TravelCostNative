@@ -135,4 +135,47 @@ describe("split history write path", () => {
     );
     expect(appendSplitHistoryEntry).not.toHaveBeenCalled();
   });
+
+  it("a failed history write never fails the save: the Expense is written exactly once", async () => {
+    (appendSplitHistoryEntry as jest.Mock).mockRejectedValue(new Error("Network Error"));
+
+    await expect(
+      storeExpenseOnlineOffline(
+        {
+          type: "add",
+          historyEntry: entry("h5"),
+          expense: { tripid: "trip-1", uid: "u1", expenseData: makeExpense() },
+        },
+        true
+      )
+    ).resolves.toBeDefined();
+    await updateExpenseOnlineOffline({
+      type: "update",
+      historyEntry: entry("h6"),
+      expense: { tripid: "trip-1", uid: "u1", id: "e1", expenseData: makeExpense() },
+    });
+
+    expect(storeExpenseWithId).toHaveBeenCalledTimes(1);
+    expect(updateExpense).toHaveBeenCalledTimes(1);
+    expect(mmkvStore["offlineQueue"] ?? []).toEqual([]);
+  });
+
+  it("a failed history write does not keep an applied item in the queue", async () => {
+    (isConnectionFastEnough as jest.Mock).mockResolvedValue({ isFastEnough: false });
+    await storeExpenseOnlineOffline(
+      {
+        type: "add",
+        historyEntry: entry("h7"),
+        expense: { tripid: "trip-1", uid: "u1", expenseData: makeExpense() },
+      },
+      true
+    );
+    (isConnectionFastEnough as jest.Mock).mockResolvedValue({ isFastEnough: true });
+    (appendSplitHistoryEntry as jest.Mock).mockRejectedValue(new Error("500"));
+
+    await sendOfflineQueue(false, () => {});
+
+    expect(storeExpenseWithId).toHaveBeenCalledTimes(1);
+    expect(mmkvStore["offlineQueue"] ?? []).toEqual([]);
+  });
 });

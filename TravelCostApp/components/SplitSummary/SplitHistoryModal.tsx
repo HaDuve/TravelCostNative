@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import PropTypes from "prop-types";
 
 import AppModal from "../UI/AppModal";
@@ -8,7 +15,10 @@ import ModalFrame from "../layout/ModalFrame";
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
 import { useLayoutProfile } from "../../store/layout-context";
-import { fetchSplitHistoryPage, SPLIT_HISTORY_PAGE_SIZE } from "../../util/http";
+import {
+  fetchSplitHistoryPage,
+  SPLIT_HISTORY_PAGE_SIZE,
+} from "../../util/http";
 import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../../util/string";
@@ -19,6 +29,8 @@ import type {
   SplitHistoryEntry,
   SplitHistoryKind,
 } from "../../util/split-history";
+
+const MODAL_SCREEN_MARGIN = 16;
 
 const KIND_COPY_KEYS: Record<SplitHistoryKind, string> = {
   added: "splitHistoryAdded",
@@ -33,7 +45,7 @@ function formatChange(change: BalanceChange, tripCurrency: string): string {
   const sign = change.amount < 0 ? "−" : "+";
   return `${change.userName} ${sign}${formatExpenseWithCurrency(
     Math.abs(change.amount),
-    tripCurrency
+    tripCurrency,
   )}`;
 }
 
@@ -79,7 +91,7 @@ function validChanges(changes: unknown): BalanceChange[] {
       !!c &&
       typeof (c as BalanceChange).userName === "string" &&
       typeof (c as BalanceChange).amount === "number" &&
-      Number.isFinite((c as BalanceChange).amount)
+      Number.isFinite((c as BalanceChange).amount),
   );
 }
 
@@ -100,12 +112,14 @@ const HistoryRow = React.memo(function HistoryRow({
         <Text style={styles.range}>
           {days
             ? formatRange(entry.range)
-            : i18n.t("splitHistoryRangeDay", { range: formatRange(entry.range) })}
+            : i18n.t("splitHistoryRangeDay", {
+                range: formatRange(entry.range),
+              })}
         </Text>
       )}
       <Text style={styles.meta}>
         {`${i18n.t("splitHistoryBy", { name: entry.byName })} · ${formatWhen(
-          entry.timestamp
+          entry.timestamp,
         )}`}
       </Text>
       {validChanges(entry.balanceChanges).map((change) => (
@@ -128,7 +142,9 @@ const HistoryRow = React.memo(function HistoryRow({
             style={styles.toggle}
           >
             <Text style={styles.toggleText}>
-              {i18n.t(expanded ? "splitHistoryHideDays" : "splitHistoryShowDays")}
+              {i18n.t(
+                expanded ? "splitHistoryHideDays" : "splitHistoryShowDays",
+              )}
             </Text>
           </Pressable>
           {expanded &&
@@ -144,7 +160,9 @@ const HistoryRow = React.memo(function HistoryRow({
                     key={change.userName}
                     style={[
                       styles.dayChange,
-                      change.amount < 0 ? styles.changeNegative : styles.changePositive,
+                      change.amount < 0
+                        ? styles.changeNegative
+                        : styles.changePositive,
                     ]}
                   >
                     {formatChange(change, entry.tripCurrency)}
@@ -170,6 +188,13 @@ type Props = {
  */
 const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
   const layout = useLayoutProfile();
+  const { width: screenWidth } = useWindowDimensions();
+  // Explicit pixel width: AppModal wraps content in a shrink-wrapped Pressable,
+  // so a percentage width has nothing to resolve against and text overflows.
+  const contentWidth = Math.min(
+    screenWidth - MODAL_SCREEN_MARGIN * 2,
+    MODAL_MAX_WIDTH,
+  );
   const [entries, setEntries] = useState<SplitHistoryEntry[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -209,7 +234,7 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
         }
       }
     },
-    [tripid]
+    [tripid],
   );
 
   useEffect(() => {
@@ -236,7 +261,7 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
       contentTestID="split-history-content"
       contentStyle={[
         styles.content,
-        { width: "100%", maxWidth: MODAL_MAX_WIDTH, alignSelf: "center" },
+        { width: contentWidth, maxWidth: contentWidth, marginHorizontal: 0 },
       ]}
     >
       <ModalFrame layout={layout}>
@@ -314,12 +339,18 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
+    flexShrink: 1,
     paddingLeft: dynamicScale(8, false, 0.5),
+    paddingRight: dynamicScale(8, false, 0.5),
     fontWeight: "300",
     fontSize: dynamicScale(22, false, 0.5),
     color: GlobalStyles.colors.textColor,
   },
-  closeAction: { marginBottom: 0, flex: 1 },
+  closeAction: {
+    marginBottom: 0,
+    flexShrink: 0,
+    minWidth: dynamicScale(110, false, 0.5),
+  },
   list: { flexGrow: 0 },
   row: {
     paddingVertical: dynamicScale(10, true),

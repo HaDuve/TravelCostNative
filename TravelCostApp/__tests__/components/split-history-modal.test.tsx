@@ -252,6 +252,7 @@ describe("SplitHistoryModal", () => {
     const tabletStyle = StyleSheet.flatten(
       tablet.getByTestId("split-history-content").props.style
     ) as Record<string, unknown>;
+    expect(tabletStyle.width).toBe(600);
     expect(tabletStyle.maxWidth).toBe(600);
 
     const phone = renderModal({}, { width: 390, height: 844 });
@@ -259,7 +260,8 @@ describe("SplitHistoryModal", () => {
     const phoneStyle = StyleSheet.flatten(
       phone.getByTestId("split-history-content").props.style
     ) as Record<string, unknown>;
-    expect(phoneStyle.width).toBe("100%");
+    // Explicit pixel width (screen minus 16pt margins), never a percentage.
+    expect(phoneStyle.width).toBe(358);
   });
 
   it("ignores a page that was still in flight when the modal was closed and reopened", async () => {

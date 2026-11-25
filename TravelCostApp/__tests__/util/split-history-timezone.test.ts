@@ -1,8 +1,8 @@
 /**
  * Day buckets are LOCAL calendar days (the modal renders them as such), and a
  * date-less expense must never throw on the save path (#438 review).
+ * The zone is pinned to Europe/Berlin in jest-global-setup.js.
  */
-process.env.TZ = "Europe/Berlin";
 
 import { buildSplitHistoryEntry } from "../../util/split-history";
 import { buildExpense, makeTrip, resetHarnessIds } from "../fixtures/split-summary";

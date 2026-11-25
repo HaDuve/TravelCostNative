@@ -267,14 +267,21 @@ const SplitHistoryModal = ({ isVisible, onClose, tripid }: Props) => {
       <ModalFrame layout={layout}>
         <View style={styles.header}>
           <Text style={styles.title}>{i18n.t("splitHistoryTitle")}</Text>
-          <ActionRow
+          <Pressable
             testID="split-history-close"
-            tier="secondary"
-            label={i18n.t("close")}
+            accessibilityRole="button"
+            accessibilityLabel={i18n.t("close")}
+            hitSlop={8}
             onPress={onClose}
-            showChevron={false}
-            style={styles.closeAction}
-          />
+            style={({ pressed }) => [
+              styles.closeButton,
+              pressed && styles.closeButtonPressed,
+            ]}
+          >
+            <Text style={styles.closeText} numberOfLines={1}>
+              {i18n.t("close")}
+            </Text>
+          </Pressable>
         </View>
         <FlatList
           testID="split-history-list"
@@ -346,10 +353,19 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(22, false, 0.5),
     color: GlobalStyles.colors.textColor,
   },
-  closeAction: {
-    marginBottom: 0,
+  closeButton: {
     flexShrink: 0,
-    minWidth: dynamicScale(110, false, 0.5),
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    borderRadius: dynamicScale(12, false, 0.5),
+    backgroundColor: GlobalStyles.colors.gray300,
+  },
+  closeButtonPressed: { opacity: 0.6 },
+  closeText: {
+    fontSize: dynamicScale(15, false, 0.5),
+    fontWeight: "600",
+    color: GlobalStyles.colors.textColor,
   },
   list: { flexGrow: 0 },
   row: {
@@ -395,10 +411,16 @@ const styles = StyleSheet.create({
   change: { fontSize: dynamicScale(15, false, 0.5) },
   changePositive: { color: GlobalStyles.colors.textColor },
   changeNegative: { color: GlobalStyles.colors.errorGrayed },
-  empty: { padding: dynamicScale(20, false, 0.5), alignItems: "center" },
+  empty: {
+    paddingHorizontal: dynamicScale(12, false, 0.5),
+    paddingTop: dynamicScale(8, true),
+    paddingBottom: dynamicScale(24, true),
+    alignItems: "center",
+  },
   emptyText: {
     fontSize: dynamicScale(16, false, 0.5),
     fontStyle: "italic",
+    lineHeight: dynamicScale(24, false, 0.5),
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
   },

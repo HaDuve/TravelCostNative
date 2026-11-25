@@ -108,6 +108,15 @@ import { getRate } from "../../util/currencyExchange";
 - Database rules: `pnpm test:rules` (from `TravelCostApp/`) runs `rules-tests/` against the Realtime Database emulator (needs Java 21+). Trip paths are limited to trip members, users to their own node, and anonymous access is denied. See [rtdb-rules.md](./rtdb-rules.md).
 - Package manager: [package-manager.md](./package-manager.md)
 
+## Split Summary correctness harness
+
+`__tests__/fixtures/split-summary.ts` plus `__tests__/util/split-summary-add-delete.test.ts` check that the Split Summary (open **Balances** and **Balance simplification**) stays correct as Expenses change.
+
+- `makeTrip(travellers, tripCurrency)` builds a **Trip** with 2-4 **Travellers**; `buildExpense`/`addExpense` add Expenses through the same utils as the UI (`expandRangedExpense` for **Ranged expenses**, `expensesReducer` ADD/UPDATE/DELETE/RESTORE).
+- Deletes and **Undo** go through `deleteUserExpenses` / `undoUserExpenseDelete` with `expenseCtxFor(trip)` (mock Toast and offline-queue at the boundary, see the test file).
+- `expectSplitSummary(trip, { balances, simplified? })` recomputes from scratch (`rollupOpenBalances`, `simplifySplits`) and compares with a **hand-computed** expectation (never derive expected values with the code under test). Tolerance is one minor currency unit (0.01). It always asserts the zero-sum invariant (all Balances net to 0) and that simplification keeps each Traveller's net position.
+- Add one test per new flow; known bugs go in as `test.failing` with a linked issue.
+
 ## Tracer-bullet examples
 
 | Layer | Example file |

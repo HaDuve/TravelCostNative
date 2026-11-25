@@ -79,8 +79,9 @@ describe("SplitHistoryModal", () => {
     expect(within(row).getByText("Expense added")).toBeTruthy();
     expect(within(row).getByText("Dinner")).toBeTruthy();
     expect(within(row).getByText(/by Alice/)).toBeTruthy();
-    expect(within(row).getByText(/Alice \+€12\.40/)).toBeTruthy();
-    expect(within(row).getByText(/Bob (−|-)€12\.40/)).toBeTruthy();
+    expect(
+      within(row).getByText("Bob now owes Alice €12.40 more")
+    ).toBeTruthy();
   });
 
   it("labels every kind of change", async () => {
@@ -200,7 +201,7 @@ describe("SplitHistoryModal", () => {
       const row = await screen.findByTestId(`split-history-entry-${entry(1).id}`);
       expect(within(row).getByText("Rent")).toBeTruthy();
       expect(within(row).getByText(/Jan 1, 2026 – Jan 3, 2026/)).toBeTruthy();
-      expect(within(row).getByText(/Alice \+€30/)).toBeTruthy();
+      expect(within(row).getByText("Bob now owes Alice €30 more")).toBeTruthy();
       expect(within(row).queryByTestId(`split-history-day-${entry(1).id}-${day(2)}`)).toBeNull();
       expect(screen.getAllByTestId(/^split-history-entry-/)).toHaveLength(1);
     });
@@ -214,7 +215,7 @@ describe("SplitHistoryModal", () => {
 
       for (const d of [1, 2, 3]) {
         const line = screen.getByTestId(`split-history-day-${entry(1).id}-${day(d)}`);
-        expect(within(line).getByText(/Alice \+€10/)).toBeTruthy();
+        expect(within(line).getByText("Bob now owes Alice €10 more")).toBeTruthy();
       }
       expect(screen.getByText("Hide days")).toBeTruthy();
 

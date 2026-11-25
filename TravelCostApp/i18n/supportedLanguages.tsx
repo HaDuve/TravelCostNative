@@ -701,6 +701,12 @@ const en = {
   splitHistoryRangeDay: "Day of %{range}",
   splitHistoryShowDays: "Show days",
   splitHistoryHideDays: "Hide days",
+  splitHistoryOwesMore: "%{debtor} now owes %{creditor} %{amount} more",
+  splitHistoryOwesLess: "%{debtor} now owes %{creditor} %{amount} less",
+  splitHistoryOweMore: "%{name} now owes %{amount} more",
+  splitHistoryOweLess: "%{name} now owes %{amount} less",
+  splitHistoryOwedMore: "%{name} is now owed %{amount} more",
+  splitHistoryOwedLess: "%{name} is now owed %{amount} less",
 };
 const de = {
   // special expense strings
@@ -1445,6 +1451,12 @@ const de = {
   splitHistoryRangeDay: "Tag aus %{range}",
   splitHistoryShowDays: "Tage anzeigen",
   splitHistoryHideDays: "Tage ausblenden",
+  splitHistoryOwesMore: "%{debtor} schuldet %{creditor} jetzt %{amount} mehr",
+  splitHistoryOwesLess: "%{debtor} schuldet %{creditor} jetzt %{amount} weniger",
+  splitHistoryOweMore: "%{name} schuldet jetzt %{amount} mehr",
+  splitHistoryOweLess: "%{name} schuldet jetzt %{amount} weniger",
+  splitHistoryOwedMore: "%{name} bekommt jetzt %{amount} mehr zurück",
+  splitHistoryOwedLess: "%{name} bekommt jetzt %{amount} weniger zurück",
 };
 const fr = {
   // special expense strings
@@ -2186,6 +2198,12 @@ const fr = {
   splitHistoryRangeDay: "Jour de %{range}",
   splitHistoryShowDays: "Afficher les jours",
   splitHistoryHideDays: "Masquer les jours",
+  splitHistoryOwesMore: "%{debtor} doit maintenant %{amount} de plus à %{creditor}",
+  splitHistoryOwesLess: "%{debtor} doit maintenant %{amount} de moins à %{creditor}",
+  splitHistoryOweMore: "%{name} doit maintenant %{amount} de plus",
+  splitHistoryOweLess: "%{name} doit maintenant %{amount} de moins",
+  splitHistoryOwedMore: "%{name} doit maintenant recevoir %{amount} de plus",
+  splitHistoryOwedLess: "%{name} doit maintenant recevoir %{amount} de moins",
 };
 const ru = {
   // special expense strings
@@ -2925,5 +2943,11 @@ const ru = {
   splitHistoryRangeDay: "День из %{range}",
   splitHistoryShowDays: "Показать дни",
   splitHistoryHideDays: "Скрыть дни",
+  splitHistoryOwesMore: "%{debtor} теперь должен(на) %{creditor} ещё %{amount}",
+  splitHistoryOwesLess: "%{debtor} теперь должен(на) %{creditor} на %{amount} меньше",
+  splitHistoryOweMore: "%{name} теперь должен(на) ещё %{amount}",
+  splitHistoryOweLess: "%{name} теперь должен(на) на %{amount} меньше",
+  splitHistoryOwedMore: "%{name} теперь должны ещё %{amount}",
+  splitHistoryOwedLess: "%{name} теперь должны на %{amount} меньше",
 };
 export { en, de, fr, ru };

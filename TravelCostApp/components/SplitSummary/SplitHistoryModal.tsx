@@ -22,6 +22,10 @@ import {
 import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../../util/string";
+import {
+  describeBalanceChanges,
+  type HistorySentence,
+} from "../../util/split-history-sentences";
 import { MODAL_MAX_WIDTH } from "../../util/modal-frame-layout";
 import type {
   BalanceChange,
@@ -41,12 +45,15 @@ const KIND_COPY_KEYS: Record<SplitHistoryKind, string> = {
   settlement: "splitHistorySettlement",
 };
 
-function formatChange(change: BalanceChange, tripCurrency: string): string {
-  const sign = change.amount < 0 ? "−" : "+";
-  return `${change.userName} ${sign}${formatExpenseWithCurrency(
-    Math.abs(change.amount),
-    tripCurrency,
-  )}`;
+function formatSentence(
+  sentence: HistorySentence,
+  tripCurrency: string,
+): string {
+  const { key, amount, ...names } = sentence;
+  return i18n.t(key, {
+    ...names,
+    amount: formatExpenseWithCurrency(amount, tripCurrency),
+  });
 }
 
 function formatWhen(timestamp: number): string {
@@ -95,6 +102,17 @@ function validChanges(changes: unknown): BalanceChange[] {
   );
 }
 
+/** Plain "X now owes Y …" sentences for one entry's balance changes. */
+function sentences(
+  kind: SplitHistoryKind,
+  changes: unknown,
+  tripCurrency: string,
+): string[] {
+  return describeBalanceChanges(kind, validChanges(changes)).map((s) =>
+    formatSentence(s, tripCurrency),
+  );
+}
+
 const HistoryRow = React.memo(function HistoryRow({
   entry,
 }: {
@@ -122,17 +140,13 @@ const HistoryRow = React.memo(function HistoryRow({
           entry.timestamp,
         )}`}
       </Text>
-      {validChanges(entry.balanceChanges).map((change) => (
-        <Text
-          key={change.userName}
-          style={[
-            styles.change,
-            change.amount < 0 ? styles.changeNegative : styles.changePositive,
-          ]}
-        >
-          {formatChange(change, entry.tripCurrency)}
-        </Text>
-      ))}
+      {sentences(entry.kind, entry.balanceChanges, entry.tripCurrency).map(
+        (text) => (
+          <Text key={text} style={styles.change}>
+            {text}
+          </Text>
+        ),
+      )}
       {!!days?.length && (
         <>
           <Pressable
@@ -155,17 +169,13 @@ const HistoryRow = React.memo(function HistoryRow({
                 style={styles.day}
               >
                 <Text style={styles.dayDate}>{formatDay(day.date)}</Text>
-                {day.balanceChanges.map((change) => (
-                  <Text
-                    key={change.userName}
-                    style={[
-                      styles.dayChange,
-                      change.amount < 0
-                        ? styles.changeNegative
-                        : styles.changePositive,
-                    ]}
-                  >
-                    {formatChange(change, entry.tripCurrency)}
+                {sentences(
+                  entry.kind,
+                  day.balanceChanges,
+                  entry.tripCurrency,
+                ).map((text) => (
+                  <Text key={text} style={styles.dayChange}>
+                    {text}
                   </Text>
                 ))}
               </View>
@@ -412,10 +422,14 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(13, false, 0.5),
     color: GlobalStyles.colors.gray700,
   },
-  dayChange: { fontSize: dynamicScale(14, false, 0.5) },
-  change: { fontSize: dynamicScale(15, false, 0.5) },
-  changePositive: { color: GlobalStyles.colors.textColor },
-  changeNegative: { color: GlobalStyles.colors.errorGrayed },
+  dayChange: {
+    fontSize: dynamicScale(14, false, 0.5),
+    color: GlobalStyles.colors.textColor,
+  },
+  change: {
+    fontSize: dynamicScale(15, false, 0.5),
+    color: GlobalStyles.colors.textColor,
+  },
   empty: {
     paddingHorizontal: dynamicScale(12, false, 0.5),
     paddingTop: dynamicScale(8, true),

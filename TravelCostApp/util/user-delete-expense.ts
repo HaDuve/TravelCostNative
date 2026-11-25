@@ -3,6 +3,10 @@ import { i18n } from "../i18n/i18n";
 import { touchAllTravelers } from "./http";
 import type { ExpenseData } from "./expense";
 import {
+  buildSplitHistoryEntry,
+  type SplitHistoryAuthor,
+} from "./split-history";
+import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
   restoreExpenseOnlineOffline,
@@ -16,11 +20,23 @@ export type UserDeleteExpenseTarget = {
   id: string;
 };
 
+/** What split history needs to describe a delete (and its undo). */
+export type DeleteHistoryContext = {
+  /** The trip's active expenses before the delete; defaults to `expenseCtx.expenses`. */
+  expenses?: ExpenseData[];
+  tripCurrency: string;
+  isPaidTimestamp?: number;
+  author: SplitHistoryAuthor;
+};
+
 type PendingUndoDelete = {
   actionId: string;
   expiresAt: number;
   tripid: string;
   targets: UserDeleteExpenseTarget[];
+  /** The deleted expenses, kept so undo can write its history entry. */
+  deleted?: ExpenseData[];
+  history?: DeleteHistoryContext;
 };
 
 export interface UserDeleteExpenseContext {
@@ -91,12 +107,21 @@ export function isUndoDeleteAvailable(actionId: string): boolean {
 function registerPendingUndoDelete(
   tripid: string,
   targets: UserDeleteExpenseTarget[],
+  deleted?: ExpenseData[],
+  history?: DeleteHistoryContext,
 ): string {
   clearPendingUndoDelete();
   dismissToastClearsUndo = true;
   const actionId = `${Date.now()}-${targets.map((t) => t.id).join(",")}`;
   const expiresAt = Date.now() + UNDO_DELETE_WINDOW_MS;
-  pendingUndoDelete = { actionId, expiresAt, tripid, targets };
+  pendingUndoDelete = {
+    actionId,
+    expiresAt,
+    tripid,
+    targets,
+    deleted,
+    history,
+  };
   undoExpiryTimer = setTimeout(() => {
     clearPendingUndoDelete();
   }, UNDO_DELETE_WINDOW_MS);
@@ -133,18 +158,44 @@ export async function deleteUserExpenses({
   expenseCtx,
   afterSync = () => touchAllTravelers(tripid, true),
   showUndoToast = true,
+  history,
 }: {
   tripid: string;
   targets: UserDeleteExpenseTarget[];
   isOnline: boolean;
-  expenseCtx: Pick<UserDeleteExpenseContext, "deleteExpense">;
+  expenseCtx: Pick<
+    UserDeleteExpenseContext,
+    "deleteExpense" | "restoreExpenses"
+  > & {
+    expenses?: ExpenseData[];
+  };
   afterSync?: () => Promise<void>;
   /** False for compound flows (e.g. ranged date edit) that are not a user delete action. */
   showUndoToast?: boolean;
+  /** When given, the delete writes one split history entry (and undo another). */
+  history?: DeleteHistoryContext;
 }): Promise<void> {
   if (targets.length === 0) {
     return;
   }
+
+  const targetIds = new Set(targets.map((t) => t.id));
+  const knownExpenses = history?.expenses ?? expenseCtx.expenses ?? [];
+  const deleted = history
+    ? knownExpenses.filter((e) => e.id && targetIds.has(e.id))
+    : undefined;
+  const deleteEntry =
+    history && deleted?.length
+      ? buildSplitHistoryEntry({
+          kind: "deleted",
+          description: deleted[0].description,
+          before: deleted,
+          after: [],
+          tripCurrency: history.tripCurrency,
+          isPaidTimestamp: history.isPaidTimestamp,
+          author: history.author,
+        })
+      : null;
 
   clearPendingUndoDelete();
   Toast.hide();
@@ -154,7 +205,7 @@ export async function deleteUserExpenses({
       expenseCtx.deleteExpense(target.id);
     }
 
-    for (const target of targets) {
+    for (const [index, target] of targets.entries()) {
       const item: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {
@@ -162,6 +213,8 @@ export async function deleteUserExpenses({
           uid: target.uid,
           id: target.id,
         },
+        // One entry per user action, carried by the first save.
+        ...(index === 0 && deleteEntry ? { historyEntry: deleteEntry } : {}),
       };
       await deleteExpenseOnlineOffline(item, isOnline);
     }
@@ -179,7 +232,7 @@ export async function deleteUserExpenses({
     return;
   }
 
-  const actionId = registerPendingUndoDelete(tripid, targets);
+  const actionId = registerPendingUndoDelete(tripid, targets, deleted, history);
   showDeletedExpenseToast(actionId, () => {
     dismissToastClearsUndo = false;
     return undoUserExpenseDelete({
@@ -211,12 +264,25 @@ export async function undoUserExpenseDelete({
     return;
   }
 
-  const { targets, tripid } = pendingUndoDelete!;
+  const { targets, tripid, deleted, history } = pendingUndoDelete!;
   clearPendingUndoDelete();
   Toast.hide();
 
+  const undoEntry =
+    history && deleted?.length
+      ? buildSplitHistoryEntry({
+          kind: "undone",
+          description: deleted[0].description,
+          before: [],
+          after: deleted,
+          tripCurrency: history.tripCurrency,
+          isPaidTimestamp: history.isPaidTimestamp,
+          author: history.author,
+        })
+      : null;
+
   try {
-    for (const target of targets) {
+    for (const [index, target] of targets.entries()) {
       const item: OfflineQueueManageExpenseItem = {
         type: "restore",
         expense: {
@@ -224,6 +290,7 @@ export async function undoUserExpenseDelete({
           uid: target.uid,
           id: target.id,
         },
+        ...(index === 0 && undoEntry ? { historyEntry: undoEntry } : {}),
       };
       await restoreExpenseOnlineOffline(item, isOnline);
     }

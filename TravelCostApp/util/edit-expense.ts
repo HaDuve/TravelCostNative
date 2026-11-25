@@ -16,7 +16,12 @@ import {
   persistRangedExpenseInPlaceEdit,
   persistRangedExpenseReplace,
   type RangedExpensePersistContext,
+  type RangedHistoryContext,
 } from "./ranged-expense-persist";
+import {
+  buildExpenseEditEntry,
+  buildSplitHistoryEntry,
+} from "./split-history";
 import { collectUserDeleteTargets } from "./user-delete-expense";
 
 /**
@@ -54,6 +59,8 @@ export interface EditExpenseParams {
   /** Submitted form payload (rate already applied via {@link applySubmitRate}). */
   expenseData: ExpenseData;
   newRangeId: () => string;
+  /** When given, edits also write split history entries. */
+  history?: RangedHistoryContext;
 }
 
 function spansMultipleDays(expenseData: ExpenseData): boolean {
@@ -89,8 +96,16 @@ async function editSingleData({
   selectedExpense,
   selectedExpenseAuthorUid,
   expenseData,
+  history,
 }: EditExpenseParams): Promise<void> {
   expenseData.editedTimestamp = Date.now();
+  const historyEntry = history
+    ? buildExpenseEditEntry({
+        before: selectedExpense,
+        after: { ...expenseData, id: selectedExpense.id },
+        ...history,
+      })
+    : null;
   const item: OfflineQueueManageExpenseItem = {
     type: "update",
     expense: {
@@ -99,6 +114,7 @@ async function editSingleData({
       expenseData,
       id: selectedExpense.id,
     },
+    ...(historyEntry ? { historyEntry } : {}),
   };
   expenseCtx.updateExpense(selectedExpense.id!, expenseData);
   await updateExpenseOnlineOffline(item, isOnline);
@@ -114,8 +130,9 @@ function editRangedData(params: EditExpenseParams): Promise<void> {
     selectedExpenseAuthorUid,
     expenseData,
     newRangeId,
+    history,
   } = params;
-  const rangedPersistParams = { tripid, uid, isOnline, expenseCtx };
+  const rangedPersistParams = { tripid, uid, isOnline, expenseCtx, history };
   const expensesInRange = expenseCtx.expenses.filter(
     (expense) => expense.rangeId && expense.rangeId === selectedExpense.rangeId
   );
@@ -126,12 +143,23 @@ function editRangedData(params: EditExpenseParams): Promise<void> {
       type: "delete",
       expense: { tripid, uid: selectedExpenseAuthorUid, id: selectedExpense.id },
     };
-    const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
     const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
-    const addSync = persistRangedExpenseAdd(
-      instances,
-      rangedPersistParams
-    ).syncPromise;
+    // One edit entry (old single expense -> new days) rides on the delete.
+    const replaceEntry = history
+      ? buildSplitHistoryEntry({
+          kind: "edited",
+          description: expenseData.description,
+          before: [selectedExpense],
+          after: instances,
+          ...history,
+        })
+      : null;
+    if (replaceEntry) item.historyEntry = replaceEntry;
+    const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
+    const addSync = persistRangedExpenseAdd(instances, {
+      ...rangedPersistParams,
+      history: undefined,
+    }).syncPromise;
     return Promise.all([deleteSync, addSync]).then(() => undefined);
   }
 

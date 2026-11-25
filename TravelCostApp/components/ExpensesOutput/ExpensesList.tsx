@@ -55,6 +55,7 @@ import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 import { UserContext } from "../../store/user-context";
+import { useSplitHistoryContext } from "../../hooks/useSplitHistoryContext";
 import * as Haptics from "expo-haptics";
 import { toShortFormat } from "../../util/date";
 import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
@@ -93,6 +94,7 @@ function ExpensesList({
   const { tripid, tripName } = useContext(TripContext);
   const { periodName } = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
+  const splitHistory = useSplitHistoryContext();
   const userCtx = useContext(UserContext);
   tripID = tripid;
   travellerName = showSumForTravellerName;
@@ -143,7 +145,9 @@ function ExpensesList({
     async function deleteAllExpenses() {
       try {
         navigation?.popToTop();
-        await deleteAllExpensesByRangedId(tripID, item, isOnline, expenseCtx);
+        await deleteAllExpensesByRangedId(tripID, item, isOnline, expenseCtx, {
+          history: splitHistory,
+        });
       } catch (error) {
         console.error("❌ [EXPENSES LIST] Delete All Error:", error);
         Toast.show({
@@ -185,6 +189,7 @@ function ExpensesList({
                     ],
                     isOnline,
                     expenseCtx,
+                    history: splitHistory,
                   });
                 } catch (error) {
                   Toast.show({
@@ -219,6 +224,7 @@ function ExpensesList({
             ],
             isOnline,
             expenseCtx,
+            history: splitHistory,
           });
         } catch (error) {
           Toast.show({
@@ -247,7 +253,7 @@ function ExpensesList({
       ]);
     }
     deleteExpenseHandler();
-  }, [tripID, expenseCtx, navigation, forceCloseRow, isOnline]);
+  }, [tripID, expenseCtx, navigation, forceCloseRow, isOnline, splitHistory]);
 
   const renderExpenseItem = useCallback(
     (
@@ -608,7 +614,7 @@ function ExpensesList({
         ...buttonTripList,
       ]
     );
-  }, [expenses?.length, isOnline, selected?.length, tripID]);
+  }, [expenses?.length, isOnline, selected?.length, tripID, splitHistory]);
 
   const deleteSelected = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -650,6 +656,7 @@ function ExpensesList({
                 targets,
                 isOnline,
                 expenseCtx,
+                history: splitHistory,
               });
             } catch (error) {
               Toast.show({
@@ -662,7 +669,7 @@ function ExpensesList({
         },
       ]
     );
-  }, [expenses?.length, isOnline, selected?.length, tripID]);
+  }, [expenses?.length, isOnline, selected?.length, tripID, splitHistory]);
 
   const selectPressHandler = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

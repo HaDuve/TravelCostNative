@@ -12,6 +12,7 @@ import { i18n } from "../i18n/i18n";
 import {
   collectUserDeleteTargets,
   deleteUserExpenses,
+  type DeleteHistoryContext,
 } from "./user-delete-expense";
 import { splitType } from "./split";
 import { asPeriodSlice, sumByPeriod, sumForTrip } from "./expenseTotals";
@@ -193,7 +194,7 @@ export async function deleteAllExpensesByRangedId(
   isOnline: boolean,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expenseCtx: any,
-  options?: { showUndoToast?: boolean },
+  options?: { showUndoToast?: boolean; history?: DeleteHistoryContext },
 ) {
   const allExpenses = expenseCtx?.expenses || [];
   const targets = selectedExpense?.id
@@ -215,6 +216,7 @@ export async function deleteAllExpensesByRangedId(
     isOnline,
     expenseCtx,
     showUndoToast: options?.showUndoToast ?? true,
+    history: options?.history,
   });
 }
 

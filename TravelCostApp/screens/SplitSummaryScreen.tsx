@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -33,7 +34,9 @@ import {
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
-import SplitHistoryModal from "../components/SplitSummary/SplitHistoryModal";
+import SplitHistoryHost, {
+  type SplitHistoryHostHandle,
+} from "../components/SplitSummary/SplitHistoryHost";
 import { appendSplitHistoryEntry } from "../util/http";
 import { buildSplitHistoryEntry } from "../util/split-history";
 import { ExpensesContext } from "../store/expenses-context";
@@ -65,7 +68,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   } = useContext(TripContext);
   const { userName } = useContext(UserContext);
   const { uid } = useContext(AuthContext);
-  const [historyVisible, setHistoryVisible] = useState(false);
+  const historyHostRef = useRef<SplitHistoryHostHandle>(null);
   const { expenses } = useContext(ExpensesContext);
   // avoid rerenders
   const [isFetching, setIsFetching] = useState(false);
@@ -407,7 +410,7 @@ const SplitSummaryScreen = ({ navigation }) => {
             tier: "secondary" as const,
             label: i18n.t("splitHistoryButton"),
             icon: "time-outline",
-            onPress: () => setHistoryVisible(true),
+            onPress: () => historyHostRef.current?.open(),
           },
           ...(!showSimplify
             ? [
@@ -574,11 +577,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       >
         {splitSummaryContent}
       </ContentFrame>
-      <SplitHistoryModal
-        isVisible={historyVisible}
-        onClose={() => setHistoryVisible(false)}
-        tripid={tripid}
-      />
+      <SplitHistoryHost ref={historyHostRef} tripid={tripid} />
     </View>
   );
 };

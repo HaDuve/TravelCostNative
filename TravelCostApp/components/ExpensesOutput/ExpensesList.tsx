@@ -77,6 +77,12 @@ import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
+/**
+ * Height of one Expense row, before scaling. The multi-select toolbar above
+ * the list has the same height, so the list rests one row down to hide it.
+ */
+export const EXPENSE_ROW_HEIGHT = 55;
+
 // Displays a list of all expenses.
 function ExpensesList({
   expenses,
@@ -118,6 +124,8 @@ function ExpensesList({
   const showScrollToTop = contentVerticalOffset > CONTENT_OFFSET_THRESHOLD;
 
   if (expenses?.length < 6) addShadowItemsToExpenses(expenses);
+  // Long lists use cheap rows and have no multi-select toolbar.
+  const hasListHeader = expenses?.length < MAX_EXPENSES_RENDER;
 
   // Rows of the list: day headers (week period) and Expenses, followed by
   // the blank shadow rows that pad short lists.
@@ -144,7 +152,7 @@ function ExpensesList({
   const listItemLayouts = useMemo(
     () =>
       expenseListItemLayouts(listEntries, {
-        expenseRowHeight: dynamicScale(55, true),
+        expenseRowHeight: dynamicScale(EXPENSE_ROW_HEIGHT, true),
         dayHeaderHeight: DAY_HEADER_HEIGHT,
       }),
     [listEntries]
@@ -337,7 +345,7 @@ function ExpensesList({
               style={[
                 styles.fastExpenseContainer,
                 {
-                  height: constantScale(55),
+                  height: constantScale(EXPENSE_ROW_HEIGHT),
                   paddingLeft: dynamicScale(16),
                   paddingRight: dynamicScale(12),
                 },
@@ -398,7 +406,7 @@ function ExpensesList({
         return (
           <View
             style={{
-              height: constantScale(55),
+              height: constantScale(EXPENSE_ROW_HEIGHT),
               width: "100%",
               backgroundColor: GlobalStyles.colors.backgroundColor,
             }}
@@ -431,7 +439,7 @@ function ExpensesList({
         );
       //else platform ios
       return (
-        <View style={{ height: constantScale(55), width: "100%" }}>
+        <View style={{ height: constantScale(EXPENSE_ROW_HEIGHT), width: "100%" }}>
           <Swipeable
             renderRightActions={(progress, dragX) =>
               renderRightActions(
@@ -465,8 +473,9 @@ function ExpensesList({
   // The list header (multi-select toolbar) sits above the first row and is
   // scrolled out of view at rest. Scroll by content offset rather than row
   // index, because day headers make row offsets differ from index * height.
-  const hasListHeader = expenses?.length < MAX_EXPENSES_RENDER;
-  const firstRowScrollOffset = hasListHeader ? dynamicScale(55, true) : 0;
+  const firstRowScrollOffset = hasListHeader
+    ? dynamicScale(EXPENSE_ROW_HEIGHT, true)
+    : 0;
   const initialContentOffset = useMemo(
     () => ({ x: 0, y: firstRowScrollOffset }),
     [firstRowScrollOffset]
@@ -740,7 +749,7 @@ function ExpensesList({
 
   const listHeaderJSX = useMemo(() => {
     return (
-      expenses?.length < MAX_EXPENSES_RENDER && (
+      hasListHeader && (
         <View
           style={{
             paddingRight: dynamicScale(20),
@@ -748,7 +757,7 @@ function ExpensesList({
             alignItems: "center",
             justifyContent: "flex-end",
             flexDirection: "row",
-            height: dynamicScale(55, true),
+            height: dynamicScale(EXPENSE_ROW_HEIGHT, true),
           }}
         >
           {/* hide until production ready */}
@@ -861,6 +870,7 @@ function ExpensesList({
     selectAll,
     selectPressHandler,
     isFiltered,
+    hasListHeader,
   ]);
 
   return (

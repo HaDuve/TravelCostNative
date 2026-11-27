@@ -55,6 +55,7 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses, isShadowExpense } from "./ExpenseListUtil";
 import ExpenseListSectionHeader, { SECTION_HEADER_HEIGHT } from "./ExpenseListSectionHeader";
 import {
+  ExpenseListEntry,
   expenseListItemLayouts,
   formatExpenseTimeOfDay,
 } from "../../util/expense-list-sections";

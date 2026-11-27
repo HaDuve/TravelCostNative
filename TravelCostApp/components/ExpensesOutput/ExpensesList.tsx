@@ -55,14 +55,12 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses, isShadowExpense } from "./ExpenseListUtil";
 import ExpenseListDayHeader, { DAY_HEADER_HEIGHT } from "./ExpenseListDayHeader";
 import {
-  ExpenseListEntry,
   expenseListItemLayouts,
   formatExpenseTimeOfDay,
-  groupExpensesForList,
 } from "../../util/expense-list-sections";
 import { UserContext } from "../../store/user-context";
 import { useSplitHistoryContext } from "../../hooks/useSplitHistoryContext";
-import { useRefreshOnReturn } from "../../hooks/useRefreshOnReturn";
+import { useExpenseListEntries } from "../../hooks/useExpenseListEntries";
 import * as Haptics from "expo-haptics";
 import { toShortFormat } from "../../util/date";
 import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
@@ -128,30 +126,7 @@ function ExpensesList({
   // Long lists use cheap rows and have no multi-select toolbar.
   const hasListHeader = expenses?.length < MAX_EXPENSES_RENDER;
 
-  // Rows of the list: section headers (day, time of day or month, by period)
-  // and Expenses, followed by the blank shadow rows that pad short lists.
-  // Labels such as "Just now" are recomputed when the user comes back to the
-  // screen or the app.
-  const returnsToScreen = useRefreshOnReturn();
-  const listEntries: ExpenseListEntry[] = useMemo(() => {
-    const shadowEntries: ExpenseListEntry[] = expenses
-      .filter(isShadowExpense)
-      .map((item) => ({
-        kind: "expense",
-        key: item.id,
-        expense: item,
-        underDayHeader: false,
-      }));
-    return [
-      ...groupExpensesForList(
-        expenses.filter((item) => !isShadowExpense(item)),
-        periodName,
-        new Date(),
-        i18n.locale
-      ),
-      ...shadowEntries,
-    ];
-  }, [expenses, expenses?.length, periodName, returnsToScreen]);
+  const listEntries = useExpenseListEntries(expenses, periodName);
   const listItemLayouts = useMemo(
     () =>
       expenseListItemLayouts(listEntries, {

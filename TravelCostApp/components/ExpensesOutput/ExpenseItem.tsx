@@ -20,6 +20,7 @@ import React from "react";
 
 import { i18n } from "../../i18n/i18n";
 import { DateTime } from "luxon";
+import { formatExpenseTimeOfDay } from "../../util/expense-list-sections";
 import { UserContext } from "../../store/user-context";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
@@ -288,7 +289,7 @@ function ExpenseItem(props): JSX.Element {
     const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
     // a day header above the row already names the day
     if (underDayHeader) {
-      dateString.current = hourAndMinuteString;
+      dateString.current = formatExpenseTimeOfDay(date);
     } else if (isToday(new Date(date))) {
       dateString.current = `${todayString()}${hourAndMinuteString}`;
     } else dateString.current = toShortFormat(date);

@@ -103,7 +103,7 @@ function ExpensesList({
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
-  const { tripid, tripName } = useContext(TripContext);
+  const { tripid, tripName, tripCurrency } = useContext(TripContext);
   const { periodName } = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
   const splitHistory = useSplitHistoryContext();
@@ -291,7 +291,13 @@ function ExpensesList({
     ) => {
       const entry = listItemData.item;
       if (entry.kind === "header")
-        return <ExpenseListSectionHeader label={entry.label} />;
+        return (
+          <ExpenseListSectionHeader
+            label={entry.label}
+            total={entry.total}
+            currency={tripCurrency}
+          />
+        );
       const underDayHeader = entry.underDayHeader;
       const itemData = { item: entry.expense, index: listItemData.index };
       if (isShadowExpense(itemData.item))
@@ -441,7 +447,7 @@ function ExpensesList({
         </View>
       );
     },
-    [closeRow, travellerName, filtered, renderRightActions, onClick, row]
+    [closeRow, travellerName, filtered, renderRightActions, onClick, row, tripCurrency]
   );
 
   // The list header (multi-select toolbar) sits above the first row and is

@@ -56,9 +56,9 @@ describe("useExpenseListEntries", () => {
 
     const lines = outline(result.current);
     expect(lines.slice(0, 4)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "lunch",
-      "# Yesterday",
+      "# Thursday 26.11",
       "dinner",
     ]);
     expect(lines.slice(4).every((line) => line.startsWith("shadow"))).toBe(
@@ -72,12 +72,12 @@ describe("useExpenseListEntries", () => {
     const { result, rerender } = renderHook(() =>
       useExpenseListEntries(expenses, "week"),
     );
-    expect(outline(result.current)[0]).toBe("# Today");
+    expect(outline(result.current)[0]).toBe("# Friday 27.11");
 
     i18n.locale = "de";
     rerender({});
 
-    expect(outline(result.current)[0]).toBe("# Heute");
+    expect(outline(result.current)[0]).toBe("# Freitag 27.11");
   });
 
   it("refreshes Just now when the screen regains focus", () => {

@@ -131,14 +131,14 @@ function newestFirst(expenses: ExpenseData[]): DatedExpense[] {
       time,
       day: time.startOf("day").toMillis(),
       // timed, then midnight, then Ranged expense days
-      noTimeOfDay: expense.rangeId ? 2 : hasNoTimeOfDay(expense, time) ? 1 : 0,
+      noTimeOfDayRank: expense.rangeId ? 2 : hasNoTimeOfDay(expense, time) ? 1 : 0,
       millis: time.toMillis(),
     };
   });
   keyed.sort(
     (a, b) =>
       b.day - a.day ||
-      a.noTimeOfDay - b.noTimeOfDay ||
+      a.noTimeOfDayRank - b.noTimeOfDayRank ||
       b.millis - a.millis,
   );
   return keyed.map(({ expense, time }) => ({ expense, time }));
@@ -202,8 +202,8 @@ function groupLabel(
  * Turns the Expenses shown for a period into the rows of the Expense list.
  *
  * - day: today's Expenses in time-of-day groups (see `TIME_OF_DAY_GROUPS`),
- *   with those that have no real time of day under a "Today" group at the
- *   end. Expenses from other days (filtered lists) get a day group as in
+ *   with midnight Expenses under a "Today" group and **Ranged expense**
+ *   days under a trailing "Multi-day expenses" group. Expenses from other days (filtered lists) get a day group as in
  *   the week period.
  * - week and month: one group per local day ("Today", "Yesterday",
  *   "Monday 23.11").
@@ -245,8 +245,8 @@ export function groupExpensesForList(
   }
 
   // Groups come in the order of their first Expense. The newest-first sort
-  // already puts today's "Today" group (no time of day) after its
-  // time-of-day groups.
+  // already puts today's "Today" group (midnight) after its
+  // time-of-day groups, and "Multi-day expenses" (Ranged expense days) last.
   const entries: ExpenseListEntry[] = [];
   for (const [key, rows] of groups) {
     entries.push({

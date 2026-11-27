@@ -13,7 +13,13 @@ import type { ExpenseData } from "./expense";
  * it, so the row only needs to show the time.
  */
 export type ExpenseListEntry =
-  | { kind: "header"; key: string; label: string }
+  | {
+      kind: "header";
+      key: string;
+      label: string;
+      /** Period spend of the group, in the Trip currency (see CONTEXT.md). */
+      total: number;
+    }
   | {
       kind: "expense";
       key: string;
@@ -51,9 +57,14 @@ export function formatExpenseTimeOfDay(
   return toLocalDateTime(expense.date).toFormat("HH:mm");
 }
 
-function dayLabel(day: DateTime, now: DateTime, locale: string): string {
-  if (day.hasSame(now, "day")) return i18n.t("today", { locale });
-  if (day.hasSame(now.minus({ days: 1 }), "day"))
+function dayLabel(
+  day: DateTime,
+  now: DateTime,
+  locale: string,
+  relative: boolean,
+): string {
+  if (relative && day.hasSame(now, "day")) return i18n.t("today", { locale });
+  if (relative && day.hasSame(now.minus({ days: 1 }), "day"))
     return i18n.t("yesterday", { locale });
   // toLocaleString, not toFormat("cccc"): luxon's weekday token needs
   // Intl formatToParts, which prints "null" on Hermes.
@@ -142,8 +153,6 @@ function timeOfDayLabelKey(
     .labelKey;
 }
 
-const THIS_MONTH_KEY = "expenseListThisMonth";
-
 /**
  * Key of the group an Expense belongs to. Cheap, since it runs for every
  * Expense; the caption is built once per group by `groupLabel`.
@@ -151,15 +160,23 @@ const THIS_MONTH_KEY = "expenseListThisMonth";
 function groupKey(row: DatedExpense, period: string, now: DateTime): string {
   const { time } = row;
   if (PERIODS_WITH_MONTH_HEADERS.has(period)) {
-    return time.hasSame(now, "month")
-      ? THIS_MONTH_KEY
-      : time.toFormat("yyyy-MM");
+    return time.toFormat("yyyy-MM");
   }
   // a filtered list can hold other days; only today is split by time
   if (period === RangeString.day && time.hasSame(now, "day")) {
     return timeOfDayLabelKey(row, now);
   }
   return time.toISODate();
+}
+
+/** Period spend of a group: Ranged expense days count once per day. */
+function periodSpend(rows: DatedExpense[]): number {
+  let sum = 0;
+  for (const { expense } of rows) {
+    const amount = Number(expense.calcAmount);
+    if (!isNaN(amount)) sum += amount;
+  }
+  return sum;
 }
 
 /** Caption of a group, from its key and the date of its first Expense. */
@@ -171,14 +188,14 @@ function groupLabel(
   locale: string,
 ): string {
   if (PERIODS_WITH_MONTH_HEADERS.has(period)) {
-    if (key === THIS_MONTH_KEY) return i18n.t(THIS_MONTH_KEY, { locale });
     // toLocaleString, not toFormat("LLLL"): see dayLabel (Hermes prints "null").
     return `${first.setLocale(locale).toLocaleString({ month: "long" })} ${first.year}`;
   }
   if (period === RangeString.day && first.hasSame(now, "day")) {
     return i18n.t(key, { locale });
   }
-  return dayLabel(first, now, locale);
+  // only the day period keeps "Today" / "Yesterday"
+  return dayLabel(first, now, locale, period === RangeString.day);
 }
 
 /**
@@ -236,6 +253,7 @@ export function groupExpensesForList(
       kind: "header",
       key: `header-${key}`,
       label: groupLabel(key, rows[0].time, period, nowDay, locale),
+      total: periodSpend(rows),
     });
     for (const { expense } of rows) {
       entries.push({

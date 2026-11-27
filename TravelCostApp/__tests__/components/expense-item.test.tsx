@@ -75,4 +75,47 @@ describe("ExpenseItem", () => {
       );
     });
   });
+
+  describe("date line", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      // Friday 27 November 2026, local time (TZ=Europe/Berlin in jest)
+      jest.setSystemTime(new Date(2026, 10, 27, 15, 0));
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    function renderOn(date: Date, extraProps: Record<string, unknown> = {}) {
+      const dated = makeExpense({ date, startDate: date, endDate: date });
+      return renderWithAppProviders(
+        <ExpenseItem {...dated} {...extraProps} />,
+        { wrapNavigation: false }
+      );
+    }
+
+    it("shows only the time under a day header, without repeating the date", () => {
+      const screen = renderOn(new Date(2026, 10, 23, 14, 32), {
+        underDayHeader: true,
+      });
+
+      expect(screen.getByText("14:32")).toBeTruthy();
+      expect(screen.queryByText(/Nov/)).toBeNull();
+    });
+
+    it("shows only the time for today's Expense under a day header", () => {
+      const screen = renderOn(new Date(2026, 10, 27, 9, 5), {
+        underDayHeader: true,
+      });
+
+      expect(screen.getByText("09:05")).toBeTruthy();
+    });
+
+    it("keeps the date when there is no day header", () => {
+      const screen = renderOn(new Date(2026, 10, 23, 14, 32));
+
+      expect(screen.queryByText("14:32")).toBeNull();
+      expect(screen.getByText(/Nov/)).toBeTruthy();
+    });
+  });
 });

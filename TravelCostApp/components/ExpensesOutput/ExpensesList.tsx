@@ -39,7 +39,6 @@ import {
 } from "../../util/offline-queue";
 import {
   ExpenseData,
-  Expense,
   deleteAllExpensesByRangedId,
 } from "../../util/expense";
 import {
@@ -53,7 +52,14 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
-import { addShadowItemsToExpenses } from "./ExpenseListUtil";
+import { addShadowItemsToExpenses, isShadowExpense } from "./ExpenseListUtil";
+import ExpenseListDayHeader, { DAY_HEADER_HEIGHT } from "./ExpenseListDayHeader";
+import {
+  ExpenseListEntry,
+  expenseListItemLayouts,
+  formatExpenseTimeOfDay,
+  groupExpensesForList,
+} from "../../util/expense-list-sections";
 import { UserContext } from "../../store/user-context";
 import { useSplitHistoryContext } from "../../hooks/useSplitHistoryContext";
 import * as Haptics from "expo-haptics";
@@ -70,6 +76,12 @@ import safeLogError from "../../util/error";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+
+/**
+ * Height of one Expense row, before scaling. The multi-select toolbar above
+ * the list has the same height, so the list rests one row down to hide it.
+ */
+export const EXPENSE_ROW_HEIGHT = 55;
 
 // Displays a list of all expenses.
 function ExpensesList({
@@ -112,6 +124,38 @@ function ExpensesList({
   const showScrollToTop = contentVerticalOffset > CONTENT_OFFSET_THRESHOLD;
 
   if (expenses?.length < 6) addShadowItemsToExpenses(expenses);
+  // Long lists use cheap rows and have no multi-select toolbar.
+  const hasListHeader = expenses?.length < MAX_EXPENSES_RENDER;
+
+  // Rows of the list: day headers (week period) and Expenses, followed by
+  // the blank shadow rows that pad short lists.
+  const listEntries: ExpenseListEntry[] = useMemo(() => {
+    const shadowEntries: ExpenseListEntry[] = expenses
+      .filter(isShadowExpense)
+      .map((item) => ({
+        kind: "expense",
+        key: item.id,
+        expense: item,
+        underDayHeader: false,
+      }));
+    return [
+      ...groupExpensesForList(
+        expenses.filter((item) => !isShadowExpense(item)),
+        periodName,
+        new Date(),
+        i18n.locale
+      ),
+      ...shadowEntries,
+    ];
+  }, [expenses, expenses?.length, periodName]);
+  const listItemLayouts = useMemo(
+    () =>
+      expenseListItemLayouts(listEntries, {
+        expenseRowHeight: dynamicScale(EXPENSE_ROW_HEIGHT, true),
+        dayHeaderHeight: DAY_HEADER_HEIGHT,
+      }),
+    [listEntries]
+  );
 
   const forceCloseRow = useCallback(
     (index) => {
@@ -259,22 +303,18 @@ function ExpensesList({
     (
       isOnline: boolean,
       selectable: boolean,
-      selected: ExpenseData[],
+      selected: string[],
       selectItem: (item: ExpenseData, id: object) => void,
       setSelectable: (selectable: boolean) => void,
       expensesLength: number,
-      itemData
+      listItemData: { item: ExpenseListEntry; index: number }
     ) => {
-      const id = itemData.item.id || null;
-      if (
-        id &&
-        itemData.item.id[0] === "s" &&
-        itemData.item.id[1] === "h" &&
-        itemData.item.id[2] === "a" &&
-        itemData.item.id[3] === "d" &&
-        itemData.item.id[4] === "o" &&
-        itemData.item.id[5] === "w"
-      )
+      const entry = listItemData.item;
+      if (entry.kind === "dayHeader")
+        return <ExpenseListDayHeader label={entry.label} />;
+      const underDayHeader = entry.underDayHeader;
+      const itemData = { item: entry.expense, index: listItemData.index };
+      if (isShadowExpense(itemData.item))
         return (
           <View
             style={{ height: dynamicScale(56, true), width: "100%" }}
@@ -295,7 +335,7 @@ function ExpensesList({
               style={[
                 styles.fastExpenseContainer,
                 {
-                  height: constantScale(55),
+                  height: constantScale(EXPENSE_ROW_HEIGHT),
                   paddingLeft: dynamicScale(16),
                   paddingRight: dynamicScale(12),
                 },
@@ -308,7 +348,9 @@ function ExpensesList({
                   {itemData.item?.description}
                 </Text>
                 <Text style={styles.secondaryText}>
-                  {toShortFormat(itemData.item?.date)}{" "}
+                  {underDayHeader
+                    ? formatExpenseTimeOfDay(itemData.item?.date)
+                    : toShortFormat(itemData.item?.date)}{" "}
                 </Text>
               </View>
               <Text style={styles.fastExpenseText}>
@@ -354,7 +396,7 @@ function ExpensesList({
         return (
           <View
             style={{
-              height: constantScale(55),
+              height: constantScale(EXPENSE_ROW_HEIGHT),
               width: "100%",
               backgroundColor: GlobalStyles.colors.backgroundColor,
             }}
@@ -378,6 +420,7 @@ function ExpensesList({
                   filtered={filtered}
                   setSelectable={setSelectable}
                   selectItem={selectItem}
+                  underDayHeader={underDayHeader}
                   {...itemData.item}
                 />
               </Swipeable>
@@ -386,7 +429,7 @@ function ExpensesList({
         );
       //else platform ios
       return (
-        <View style={{ height: constantScale(55), width: "100%" }}>
+        <View style={{ height: constantScale(EXPENSE_ROW_HEIGHT), width: "100%" }}>
           <Swipeable
             renderRightActions={(progress, dragX) =>
               renderRightActions(
@@ -407,6 +450,7 @@ function ExpensesList({
               filtered={filtered}
               setSelectable={setSelectable}
               selectItem={selectItem}
+              underDayHeader={underDayHeader}
               {...itemData.item}
             />
           </Swipeable>
@@ -416,25 +460,27 @@ function ExpensesList({
     [closeRow, travellerName, filtered, renderRightActions, onClick, row]
   );
 
-  const scrollTo = useCallback(
-    (index: number, animated = true) => {
-      if (!flatListRef.current || index > expenses?.length + 1) return;
-      if (flatListRef.current) {
-        flatListRef.current.scrollToIndex({
-          index: index,
-          animated: animated,
-        });
-      }
-    },
-    [expenses?.length]
+  // The list header (multi-select toolbar) sits above the first row and is
+  // scrolled out of view at rest. Scroll by content offset rather than row
+  // index, because day headers make row offsets differ from index * height.
+  const firstRowScrollOffset = hasListHeader
+    ? dynamicScale(EXPENSE_ROW_HEIGHT, true)
+    : 0;
+  const initialContentOffset = useMemo(
+    () => ({ x: 0, y: firstRowScrollOffset }),
+    [firstRowScrollOffset]
   );
-  const scrollToTopHandler = useCallback(() => {
-    scrollTo(1);
-  }, [scrollTo]);
+  const scrollToOffset = useCallback((offset: number, animated = true) => {
+    flatListRef.current?.scrollToOffset({ offset, animated });
+  }, []);
+  const scrollToFirstRow = useCallback(() => {
+    scrollToOffset(firstRowScrollOffset);
+  }, [scrollToOffset, firstRowScrollOffset, expenses?.length]);
+  const scrollToTopHandler = scrollToFirstRow;
 
   useEffect(() => {
-    scrollTo(1);
-  }, [scrollTo, periodName]);
+    scrollToFirstRow();
+  }, [scrollToFirstRow, periodName]);
 
   const selectItem = (item) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -455,7 +501,7 @@ function ExpensesList({
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const filteredExpenses = expenses.filter(
-      (item) => !item.id.includes("shadow")
+      (item) => !isShadowExpense(item)
     );
     requestAnimationFrame(() => {
       if (selected?.length === filteredExpenses?.length) {
@@ -476,7 +522,7 @@ function ExpensesList({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.length === 0) return;
     const finderExpenses = expenses.filter(
-      (item) => selected.includes(item.id) && !item.id.includes("shadow")
+      (item) => selected.includes(item.id) && !isShadowExpense(item)
     );
 
     // Track filtered pie charts with selected expenses
@@ -677,23 +723,23 @@ function ExpensesList({
       if (selectable) {
         setSelectable(false);
         setSelected([]);
-        scrollTo(1);
+        scrollToFirstRow();
         trackEvent(VexoEvents.MULTI_SELECT_MODE_TOGGLED, {
           enabled: false,
         });
       } else {
         setSelectable(true);
-        scrollTo(0);
+        scrollToOffset(0);
         trackEvent(VexoEvents.MULTI_SELECT_MODE_TOGGLED, {
           enabled: true,
         });
       }
     });
-  }, [scrollTo, selectable]);
+  }, [scrollToFirstRow, scrollToOffset, selectable]);
 
   const listHeaderJSX = useMemo(() => {
     return (
-      expenses?.length < MAX_EXPENSES_RENDER && (
+      hasListHeader && (
         <View
           style={{
             paddingRight: dynamicScale(20),
@@ -701,7 +747,7 @@ function ExpensesList({
             alignItems: "center",
             justifyContent: "flex-end",
             flexDirection: "row",
-            height: dynamicScale(55, true),
+            height: dynamicScale(EXPENSE_ROW_HEIGHT, true),
           }}
         >
           {/* hide until production ready */}
@@ -786,7 +832,7 @@ function ExpensesList({
               <IconButton
                 icon={
                   selected?.length ===
-                  expenses.filter((item) => !item.id.includes("shadow")).length
+                  expenses.filter((item) => !isShadowExpense(item)).length
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }
@@ -814,6 +860,7 @@ function ExpensesList({
     selectAll,
     selectPressHandler,
     isFiltered,
+    hasListHeader,
   ]);
 
   return (
@@ -834,7 +881,7 @@ function ExpensesList({
         }}
         refreshControl={refreshControl}
         refreshing={refreshing}
-        data={expenses}
+        data={listEntries}
         ref={flatListRef}
         layout={ListLayoutAnimation}
         renderItem={renderExpenseItem.bind(
@@ -850,23 +897,13 @@ function ExpensesList({
           <View style={{ height: dynamicScale(300, true) }}></View>
         }
         ListHeaderComponent={listHeaderJSX}
-        keyExtractor={(item: Expense) => item.id}
+        keyExtractor={(entry: ExpenseListEntry) => entry.key}
         getItemLayout={(data, index) => ({
-          length: dynamicScale(55, true),
-          offset: dynamicScale(55, true) * index,
+          ...listItemLayouts[index],
           index,
         })}
-        initialScrollIndex={1}
+        contentOffset={initialContentOffset}
         windowSize={8}
-        onScrollToIndexFailed={(info) => {
-          const wait = new Promise((resolve) => setTimeout(resolve, 500));
-          wait.then(() => {
-            flatListRef.current?.scrollToIndex({
-              index: info.index,
-              animated: true,
-            });
-          });
-        }}
       />
       {showScrollToTop && (
         <Animated.View

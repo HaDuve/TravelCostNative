@@ -94,7 +94,7 @@ jest.mock("react-native-toast-message/lib/src/Toast", () => ({
   Toast: { show: jest.fn(), hide: jest.fn() },
 }));
 
-import { act, fireEvent, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { RefreshControl, StyleSheet } from "react-native";
 import RecentExpenses from "../../screens/RecentExpenses";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
@@ -192,7 +192,9 @@ describe("RecentExpenses screen", () => {
     );
 
     expect(screen.getByText(/Japan 2026/)).toBeTruthy();
-    expect(screen.getByText(/75/)).toBeTruthy();
+    expect(
+      within(screen.getByTestId("expenses-summary-pressable")).getByText(/75/)
+    ).toBeTruthy();
   });
 
   it("uses the same period header card chrome as Overview", () => {

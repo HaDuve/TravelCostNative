@@ -39,7 +39,10 @@ function dayLabel(day: DateTime, now: DateTime, locale: string): string {
   if (day.hasSame(now, "day")) return i18n.t("today", { locale });
   if (day.hasSame(now.minus({ days: 1 }), "day"))
     return i18n.t("yesterday", { locale });
-  return day.setLocale(locale).toFormat("cccc dd.MM");
+  // toLocaleString, not toFormat("cccc"): luxon's weekday token needs
+  // Intl formatToParts, which prints "null" on Hermes.
+  const weekday = day.setLocale(locale).toLocaleString({ weekday: "long" });
+  return `${weekday} ${day.toFormat("dd.MM")}`;
 }
 
 /**

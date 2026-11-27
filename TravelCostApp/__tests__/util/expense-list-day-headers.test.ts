@@ -158,6 +158,33 @@ describe("groupExpensesForList (week period)", () => {
   });
 });
 
+describe("groupExpensesForList on Hermes (no usable Intl formatToParts)", () => {
+  // Hermes on iOS returns parts without a weekday/month part, which makes
+  // luxon's toFormat("cccc") / ("LLLL") print "null". Labels must not depend
+  // on formatToParts.
+  const original = Intl.DateTimeFormat.prototype.formatToParts;
+  beforeEach(() => {
+    Intl.DateTimeFormat.prototype.formatToParts = function (date) {
+      return [{ type: "literal", value: this.format(date) }];
+    };
+  });
+  afterEach(() => {
+    Intl.DateTimeFormat.prototype.formatToParts = original;
+  });
+
+  it("still names the weekday in week headers", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const entries = groupExpensesForList(
+      [expenseOn("groceries", at(2026, 11, 25, 18, 30))],
+      RangeString.week,
+      now,
+      "de"
+    );
+
+    expect(outline(entries)).toEqual(["# Mittwoch 25.11", "groceries"]);
+  });
+});
+
 describe("groupExpensesForList (other periods)", () => {
   const now = at(2026, 11, 27, 15, 0);
   const expenses = [

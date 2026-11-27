@@ -20,7 +20,8 @@ export function useRefreshOnReturn(): number {
         if (state === "active") refresh();
       },
     );
-    // not every host of the list is a navigator screen
+    // the app always has addListener; this guards test navigation mocks
+    // that only stub navigate
     const unsubscribeFocus =
       typeof navigation?.addListener === "function"
         ? navigation.addListener("focus", refresh)

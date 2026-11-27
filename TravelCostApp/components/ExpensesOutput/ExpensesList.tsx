@@ -52,7 +52,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
-import { addShadowItemsToExpenses } from "./ExpenseListUtil";
+import { addShadowItemsToExpenses, isShadowExpense } from "./ExpenseListUtil";
 import ExpenseListDayHeader, { DAY_HEADER_HEIGHT } from "./ExpenseListDayHeader";
 import {
   ExpenseListEntry,
@@ -130,9 +130,8 @@ function ExpensesList({
   // Rows of the list: day headers (week period) and Expenses, followed by
   // the blank shadow rows that pad short lists.
   const listEntries: ExpenseListEntry[] = useMemo(() => {
-    const isShadow = (item) => item.id?.startsWith("shadow");
     const shadowEntries: ExpenseListEntry[] = expenses
-      .filter(isShadow)
+      .filter(isShadowExpense)
       .map((item) => ({
         kind: "expense",
         key: item.id,
@@ -141,7 +140,7 @@ function ExpensesList({
       }));
     return [
       ...groupExpensesForList(
-        expenses.filter((item) => !isShadow(item)),
+        expenses.filter((item) => !isShadowExpense(item)),
         periodName,
         new Date(),
         i18n.locale
@@ -315,16 +314,7 @@ function ExpensesList({
         return <ExpenseListDayHeader label={entry.label} />;
       const underDayHeader = entry.underDayHeader;
       const itemData = { item: entry.expense, index: listItemData.index };
-      const id = itemData.item.id || null;
-      if (
-        id &&
-        itemData.item.id[0] === "s" &&
-        itemData.item.id[1] === "h" &&
-        itemData.item.id[2] === "a" &&
-        itemData.item.id[3] === "d" &&
-        itemData.item.id[4] === "o" &&
-        itemData.item.id[5] === "w"
-      )
+      if (isShadowExpense(itemData.item))
         return (
           <View
             style={{ height: dynamicScale(56, true), width: "100%" }}
@@ -511,7 +501,7 @@ function ExpensesList({
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const filteredExpenses = expenses.filter(
-      (item) => !item.id.includes("shadow")
+      (item) => !isShadowExpense(item)
     );
     requestAnimationFrame(() => {
       if (selected?.length === filteredExpenses?.length) {
@@ -532,7 +522,7 @@ function ExpensesList({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.length === 0) return;
     const finderExpenses = expenses.filter(
-      (item) => selected.includes(item.id) && !item.id.includes("shadow")
+      (item) => selected.includes(item.id) && !isShadowExpense(item)
     );
 
     // Track filtered pie charts with selected expenses
@@ -842,7 +832,7 @@ function ExpensesList({
               <IconButton
                 icon={
                   selected?.length ===
-                  expenses.filter((item) => !item.id.includes("shadow")).length
+                  expenses.filter((item) => !isShadowExpense(item)).length
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }

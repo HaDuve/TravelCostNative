@@ -17,8 +17,11 @@ export type ExpenseListEntry =
       kind: "header";
       key: string;
       label: string;
-      /** Period spend of the group, in the Trip currency (see CONTEXT.md). */
-      total: number;
+      /**
+       * Period spend of the group, in the Trip currency (see CONTEXT.md).
+       * Left out in the day period, whose headers stay unchanged.
+       */
+      total?: number;
     }
   | {
       kind: "expense";
@@ -253,7 +256,7 @@ export function groupExpensesForList(
       kind: "header",
       key: `header-${key}`,
       label: groupLabel(key, rows[0].time, period, nowDay, locale),
-      total: periodSpend(rows),
+      ...(period === RangeString.day ? {} : { total: periodSpend(rows) }),
     });
     for (const { expense } of rows) {
       entries.push({

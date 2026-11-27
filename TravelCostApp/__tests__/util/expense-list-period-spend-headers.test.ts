@@ -93,3 +93,13 @@ describe("period spend", () => {
     ).toEqual([{ label: "November 2026", total: 18 }]);
   });
 });
+
+describe("day period headers", () => {
+  it("carry no period spend", () => {
+    const hs = groupExpensesForList(data(), RangeString.day, now, "en").filter(
+      (e) => e.kind === "header",
+    );
+    expect(hs.length).toBeGreaterThan(0);
+    for (const h of hs) expect(h).not.toHaveProperty("total");
+  });
+});

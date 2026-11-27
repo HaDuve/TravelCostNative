@@ -60,6 +60,21 @@ export function formatExpenseTimeOfDay(
   return toLocalDateTime(expense.date).toFormat("HH:mm");
 }
 
+/**
+ * Date range of a Ranged expense day, e.g. "20.11 – 03.12", or with the years
+ * when it crosses a year boundary: "28.12.26 – 04.01.27". Empty for an
+ * Expense that is not part of a Ranged expense.
+ */
+export function formatRangedExpenseDateRange(
+  expense: Pick<ExpenseData, "rangeId" | "startDate" | "endDate">,
+): string {
+  if (!expense.rangeId) return "";
+  const start = toLocalDateTime(expense.startDate);
+  const end = toLocalDateTime(expense.endDate);
+  const format = start.year === end.year ? "dd.MM" : "dd.MM.yy";
+  return `${start.toFormat(format)} – ${end.toFormat(format)}`;
+}
+
 function dayLabel(
   day: DateTime,
   now: DateTime,
@@ -129,14 +144,15 @@ function newestFirst(expenses: ExpenseData[]): DatedExpense[] {
       expense,
       time,
       day: time.startOf("day").toMillis(),
-      noTimeOfDay: hasNoTimeOfDay(expense, time),
+      // timed, then midnight, then Ranged expense days
+      noTimeOfDayRank: expense.rangeId ? 2 : hasNoTimeOfDay(expense, time) ? 1 : 0,
       millis: time.toMillis(),
     };
   });
   keyed.sort(
     (a, b) =>
       b.day - a.day ||
-      Number(a.noTimeOfDay) - Number(b.noTimeOfDay) ||
+      a.noTimeOfDayRank - b.noTimeOfDayRank ||
       b.millis - a.millis,
   );
   return keyed.map(({ expense, time }) => ({ expense, time }));
@@ -147,6 +163,7 @@ function timeOfDayLabelKey(
   { expense, time }: DatedExpense,
   now: DateTime,
 ): string {
+  if (expense.rangeId) return "expenseListMultiDay";
   if (hasNoTimeOfDay(expense, time)) return "today";
   const minutesAgo = now.diff(time, "minutes").minutes;
   // negative when dated later than now: still "Just now", so it does not
@@ -205,8 +222,8 @@ function groupLabel(
  * Turns the Expenses shown for a period into the rows of the Expense list.
  *
  * - day: today's Expenses in time-of-day groups (see `TIME_OF_DAY_GROUPS`),
- *   with those that have no real time of day under a "Today" group at the
- *   end. Expenses from other days (filtered lists) get a day group as in
+ *   with midnight Expenses under a "Today" group and **Ranged expense**
+ *   days under a trailing "Multi-day expenses" group. Expenses from other days (filtered lists) get a day group as in
  *   the week period.
  * - week and month: one group per local day ("Today", "Yesterday",
  *   "Monday 23.11").
@@ -248,8 +265,8 @@ export function groupExpensesForList(
   }
 
   // Groups come in the order of their first Expense. The newest-first sort
-  // already puts today's "Today" group (no time of day) after its
-  // time-of-day groups.
+  // already puts today's "Today" group (midnight) after its
+  // time-of-day groups, and "Multi-day expenses" (Ranged expense days) last.
   const entries: ExpenseListEntry[] = [];
   for (const [key, rows] of groups) {
     entries.push({

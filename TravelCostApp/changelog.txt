@@ -7,6 +7,13 @@ Formatting rules (not shown in-app; see .cursor/skills/update-budget-app/changel
 
 __Newest Changes:
 
+1.3.005s
+- New headers in the expense list: Today, Yesterday, weekdays, times of day and months
+- Expenses are always listed newest first
+- Bugfixes and performance improvements
+
+__Other Changes:
+
 1.3.005r!
 - Fix excessive data usage: stop repeated full trip downloads
 - Improved security: shared budgets are only visible to their travellers
@@ -17,8 +24,6 @@ __Newest Changes:
 - Added password autofill on sign-in and sign-up
 - You are asked to log in again when your login is no longer valid
 - Bugfixes and performance improvements
-
-__Other Changes:
 
 1.3.005q
 - Fixed budget numbers getting cut off in trip history

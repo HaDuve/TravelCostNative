@@ -9,6 +9,8 @@ __Newest Changes:
 
 1.3.005s
 - New headers in the expense list: Today, Yesterday, weekdays, times of day and months
+- Week, Month, Year and Total headers show exact dates and period spend
+- Multi-day expenses get their own header and show their date range
 - Expenses are always listed newest first
 - Bugfixes and performance improvements
 

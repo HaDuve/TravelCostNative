@@ -39,9 +39,16 @@ function toLocalDateTime(date: DateOrDateTime | string): DateTime {
   return DateTime.fromJSDate(new Date(date));
 }
 
-/** Time of day of an Expense, e.g. "14:32" (shown under a day header). */
-export function formatExpenseTimeOfDay(date: DateOrDateTime | string): string {
-  return toLocalDateTime(date).toFormat("HH:mm");
+/**
+ * Time of day of an Expense, e.g. "14:32" (shown under a day header). Empty
+ * for a Ranged expense day: it only carries the time the Ranged expense was
+ * created at.
+ */
+export function formatExpenseTimeOfDay(
+  expense: Pick<ExpenseData, "date" | "rangeId">,
+): string {
+  if (expense.rangeId) return "";
+  return toLocalDateTime(expense.date).toFormat("HH:mm");
 }
 
 function dayLabel(day: DateTime, now: DateTime, locale: string): string {
@@ -104,6 +111,31 @@ function section(labelKey: string, locale: string): Section {
 function hasNoTimeOfDay(expense: ExpenseData, time: DateTime): boolean {
   if (expense.rangeId) return true;
   return time.hour === 0 && time.minute === 0;
+}
+
+/**
+ * Newest day first. Inside a day, Expenses with a real time of day come
+ * first, newest first, and those without one (midnight, Ranged expense days)
+ * follow: a Ranged expense day carries the time it was created at, which can
+ * be later than anything else that day, or even later than now.
+ */
+function newestFirst(expenses: ExpenseData[]): ExpenseData[] {
+  const keyed = expenses.map((expense) => {
+    const time = toLocalDateTime(expense.date);
+    return {
+      expense,
+      day: time.startOf("day").toMillis(),
+      noTimeOfDay: hasNoTimeOfDay(expense, time),
+      millis: time.toMillis(),
+    };
+  });
+  keyed.sort(
+    (a, b) =>
+      b.day - a.day ||
+      Number(a.noTimeOfDay) - Number(b.noTimeOfDay) ||
+      b.millis - a.millis,
+  );
+  return keyed.map(({ expense }) => expense);
 }
 
 function timeOfDaySection(
@@ -171,16 +203,18 @@ function sectionFor(
  * Under day and time-of-day headers a row only needs its time
  * (`underDayHeader`); under month headers it keeps its short date.
  *
- * The Expenses keep their incoming order (newest first) inside a group, and
- * groups are ordered by their first Expense. An unknown period gets plain
+ * The Expenses are sorted newest first (see `newestFirst`) whatever order
+ * they come in, since the store does not keep its list sorted after an add
+ * or an edit; groups follow from that order. An unknown period gets plain
  * Expense rows.
  */
 export function groupExpensesForList(
-  expenses: ExpenseData[],
+  unsortedExpenses: ExpenseData[],
   period: RangeString | string,
   now: Date,
   locale: string,
 ): ExpenseListEntry[] {
+  const expenses = newestFirst(unsortedExpenses);
   const underDayHeader = PERIODS_WITH_DAY_HEADERS.has(period);
   if (!underDayHeader && !PERIODS_WITH_MONTH_HEADERS.has(period)) {
     return expenses.map((expense) => ({

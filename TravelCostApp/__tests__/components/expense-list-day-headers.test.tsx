@@ -99,6 +99,22 @@ describe("ExpensesList day headers", () => {
     expect(screen.queryByText(/Nov/)).toBeNull();
   });
 
+  it("shows no time on a Ranged expense day, which only carries the time it was created at", () => {
+    const hotel = makeExpense({
+      id: "e-hotel",
+      description: "hotel",
+      date: at(11, 27, 20, 0),
+      startDate: at(11, 26, 20, 0),
+      endDate: at(11, 28, 20, 0),
+      rangeId: "r1",
+    });
+    const screen = renderList([hotel, ...weekExpenses()], "week");
+
+    expect(screen.getByText("hotel")).toBeTruthy();
+    expect(screen.queryByText("20:00")).toBeNull();
+    expect(screen.getByText("13:00")).toBeTruthy();
+  });
+
   it("opens the tapped Expense when headers sit between rows", () => {
     const screen = renderList(weekExpenses(), "week");
 
@@ -220,7 +236,7 @@ describe("ExpensesList day headers", () => {
     const count = MAX_EXPENSES_RENDER + 10;
     const expenses = Array.from({ length: count }, (_, i) =>
       // newest first: today from 14:59 backwards, one minute apart
-      expenseOn(`e${i}`, `expense ${i}`, at(11, 27, 14, 59 - (i % 60))),
+      expenseOn(`e${i}`, `expense ${i}`, at(11, 27, 14, 59 - i)),
     );
 
     const screen = renderList(expenses, "week");

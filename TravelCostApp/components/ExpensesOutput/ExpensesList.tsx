@@ -355,7 +355,7 @@ function ExpensesList({
                 </Text>
                 <Text style={styles.secondaryText}>
                   {underDayHeader
-                    ? formatExpenseTimeOfDay(itemData.item?.date)
+                    ? formatExpenseTimeOfDay(itemData.item)
                     : toShortFormat(itemData.item?.date)}{" "}
                 </Text>
               </View>

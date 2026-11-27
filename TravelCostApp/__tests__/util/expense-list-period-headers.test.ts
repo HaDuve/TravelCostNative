@@ -1,6 +1,7 @@
 import { RangeString } from "../../store/expenses-context";
 import {
   ExpenseListEntry,
+  formatExpenseTimeOfDay,
   groupExpensesForList,
 } from "../../util/expense-list-sections";
 import { makeExpense } from "../fixtures/expense";
@@ -312,5 +313,102 @@ describe("groupExpensesForList (localized time-of-day headers)", () => {
     expect(outline(entries).filter((line) => line.startsWith("#"))).toEqual(
       headers,
     );
+  });
+});
+
+describe("groupExpensesForList (order)", () => {
+  const now = at(2026, 11, 27, 15, 0);
+
+  it("sorts Expenses newest first whatever order they come in (e.g. one just added with an earlier date)", () => {
+    const expenses = [
+      expenseOn("dinner", at(2026, 11, 26, 20, 0)),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("taxi", at(2026, 11, 23, 8, 0)),
+      expenseOn("lunch", at(2026, 11, 27, 13, 0)),
+      expenseOn("snack", at(2026, 11, 26, 22, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Today",
+      "lunch",
+      "coffee",
+      "# Yesterday",
+      "snack",
+      "dinner",
+      "# Monday 23.11",
+      "taxi",
+    ]);
+  });
+
+  it("sorts today's time-of-day groups in the day period", () => {
+    const expenses = [
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("lunch", at(2026, 11, 27, 12, 0)),
+      expenseOn("bakery", at(2026, 11, 27, 10, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Midday",
+      "lunch",
+      "# This morning",
+      "bakery",
+      "coffee",
+    ]);
+  });
+
+  it("puts Ranged expense days after the timed Expenses of their day, even when stamped later than now", () => {
+    // a Ranged expense created yesterday at 20:00 carries 20:00 on every day
+    const expenses = [
+      expenseOn("hotel-today", at(2026, 11, 27, 20, 0), { rangeId: "r1" }),
+      expenseOn("hotel-yesterday", at(2026, 11, 26, 20, 0), { rangeId: "r1" }),
+      expenseOn("lunch", at(2026, 11, 27, 13, 0)),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("dinner", at(2026, 11, 26, 19, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Today",
+      "lunch",
+      "coffee",
+      "hotel-today",
+      "# Yesterday",
+      "dinner",
+      "hotel-yesterday",
+    ]);
+  });
+
+  it("sorts months and the Expenses inside them in the year period", () => {
+    const expenses = [
+      expenseOn("october", at(2026, 10, 3, 9, 0)),
+      expenseOn("late-nov", at(2026, 11, 25, 9, 0)),
+      expenseOn("september", at(2026, 9, 14, 9, 0)),
+      expenseOn("early-nov", at(2026, 11, 2, 9, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.year, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# This month",
+      "late-nov",
+      "early-nov",
+      "# October 2026",
+      "october",
+      "# September 2026",
+      "september",
+    ]);
+  });
+});
+
+describe("formatExpenseTimeOfDay", () => {
+  it("gives the time of a timed Expense and none for a Ranged expense day", () => {
+    const date = at(2026, 11, 27, 20, 0);
+    expect(formatExpenseTimeOfDay({ date })).toBe("20:00");
+    expect(formatExpenseTimeOfDay({ date, rangeId: "r1" })).toBe("");
   });
 });

@@ -143,6 +143,55 @@ describe("groupExpensesForList (week period)", () => {
     );
   });
 
+  it("sorts unsorted Expenses newest first, so each day gets one header", () => {
+    // The store prepends added Expenses and keeps edited ones in place, so a
+    // back-dated Expense can arrive above today's.
+    const expenses = [
+      expenseOn("backdated", at(2026, 11, 24, 10, 0)),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("dinner", at(2026, 11, 26, 20, 0)),
+      expenseOn("lunch", at(2026, 11, 27, 13, 0)),
+      expenseOn("breakfast", at(2026, 11, 24, 8, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Today",
+      "lunch",
+      "coffee",
+      "# Yesterday",
+      "dinner",
+      "# Tuesday 24.11",
+      "backdated",
+      "breakfast",
+    ]);
+    const keys = entries.map((entry) => entry.key);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("keeps the incoming order of Expenses with the same time", () => {
+    const expenses = [
+      expenseOn("first", at(2026, 11, 27, 13, 0)),
+      expenseOn("second", at(2026, 11, 27, 13, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
+
+    expect(outline(entries)).toEqual(["# Today", "first", "second"]);
+  });
+
+  it("does not reorder the caller's array", () => {
+    const expenses = [
+      expenseOn("older", at(2026, 11, 26, 9, 0)),
+      expenseOn("newer", at(2026, 11, 27, 9, 0)),
+    ];
+
+    groupExpensesForList(expenses, RangeString.week, now, "en");
+
+    expect(expenses.map((expense) => expense.id)).toEqual(["older", "newer"]);
+  });
+
   it("marks every Expense as sitting under a day header", () => {
     const entries = groupExpensesForList(
       [expenseOn("lunch", at(2026, 11, 27, 13, 0))],

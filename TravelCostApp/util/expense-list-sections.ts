@@ -46,19 +46,41 @@ function dayLabel(day: DateTime, now: DateTime, locale: string): string {
 }
 
 /**
+ * Newest local day first, then newest time first inside a day. The sort is
+ * stable, so Expenses with the same time keep their incoming order. Returns a
+ * sorted copy.
+ */
+function newestFirst(expenses: ExpenseData[]): ExpenseData[] {
+  const keyed = expenses.map((expense) => {
+    const time = toLocalDateTime(expense.date);
+    return {
+      expense,
+      day: time.startOf("day").toMillis(),
+      millis: time.toMillis(),
+    };
+  });
+  keyed.sort((a, b) => b.day - a.day || b.millis - a.millis);
+  return keyed.map(({ expense }) => expense);
+}
+
+/**
  * Turns the Expenses shown for a period into the rows of the Expense list.
  *
  * In the week period every local day gets a header ("Today", "Yesterday",
- * "Monday 23.11", ...) above its Expenses. The Expenses keep their incoming
- * order (newest first); a header starts whenever the day changes. Other
- * periods get plain Expense rows.
+ * "Monday 23.11", ...) above its Expenses. Other periods get plain Expense
+ * rows.
+ *
+ * The Expenses are sorted newest first (see `newestFirst`) whatever order
+ * they come in, since the store does not keep its list sorted after an add
+ * or an edit; a header starts whenever the day changes.
  */
 export function groupExpensesForList(
-  expenses: ExpenseData[],
+  unsortedExpenses: ExpenseData[],
   period: RangeString | string,
   now: Date,
   locale: string
 ): ExpenseListEntry[] {
+  const expenses = newestFirst(unsortedExpenses);
   if (!PERIODS_WITH_DAY_HEADERS.has(period)) {
     return expenses.map((expense) => ({
       kind: "expense",

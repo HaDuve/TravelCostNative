@@ -72,8 +72,9 @@ function dayLabel(day: DateTime, now: DateTime, locale: string): string {
  *   This morning     05:00 - 10:59
  *   Last night       00:01 - 04:59
  *
- * Expenses from the last hour (up to now, but not exactly an hour ago) go
- * under "Just now" instead, whatever their time of day.
+ * Expenses from the last hour (not exactly an hour ago), and those dated
+ * later today than now, go under "Just now" instead, whatever their time of
+ * day.
  */
 const TIME_OF_DAY_GROUPS: ReadonlyArray<{
   fromHour: number;
@@ -137,7 +138,9 @@ function timeOfDaySection(
 ): Section {
   if (hasNoTimeOfDay(expense, time)) return section("today", locale);
   const minutesAgo = now.diff(time, "minutes").minutes;
-  if (minutesAgo >= 0 && minutesAgo < JUST_NOW_MINUTES) {
+  // negative when dated later than now: still "Just now", so it does not
+  // land in a group above it
+  if (minutesAgo < JUST_NOW_MINUTES) {
     return section("expenseListJustNow", locale);
   }
   const group = TIME_OF_DAY_GROUPS.find(

@@ -111,6 +111,25 @@ describe("groupExpensesForList (day period)", () => {
     ]);
   });
 
+  it("puts an Expense dated later today than now under Just now, not in a group above it", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("ticket", at(2026, 11, 27, 16, 30)),
+      expenseOn("snack", at(2026, 11, 27, 14, 30)),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Just now",
+      "ticket",
+      "snack",
+      "# This morning",
+      "coffee",
+    ]);
+  });
+
   it("shows only the time on rows under time-of-day headers", () => {
     const now = at(2026, 11, 27, 15, 0);
     const entries = groupExpensesForList(

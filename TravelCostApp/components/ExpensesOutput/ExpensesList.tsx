@@ -53,7 +53,7 @@ import { useState } from "react";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses, isShadowExpense } from "./ExpenseListUtil";
-import ExpenseListDayHeader, { DAY_HEADER_HEIGHT } from "./ExpenseListDayHeader";
+import ExpenseListSectionHeader, { SECTION_HEADER_HEIGHT } from "./ExpenseListSectionHeader";
 import {
   expenseListItemLayouts,
   formatExpenseTimeOfDay,
@@ -131,7 +131,7 @@ function ExpensesList({
     () =>
       expenseListItemLayouts(listEntries, {
         expenseRowHeight: dynamicScale(EXPENSE_ROW_HEIGHT, true),
-        dayHeaderHeight: DAY_HEADER_HEIGHT,
+        headerHeight: SECTION_HEADER_HEIGHT,
       }),
     [listEntries]
   );
@@ -289,8 +289,8 @@ function ExpensesList({
       listItemData: { item: ExpenseListEntry; index: number }
     ) => {
       const entry = listItemData.item;
-      if (entry.kind === "dayHeader")
-        return <ExpenseListDayHeader label={entry.label} />;
+      if (entry.kind === "header")
+        return <ExpenseListSectionHeader label={entry.label} />;
       const underDayHeader = entry.underDayHeader;
       const itemData = { item: entry.expense, index: listItemData.index };
       if (isShadowExpense(itemData.item))

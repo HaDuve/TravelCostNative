@@ -13,7 +13,7 @@ import type { ExpenseData } from "./expense";
  * it, so the row only needs to show the time.
  */
 export type ExpenseListEntry =
-  | { kind: "dayHeader"; key: string; label: string }
+  | { kind: "header"; key: string; label: string }
   | {
       kind: "expense";
       key: string;
@@ -233,8 +233,8 @@ export function groupExpensesForList(
   const entries: ExpenseListEntry[] = [];
   for (const [key, rows] of groups) {
     entries.push({
-      kind: "dayHeader",
-      key: `dayHeader-${key}`,
+      kind: "header",
+      key: `header-${key}`,
       label: groupLabel(key, rows[0].time, period, nowDay, locale),
     });
     for (const { expense } of rows) {
@@ -251,22 +251,22 @@ export function groupExpensesForList(
 
 export type ExpenseListRowHeights = {
   expenseRowHeight: number;
-  dayHeaderHeight: number;
+  headerHeight: number;
 };
 
 /**
  * Height and scroll offset of every row, for FlatList's `getItemLayout`.
- * Day headers are shorter than Expense rows, so offsets are summed rather
+ * Section headers are shorter than Expense rows, so offsets are summed rather
  * than assumed to be `index * rowHeight`.
  */
 export function expenseListItemLayouts(
   entries: ExpenseListEntry[],
-  { expenseRowHeight, dayHeaderHeight }: ExpenseListRowHeights,
+  { expenseRowHeight, headerHeight }: ExpenseListRowHeights,
 ): { length: number; offset: number }[] {
   let offset = 0;
   return entries.map((entry) => {
     const length =
-      entry.kind === "dayHeader" ? dayHeaderHeight : expenseRowHeight;
+      entry.kind === "header" ? headerHeight : expenseRowHeight;
     const layout = { length, offset };
     offset += length;
     return layout;

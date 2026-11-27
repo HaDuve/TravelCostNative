@@ -26,7 +26,7 @@ function expenseOn(id: string, date: Date) {
 
 function outline(entries: ExpenseListEntry[]): string[] {
   return entries.map((entry) =>
-    entry.kind === "dayHeader" ? `# ${entry.label}` : entry.key,
+    entry.kind === "header" ? `# ${entry.label}` : entry.key,
   );
 }
 

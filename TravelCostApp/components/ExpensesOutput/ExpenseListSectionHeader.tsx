@@ -5,17 +5,17 @@ import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 
 /**
- * Fixed height of a day header row. The Expense list's scroll offset math
+ * Fixed height of a section header row. The Expense list's scroll offset math
  * (`getItemLayout`) relies on every header being exactly this tall.
  */
-export const DAY_HEADER_HEIGHT = dynamicScale(32, true);
+export const SECTION_HEADER_HEIGHT = dynamicScale(32, true);
 
 /**
  * Small gray caption above a group of Expenses ("Today", "Monday 23.11",
  * "This morning", "October 2026").
  * Not pressable or swipeable; announced as a header to screen readers.
  */
-function ExpenseListDayHeader({ label }: { label: string }) {
+function ExpenseListSectionHeader({ label }: { label: string }) {
   return (
     <View style={styles.container}>
       <Text
@@ -30,11 +30,11 @@ function ExpenseListDayHeader({ label }: { label: string }) {
   );
 }
 
-export default memo(ExpenseListDayHeader);
+export default memo(ExpenseListSectionHeader);
 
 const styles = StyleSheet.create({
   container: {
-    height: DAY_HEADER_HEIGHT,
+    height: SECTION_HEADER_HEIGHT,
     width: "100%",
     justifyContent: "flex-end",
     // more room above than below, so the caption reads as part of the

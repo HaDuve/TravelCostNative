@@ -25,7 +25,7 @@ function expenseOn(id: string, date: Date) {
 /** Compact view of the list: header labels and Expense ids, in order. */
 function outline(entries: ExpenseListEntry[]): string[] {
   return entries.map((entry) =>
-    entry.kind === "dayHeader" ? `# ${entry.label}` : entry.expense.id,
+    entry.kind === "header" ? `# ${entry.label}` : entry.expense.id,
   );
 }
 
@@ -279,7 +279,7 @@ describe("groupExpensesForList (no period)", () => {
 
 describe("expenseListItemLayouts", () => {
   const now = at(2026, 11, 27, 15, 0);
-  const heights = { expenseRowHeight: 55, dayHeaderHeight: 30 };
+  const heights = { expenseRowHeight: 55, headerHeight: 30 };
 
   it("adds up header and Expense row heights so each row knows its offset", () => {
     const entries = groupExpensesForList(

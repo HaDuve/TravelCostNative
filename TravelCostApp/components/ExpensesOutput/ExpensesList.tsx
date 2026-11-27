@@ -53,15 +53,15 @@ import { useState } from "react";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses, isShadowExpense } from "./ExpenseListUtil";
-import ExpenseListDayHeader, { DAY_HEADER_HEIGHT } from "./ExpenseListDayHeader";
+import ExpenseListSectionHeader, { SECTION_HEADER_HEIGHT } from "./ExpenseListSectionHeader";
 import {
   ExpenseListEntry,
   expenseListItemLayouts,
   formatExpenseTimeOfDay,
-  groupExpensesForList,
 } from "../../util/expense-list-sections";
 import { UserContext } from "../../store/user-context";
 import { useSplitHistoryContext } from "../../hooks/useSplitHistoryContext";
+import { useExpenseListEntries } from "../../hooks/useExpenseListEntries";
 import * as Haptics from "expo-haptics";
 import { toShortFormat } from "../../util/date";
 import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
@@ -127,32 +127,12 @@ function ExpensesList({
   // Long lists use cheap rows and have no multi-select toolbar.
   const hasListHeader = expenses?.length < MAX_EXPENSES_RENDER;
 
-  // Rows of the list: day headers (week period) and Expenses, followed by
-  // the blank shadow rows that pad short lists.
-  const listEntries: ExpenseListEntry[] = useMemo(() => {
-    const shadowEntries: ExpenseListEntry[] = expenses
-      .filter(isShadowExpense)
-      .map((item) => ({
-        kind: "expense",
-        key: item.id,
-        expense: item,
-        underDayHeader: false,
-      }));
-    return [
-      ...groupExpensesForList(
-        expenses.filter((item) => !isShadowExpense(item)),
-        periodName,
-        new Date(),
-        i18n.locale
-      ),
-      ...shadowEntries,
-    ];
-  }, [expenses, expenses?.length, periodName]);
+  const listEntries = useExpenseListEntries(expenses, periodName);
   const listItemLayouts = useMemo(
     () =>
       expenseListItemLayouts(listEntries, {
         expenseRowHeight: dynamicScale(EXPENSE_ROW_HEIGHT, true),
-        dayHeaderHeight: DAY_HEADER_HEIGHT,
+        headerHeight: SECTION_HEADER_HEIGHT,
       }),
     [listEntries]
   );
@@ -310,8 +290,8 @@ function ExpensesList({
       listItemData: { item: ExpenseListEntry; index: number }
     ) => {
       const entry = listItemData.item;
-      if (entry.kind === "dayHeader")
-        return <ExpenseListDayHeader label={entry.label} />;
+      if (entry.kind === "header")
+        return <ExpenseListSectionHeader label={entry.label} />;
       const underDayHeader = entry.underDayHeader;
       const itemData = { item: entry.expense, index: listItemData.index };
       if (isShadowExpense(itemData.item))
@@ -328,6 +308,9 @@ function ExpensesList({
         });
       };
       if (expensesLength > MAX_EXPENSES_RENDER) {
+        const cheapDateLine = underDayHeader
+          ? formatExpenseTimeOfDay(itemData.item)
+          : toShortFormat(itemData.item?.date);
         // show cheap JSX
         return (
           <View>
@@ -347,11 +330,12 @@ function ExpensesList({
                 <Text style={styles.descriptionText}>
                   {itemData.item?.description}
                 </Text>
-                <Text style={styles.secondaryText}>
-                  {underDayHeader
-                    ? formatExpenseTimeOfDay(itemData.item?.date)
-                    : toShortFormat(itemData.item?.date)}{" "}
-                </Text>
+                {/* no time line (Ranged expense day): the row centers the description */}
+                {!!cheapDateLine && (
+                  <Text testID="expense-item-date" style={styles.secondaryText}>
+                    {cheapDateLine}{" "}
+                  </Text>
+                )}
               </View>
               <Text style={styles.fastExpenseText}>
                 {formatExpenseWithCurrency(

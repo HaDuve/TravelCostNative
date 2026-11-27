@@ -71,6 +71,15 @@ const en = {
   thisYear: "This Year",
   lastYear: "Last Year",
 
+  // Expense list section headers
+  expenseListJustNow: "Just now",
+  expenseListThisMorning: "This morning",
+  expenseListMidday: "Midday",
+  expenseListThisAfternoon: "This afternoon",
+  expenseListThisEvening: "This evening",
+  expenseListLastNight: "Last night",
+  expenseListThisMonth: "This month",
+
   // last periodname
   last: "Last",
   latest: "Latest",
@@ -781,6 +790,15 @@ const de = {
   lastMonth: "Letzten Monat",
   thisYear: "Dieses Jahr",
   lastYear: "Letztes Jahr",
+
+  // Expense list section headers
+  expenseListJustNow: "Gerade eben",
+  expenseListThisMorning: "Heute Morgen",
+  expenseListMidday: "Mittags",
+  expenseListThisAfternoon: "Heute Nachmittag",
+  expenseListThisEvening: "Heute Abend",
+  expenseListLastNight: "Letzte Nacht",
+  expenseListThisMonth: "Dieser Monat",
 
   // last periodname
   last: "Letzte",
@@ -1531,6 +1549,15 @@ const fr = {
   thisYear: "Cette année",
   lastYear: "L'année dernière",
 
+  // Expense list section headers
+  expenseListJustNow: "À l'instant",
+  expenseListThisMorning: "Ce matin",
+  expenseListMidday: "Midi",
+  expenseListThisAfternoon: "Cet après-midi",
+  expenseListThisEvening: "Ce soir",
+  expenseListLastNight: "Cette nuit",
+  expenseListThisMonth: "Ce mois-ci",
+
   // last periodname
   last: "Dernier",
   latest: "Dernières",
@@ -2277,6 +2304,15 @@ const ru = {
   lastMonth: "В прошлом месяце",
   thisYear: "В этом году",
   lastYear: "В прошлом году",
+
+  // Expense list section headers
+  expenseListJustNow: "Только что",
+  expenseListThisMorning: "Сегодня утром",
+  expenseListMidday: "В обед",
+  expenseListThisAfternoon: "Сегодня днём",
+  expenseListThisEvening: "Сегодня вечером",
+  expenseListLastNight: "Прошлой ночью",
+  expenseListThisMonth: "Этот месяц",
 
   // last periodname
   last: "Последние",

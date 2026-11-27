@@ -13,7 +13,7 @@ function at(
   month: number,
   day: number,
   hour = 12,
-  minute = 0
+  minute = 0,
 ): Date {
   return new Date(year, month - 1, day, hour, minute);
 }
@@ -25,7 +25,7 @@ function expenseOn(id: string, date: Date) {
 /** Compact view of the list: header labels and Expense ids, in order. */
 function outline(entries: ExpenseListEntry[]): string[] {
   return entries.map((entry) =>
-    entry.kind === "dayHeader" ? `# ${entry.label}` : entry.expense.id
+    entry.kind === "header" ? `# ${entry.label}` : entry.expense.id,
   );
 }
 
@@ -65,7 +65,7 @@ describe("groupExpensesForList (week period)", () => {
       expenses,
       RangeString.week,
       justAfterMidnight,
-      "en"
+      "en",
     );
 
     expect(outline(entries)).toEqual([
@@ -112,7 +112,7 @@ describe("groupExpensesForList (week period)", () => {
       expenses,
       RangeString.week,
       wednesday,
-      "en"
+      "en",
     );
 
     expect(outline(entries)).toEqual([
@@ -136,10 +136,15 @@ describe("groupExpensesForList (week period)", () => {
       expenseOn("taxi", at(2026, 11, 23, 8, 0)),
     ];
 
-    const entries = groupExpensesForList(expenses, RangeString.week, now, locale);
+    const entries = groupExpensesForList(
+      expenses,
+      RangeString.week,
+      now,
+      locale,
+    );
 
     expect(outline(entries).filter((line) => line.startsWith("#"))).toEqual(
-      headers
+      headers,
     );
   });
 
@@ -197,7 +202,7 @@ describe("groupExpensesForList (week period)", () => {
       [expenseOn("lunch", at(2026, 11, 27, 13, 0))],
       RangeString.week,
       now,
-      "en"
+      "en",
     );
 
     expect(entries[1]).toMatchObject({
@@ -227,38 +232,54 @@ describe("groupExpensesForList on Hermes (no usable Intl formatToParts)", () => 
       [expenseOn("groceries", at(2026, 11, 25, 18, 30))],
       RangeString.week,
       now,
-      "de"
+      "de",
     );
 
     expect(outline(entries)).toEqual(["# Mittwoch 25.11", "groceries"]);
   });
+  it("still names the month in year headers", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const entries = groupExpensesForList(
+      [expenseOn("flight", at(2026, 10, 20, 7, 0))],
+      RangeString.year,
+      now,
+      "de",
+    );
+
+    expect(outline(entries)).toEqual(["# Oktober 2026", "flight"]);
+  });
 });
 
-describe("groupExpensesForList (other periods)", () => {
+describe("groupExpensesForList (no period)", () => {
   const now = at(2026, 11, 27, 15, 0);
   const expenses = [
     expenseOn("lunch", at(2026, 11, 27, 13, 0)),
     expenseOn("dinner", at(2026, 11, 26, 20, 0)),
   ];
 
-  it.each([
-    RangeString.day,
-    RangeString.month,
-    RangeString.year,
-    RangeString.total,
-  ])("%s lists plain Expense rows without headers", (period) => {
-    const entries = groupExpensesForList(expenses, period, now, "en");
+  it("lists plain Expense rows without headers before the period is known", () => {
+    const entries = groupExpensesForList(expenses, "", now, "en");
 
     expect(entries).toEqual([
-      { kind: "expense", key: "lunch", expense: expenses[0], underDayHeader: false },
-      { kind: "expense", key: "dinner", expense: expenses[1], underDayHeader: false },
+      {
+        kind: "expense",
+        key: "lunch",
+        expense: expenses[0],
+        underDayHeader: false,
+      },
+      {
+        kind: "expense",
+        key: "dinner",
+        expense: expenses[1],
+        underDayHeader: false,
+      },
     ]);
   });
 });
 
 describe("expenseListItemLayouts", () => {
   const now = at(2026, 11, 27, 15, 0);
-  const heights = { expenseRowHeight: 55, dayHeaderHeight: 30 };
+  const heights = { expenseRowHeight: 55, headerHeight: 30 };
 
   it("adds up header and Expense row heights so each row knows its offset", () => {
     const entries = groupExpensesForList(
@@ -269,7 +290,7 @@ describe("expenseListItemLayouts", () => {
       ],
       RangeString.week,
       now,
-      "en"
+      "en",
     );
 
     expect(expenseListItemLayouts(entries, heights)).toEqual([
@@ -287,9 +308,10 @@ describe("expenseListItemLayouts", () => {
         expenseOn("lunch", at(2026, 11, 27, 13, 0)),
         expenseOn("dinner", at(2026, 11, 26, 20, 0)),
       ],
-      RangeString.month,
+      // no period yet (e.g. before the user's settings have loaded)
+      "",
       now,
-      "en"
+      "en",
     );
 
     expect(expenseListItemLayouts(entries, heights)).toEqual([

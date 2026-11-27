@@ -63,6 +63,7 @@ function ExpenseItem(props): JSX.Element {
     splitList,
     iconName,
     isSpecialExpense,
+    rangeId,
   }: ExpenseData = props;
   let { date } = props;
   const navigation = useNavigation();
@@ -289,11 +290,13 @@ function ExpenseItem(props): JSX.Element {
     const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
     // a day header above the row already names the day
     if (underDayHeader) {
-      dateString.current = formatExpenseTimeOfDay(date);
-    } else if (isToday(new Date(date))) {
+      dateString.current = formatExpenseTimeOfDay({ date, rangeId });
+    } else if (isToday(new Date(date)) && !rangeId) {
+      // a Ranged expense day only carries the time the Ranged expense was
+      // created at, so it keeps its short date below
       dateString.current = `${todayString()}${hourAndMinuteString}`;
     } else dateString.current = toShortFormat(date);
-  }, [date, todayString, underDayHeader]);
+  }, [date, rangeId, todayString, underDayHeader]);
   configureDateString();
 
   const layout = useLayoutProfile();
@@ -347,11 +350,11 @@ function ExpenseItem(props): JSX.Element {
             />
           </View>
           <View
-            testID={
-              isTemplatePickerRow ? "expense-item-description-column" : undefined
-            }
+            testID="expense-item-description-column"
             style={[
               styles.leftItem,
+              // no time line (Ranged expense day): center the description
+              !dateString.current && styles.leftItemCentered,
               isTemplatePickerRow && styles.leftItemTemplatePicker,
             ]}
           >
@@ -372,18 +375,21 @@ function ExpenseItem(props): JSX.Element {
             >
               {description}
             </Text>
-            <Text
-              maxFontSizeMultiplier={1}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={[
-                styles.textBase,
-                styles.secondaryText,
-                hideSpecial && { color: GlobalStyles.colors.textHidden },
-              ]}
-            >
-              {dateString.current}
-            </Text>
+            {!!dateString.current && (
+              <Text
+                testID="expense-item-date"
+                maxFontSizeMultiplier={1}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[
+                  styles.textBase,
+                  styles.secondaryText,
+                  hideSpecial && { color: GlobalStyles.colors.textHidden },
+                ]}
+              >
+                {dateString.current}
+              </Text>
+            )}
           </View>
           {settingShowFlags && (
             <View
@@ -511,6 +517,9 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
     justifyContent: "flex-start",
     alignItems: "flex-start",
+  },
+  leftItemCentered: {
+    justifyContent: "center",
   },
   leftItemTemplatePicker: {
     flexGrow: 2,

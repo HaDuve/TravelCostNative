@@ -1,11 +1,19 @@
 import * as React from "react";
-import { Alert, FlatList, Platform } from "react-native";
+import { Alert, AppState, FlatList, Platform } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { act, fireEvent } from "@testing-library/react-native";
 
 const mockNavigate = jest.fn();
+const mockFocusListeners = new Set<() => void>();
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate, popToTop: jest.fn() }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    popToTop: jest.fn(),
+    addListener: (event: string, listener: () => void) => {
+      if (event === "focus") mockFocusListeners.add(listener);
+      return () => mockFocusListeners.delete(listener);
+    },
+  }),
 }));
 
 jest.mock("expo-haptics", () => ({
@@ -101,6 +109,22 @@ describe("ExpensesList day headers", () => {
     expect(screen.queryByText(/Nov/)).toBeNull();
   });
 
+  it("shows no time on a Ranged expense day, which only carries the time it was created at", () => {
+    const hotel = makeExpense({
+      id: "e-hotel",
+      description: "hotel",
+      date: at(11, 27, 20, 0),
+      startDate: at(11, 26, 20, 0),
+      endDate: at(11, 28, 20, 0),
+      rangeId: "r1",
+    });
+    const screen = renderList([hotel, ...weekExpenses()], "week");
+
+    expect(screen.getByText("hotel")).toBeTruthy();
+    expect(screen.queryByText("20:00")).toBeNull();
+    expect(screen.getByText("13:00")).toBeTruthy();
+  });
+
   it("opens the tapped Expense when headers sit between rows", () => {
     const screen = renderList(weekExpenses(), "week");
 
@@ -111,37 +135,142 @@ describe("ExpensesList day headers", () => {
     });
   });
 
-  it("long-press selects the pressed Expense, not a neighbour", () => {
-    const screen = renderList(weekExpenses(), "week");
-
-    fireEvent(screen.getByText("sushi"), "longPress");
-
-    expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(1);
-    expect(screen.getAllByTestId("icon-ellipse-outline")).toHaveLength(2);
-  });
-
-  it("select-all selects every Expense and no header", () => {
-    const screen = renderList(weekExpenses(), "week");
-    fireEvent(screen.getByText("sushi"), "longPress");
-
-    fireEvent.press(screen.getByTestId("icon-checkmark-done-outline"));
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
-
-    expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(3);
-    expect(screen.queryAllByTestId("icon-ellipse-outline")).toHaveLength(0);
-  });
-
-  it.each(["day", "month", "year", "total"])(
-    "keeps the %s period list without headers",
+  it.each(["week", "day", "month", "year"])(
+    "long-press selects the pressed Expense, not a neighbour, in the %s period",
     (periodName) => {
       const screen = renderList(weekExpenses(), periodName);
+      expect(screen.getAllByRole("header").length).toBeGreaterThan(0);
 
-      expect(screen.queryAllByRole("header")).toHaveLength(0);
-      expect(screen.getByText("taxi")).toBeTruthy();
+      fireEvent(screen.getByText("sushi"), "longPress");
+
+      expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(1);
+      expect(screen.getAllByTestId("icon-ellipse-outline")).toHaveLength(2);
     },
   );
+
+  it.each(["week", "day", "month", "year"])(
+    "select-all selects every Expense and no header in the %s period",
+    (periodName) => {
+      const screen = renderList(weekExpenses(), periodName);
+      fireEvent(screen.getByText("sushi"), "longPress");
+
+      fireEvent.press(screen.getByTestId("icon-checkmark-done-outline"));
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
+
+      expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(3);
+      expect(screen.queryAllByTestId("icon-ellipse-outline")).toHaveLength(0);
+    },
+  );
+
+  it("splits today into time-of-day headers in the day period, rows showing only the time", () => {
+    const screen = renderList(
+      [
+        expenseOn("e-snack", "onigiri", at(11, 27, 14, 30)),
+        expenseOn("e-coffee", "coffee", at(11, 27, 9, 5)),
+      ],
+      "day",
+    );
+
+    const headers = screen.getAllByRole("header").map((h) => h.props.children);
+    expect(headers).toEqual(["Just now", "This morning"]);
+    expect(screen.getByText("09:05")).toBeTruthy();
+  });
+
+  it("puts a day header above each day in the month period", () => {
+    const screen = renderList(weekExpenses(), "month");
+
+    const headers = screen.getAllByRole("header").map((h) => h.props.children);
+    expect(headers).toEqual(["Today", "Yesterday", "Monday 23.11"]);
+    expect(screen.getByText("20:15")).toBeTruthy();
+  });
+
+  it.each(["year", "total"])(
+    "puts month headers in the %s period and keeps the short date on rows",
+    (periodName) => {
+      const screen = renderList(
+        [...weekExpenses(), expenseOn("e-flight", "flight", at(10, 30, 7, 0))],
+        periodName,
+      );
+
+      const headers = screen
+        .getAllByRole("header")
+        .map((h) => h.props.children);
+      expect(headers).toEqual(["This month", "October 2026"]);
+      expect(screen.queryByText("20:15")).toBeNull();
+      expect(screen.getAllByText(/Nov/).length).toBeGreaterThan(0);
+    },
+  );
+
+  it("moves Just now into its time-of-day group when the app comes back after more than an hour", () => {
+    const appStateListeners: ((state: string) => void)[] = [];
+    const appStateSpy = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_event, listener) => {
+        appStateListeners.push(listener as (state: string) => void);
+        return { remove: jest.fn() } as never;
+      });
+    try {
+      const screen = renderList(
+        [expenseOn("e-snack", "onigiri", at(11, 27, 14, 30))],
+        "day",
+      );
+      expect(screen.getByRole("header").props.children).toBe("Just now");
+
+      // backgrounded until 16:10, then brought back
+      jest.setSystemTime(at(11, 27, 16, 10));
+      act(() => {
+        appStateListeners.forEach((listener) => listener("background"));
+      });
+      expect(screen.getByRole("header").props.children).toBe("Just now");
+      act(() => {
+        appStateListeners.forEach((listener) => listener("active"));
+      });
+
+      expect(screen.getByRole("header").props.children).toBe("This afternoon");
+    } finally {
+      appStateSpy.mockRestore();
+    }
+  });
+
+  it("refreshes the labels when the screen regains focus", () => {
+    const screen = renderList(
+      [expenseOn("e-snack", "onigiri", at(11, 27, 14, 30))],
+      "day",
+    );
+    expect(screen.getByRole("header").props.children).toBe("Just now");
+
+    jest.setSystemTime(at(11, 27, 16, 10));
+    act(() => {
+      mockFocusListeners.forEach((listener) => listener());
+    });
+
+    expect(screen.getByRole("header").props.children).toBe("This afternoon");
+  });
+
+  it("drops the time line of a Ranged expense day in cheap-render mode", () => {
+    const count = MAX_EXPENSES_RENDER + 10;
+    // the Ranged expense day alone today, so its row renders first
+    const dateOf = (i: number) =>
+      i === 0 ? at(11, 27, 20, 0) : at(11, 26, 23, 59 - i);
+    const expenses = Array.from({ length: count }, (_, i) =>
+      makeExpense({
+        id: `e${i}`,
+        description: `expense ${i}`,
+        date: dateOf(i),
+        startDate: dateOf(i),
+        endDate: dateOf(i),
+        rangeId: i === 0 ? "r1" : undefined,
+      }),
+    );
+
+    const screen = renderList(expenses, "week");
+
+    expect(screen.getByText("expense 0")).toBeTruthy();
+    const rows = screen.getAllByText(/^expense \d+$/).length;
+    expect(screen.getAllByTestId("expense-item-date")).toHaveLength(rows - 1);
+  });
 
   it("renders headers in cheap-render mode for a week longer than the render threshold", () => {
     const count = MAX_EXPENSES_RENDER + 10;
@@ -155,6 +284,24 @@ describe("ExpensesList day headers", () => {
     const headers = screen.getAllByRole("header").map((h) => h.props.children);
     expect(headers[0]).toBe("Today");
     expect(screen.getByText("14:59")).toBeTruthy();
+    fireEvent.press(screen.getByText("expense 1"));
+    expect(mockNavigate).toHaveBeenCalledWith("ManageExpense", {
+      expenseId: "e1",
+    });
+  });
+
+  it("renders month headers and short dates in cheap-render mode for a long year", () => {
+    const count = MAX_EXPENSES_RENDER + 10;
+    const expenses = Array.from({ length: count }, (_, i) =>
+      // newest first: one Expense a day going back from today
+      expenseOn(`e${i}`, `expense ${i}`, new Date(2026, 10, 27 - i, 12, 0)),
+    );
+
+    const screen = renderList(expenses, "year");
+
+    const headers = screen.getAllByRole("header").map((h) => h.props.children);
+    expect(headers[0]).toBe("This month");
+    expect(screen.queryByText("12:00")).toBeNull();
     fireEvent.press(screen.getByText("expense 1"));
     expect(mockNavigate).toHaveBeenCalledWith("ManageExpense", {
       expenseId: "e1",

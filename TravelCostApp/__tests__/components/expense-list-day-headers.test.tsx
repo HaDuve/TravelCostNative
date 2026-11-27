@@ -249,6 +249,29 @@ describe("ExpensesList day headers", () => {
     expect(screen.getByRole("header").props.children).toBe("This afternoon");
   });
 
+  it("drops the time line of a Ranged expense day in cheap-render mode", () => {
+    const count = MAX_EXPENSES_RENDER + 10;
+    // the Ranged expense day alone today, so its row renders first
+    const dateOf = (i: number) =>
+      i === 0 ? at(11, 27, 20, 0) : at(11, 26, 23, 59 - i);
+    const expenses = Array.from({ length: count }, (_, i) =>
+      makeExpense({
+        id: `e${i}`,
+        description: `expense ${i}`,
+        date: dateOf(i),
+        startDate: dateOf(i),
+        endDate: dateOf(i),
+        rangeId: i === 0 ? "r1" : undefined,
+      }),
+    );
+
+    const screen = renderList(expenses, "week");
+
+    expect(screen.getByText("expense 0")).toBeTruthy();
+    const rows = screen.getAllByText(/^expense \d+$/).length;
+    expect(screen.getAllByTestId("expense-item-date")).toHaveLength(rows - 1);
+  });
+
   it("renders headers in cheap-render mode for a week longer than the render threshold", () => {
     const count = MAX_EXPENSES_RENDER + 10;
     const expenses = Array.from({ length: count }, (_, i) =>

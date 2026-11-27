@@ -308,6 +308,9 @@ function ExpensesList({
         });
       };
       if (expensesLength > MAX_EXPENSES_RENDER) {
+        const cheapDateLine = underDayHeader
+          ? formatExpenseTimeOfDay(itemData.item)
+          : toShortFormat(itemData.item?.date);
         // show cheap JSX
         return (
           <View>
@@ -327,11 +330,12 @@ function ExpensesList({
                 <Text style={styles.descriptionText}>
                   {itemData.item?.description}
                 </Text>
-                <Text style={styles.secondaryText}>
-                  {underDayHeader
-                    ? formatExpenseTimeOfDay(itemData.item)
-                    : toShortFormat(itemData.item?.date)}{" "}
-                </Text>
+                {/* no time line (Ranged expense day): the row centers the description */}
+                {!!cheapDateLine && (
+                  <Text testID="expense-item-date" style={styles.secondaryText}>
+                    {cheapDateLine}{" "}
+                  </Text>
+                )}
               </View>
               <Text style={styles.fastExpenseText}>
                 {formatExpenseWithCurrency(

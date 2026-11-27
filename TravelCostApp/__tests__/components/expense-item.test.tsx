@@ -118,6 +118,31 @@ describe("ExpenseItem", () => {
       expect(screen.getByText(/Nov/)).toBeTruthy();
     });
 
+    it("drops the time line of a Ranged expense day under a day header and centers the description", () => {
+      const screen = renderOn(new Date(2026, 10, 27, 20, 0), {
+        rangeId: "r1",
+        underDayHeader: true,
+      });
+
+      expect(screen.queryByTestId("expense-item-date")).toBeNull();
+      const column = StyleSheet.flatten(
+        screen.getByTestId("expense-item-description-column").props.style,
+      );
+      expect(column.justifyContent).toBe("center");
+    });
+
+    it("keeps the description at the top when a time line sits under it", () => {
+      const screen = renderOn(new Date(2026, 10, 27, 9, 5), {
+        underDayHeader: true,
+      });
+
+      expect(screen.getByTestId("expense-item-date")).toBeTruthy();
+      const column = StyleSheet.flatten(
+        screen.getByTestId("expense-item-description-column").props.style,
+      );
+      expect(column.justifyContent).toBe("flex-start");
+    });
+
     it("shows the short date, not the creation time, for a Ranged expense day dated today without a header", () => {
       // a Ranged expense created at 20:00 carries 20:00 on every day
       const screen = renderOn(new Date(2026, 10, 27, 20, 0), {

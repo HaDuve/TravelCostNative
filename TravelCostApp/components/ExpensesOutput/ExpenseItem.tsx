@@ -350,11 +350,11 @@ function ExpenseItem(props): JSX.Element {
             />
           </View>
           <View
-            testID={
-              isTemplatePickerRow ? "expense-item-description-column" : undefined
-            }
+            testID="expense-item-description-column"
             style={[
               styles.leftItem,
+              // no time line (Ranged expense day): center the description
+              !dateString.current && styles.leftItemCentered,
               isTemplatePickerRow && styles.leftItemTemplatePicker,
             ]}
           >
@@ -375,18 +375,21 @@ function ExpenseItem(props): JSX.Element {
             >
               {description}
             </Text>
-            <Text
-              maxFontSizeMultiplier={1}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={[
-                styles.textBase,
-                styles.secondaryText,
-                hideSpecial && { color: GlobalStyles.colors.textHidden },
-              ]}
-            >
-              {dateString.current}
-            </Text>
+            {!!dateString.current && (
+              <Text
+                testID="expense-item-date"
+                maxFontSizeMultiplier={1}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[
+                  styles.textBase,
+                  styles.secondaryText,
+                  hideSpecial && { color: GlobalStyles.colors.textHidden },
+                ]}
+              >
+                {dateString.current}
+              </Text>
+            )}
           </View>
           {settingShowFlags && (
             <View
@@ -514,6 +517,9 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
     justifyContent: "flex-start",
     alignItems: "flex-start",
+  },
+  leftItemCentered: {
+    justifyContent: "center",
   },
   leftItemTemplatePicker: {
     flexGrow: 2,

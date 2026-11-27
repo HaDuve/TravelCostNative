@@ -291,7 +291,9 @@ function ExpenseItem(props): JSX.Element {
     // a day header above the row already names the day
     if (underDayHeader) {
       dateString.current = formatExpenseTimeOfDay({ date, rangeId });
-    } else if (isToday(new Date(date))) {
+    } else if (isToday(new Date(date)) && !rangeId) {
+      // a Ranged expense day only carries the time the Ranged expense was
+      // created at, so it keeps its short date below
       dateString.current = `${todayString()}${hourAndMinuteString}`;
     } else dateString.current = toShortFormat(date);
   }, [date, rangeId, todayString, underDayHeader]);

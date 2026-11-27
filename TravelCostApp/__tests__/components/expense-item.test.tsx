@@ -117,5 +117,15 @@ describe("ExpenseItem", () => {
       expect(screen.queryByText("14:32")).toBeNull();
       expect(screen.getByText(/Nov/)).toBeTruthy();
     });
+
+    it("shows the short date, not the creation time, for a Ranged expense day dated today without a header", () => {
+      // a Ranged expense created at 20:00 carries 20:00 on every day
+      const screen = renderOn(new Date(2026, 10, 27, 20, 0), {
+        rangeId: "r1",
+      });
+
+      expect(screen.queryByText(/20:00/)).toBeNull();
+      expect(screen.getByText(/Nov/)).toBeTruthy();
+    });
   });
 });

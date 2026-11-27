@@ -11,7 +11,8 @@ import { dynamicScale } from "../../util/scalingUtil";
 export const DAY_HEADER_HEIGHT = dynamicScale(32, true);
 
 /**
- * Small gray caption above a day's Expenses ("Today", "Monday 23.11").
+ * Small gray caption above a group of Expenses ("Today", "Monday 23.11",
+ * "This morning", "October 2026").
  * Not pressable or swipeable; announced as a header to screen readers.
  */
 function ExpenseListDayHeader({ label }: { label: string }) {

@@ -1,9 +1,18 @@
 import * as React from "react";
+import { AppState } from "react-native";
 import { act, fireEvent } from "@testing-library/react-native";
 
 const mockNavigate = jest.fn();
+const mockFocusListeners = new Set<() => void>();
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate, popToTop: jest.fn() }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    popToTop: jest.fn(),
+    addListener: (event: string, listener: () => void) => {
+      if (event === "focus") mockFocusListeners.add(listener);
+      return () => mockFocusListeners.delete(listener);
+    },
+  }),
 }));
 
 jest.mock("expo-haptics", () => ({
@@ -40,7 +49,10 @@ function expenseOn(id: string, description: string, date: Date) {
   return makeExpense({ id, description, date, startDate: date, endDate: date });
 }
 
-function renderList(expenses: ReturnType<typeof makeExpense>[], periodName: string) {
+function renderList(
+  expenses: ReturnType<typeof makeExpense>[],
+  periodName: string,
+) {
   return renderWithAppProviders(
     <ExpensesList
       expenses={expenses}
@@ -50,9 +62,9 @@ function renderList(expenses: ReturnType<typeof makeExpense>[], periodName: stri
       refreshing={false}
     />,
     {
-    wrapNavigation: false,
+      wrapNavigation: false,
       user: { periodName, tripHistory: [] },
-    }
+    },
   );
 }
 
@@ -119,21 +131,96 @@ describe("ExpensesList day headers", () => {
     expect(screen.queryAllByTestId("icon-ellipse-outline")).toHaveLength(0);
   });
 
-  it.each(["day", "month", "year", "total"])(
-    "keeps the %s period list without headers",
-    (periodName) => {
-      const screen = renderList(weekExpenses(), periodName);
+  it("splits today into time-of-day headers in the day period, rows showing only the time", () => {
+    const screen = renderList(
+      [
+        expenseOn("e-snack", "onigiri", at(11, 27, 14, 30)),
+        expenseOn("e-coffee", "coffee", at(11, 27, 9, 5)),
+      ],
+      "day",
+    );
 
-      expect(screen.queryAllByRole("header")).toHaveLength(0);
-      expect(screen.getByText("taxi")).toBeTruthy();
-    }
+    const headers = screen.getAllByRole("header").map((h) => h.props.children);
+    expect(headers).toEqual(["Just now", "This morning"]);
+    expect(screen.getByText("09:05")).toBeTruthy();
+  });
+
+  it("puts a day header above each day in the month period", () => {
+    const screen = renderList(weekExpenses(), "month");
+
+    const headers = screen.getAllByRole("header").map((h) => h.props.children);
+    expect(headers).toEqual(["Today", "Yesterday", "Monday 23.11"]);
+    expect(screen.getByText("20:15")).toBeTruthy();
+  });
+
+  it.each(["year", "total"])(
+    "puts month headers in the %s period and keeps the short date on rows",
+    (periodName) => {
+      const screen = renderList(
+        [...weekExpenses(), expenseOn("e-flight", "flight", at(10, 30, 7, 0))],
+        periodName,
+      );
+
+      const headers = screen
+        .getAllByRole("header")
+        .map((h) => h.props.children);
+      expect(headers).toEqual(["This month", "October 2026"]);
+      expect(screen.queryByText("20:15")).toBeNull();
+      expect(screen.getAllByText(/Nov/).length).toBeGreaterThan(0);
+    },
   );
+
+  it("moves Just now into its time-of-day group when the app comes back after more than an hour", () => {
+    const appStateListeners: ((state: string) => void)[] = [];
+    const appStateSpy = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_event, listener) => {
+        appStateListeners.push(listener as (state: string) => void);
+        return { remove: jest.fn() } as never;
+      });
+    try {
+      const screen = renderList(
+        [expenseOn("e-snack", "onigiri", at(11, 27, 14, 30))],
+        "day",
+      );
+      expect(screen.getByRole("header").props.children).toBe("Just now");
+
+      // backgrounded until 16:10, then brought back
+      jest.setSystemTime(at(11, 27, 16, 10));
+      act(() => {
+        appStateListeners.forEach((listener) => listener("background"));
+      });
+      expect(screen.getByRole("header").props.children).toBe("Just now");
+      act(() => {
+        appStateListeners.forEach((listener) => listener("active"));
+      });
+
+      expect(screen.getByRole("header").props.children).toBe("This afternoon");
+    } finally {
+      appStateSpy.mockRestore();
+    }
+  });
+
+  it("refreshes the labels when the screen regains focus", () => {
+    const screen = renderList(
+      [expenseOn("e-snack", "onigiri", at(11, 27, 14, 30))],
+      "day",
+    );
+    expect(screen.getByRole("header").props.children).toBe("Just now");
+
+    jest.setSystemTime(at(11, 27, 16, 10));
+    act(() => {
+      mockFocusListeners.forEach((listener) => listener());
+    });
+
+    expect(screen.getByRole("header").props.children).toBe("This afternoon");
+  });
 
   it("renders headers in cheap-render mode for a week longer than the render threshold", () => {
     const count = MAX_EXPENSES_RENDER + 10;
     const expenses = Array.from({ length: count }, (_, i) =>
       // newest first: today from 14:59 backwards, one minute apart
-      expenseOn(`e${i}`, `expense ${i}`, at(11, 27, 14, 59 - (i % 60)))
+      expenseOn(`e${i}`, `expense ${i}`, at(11, 27, 14, 59 - (i % 60))),
     );
 
     const screen = renderList(expenses, "week");
@@ -141,6 +228,24 @@ describe("ExpensesList day headers", () => {
     const headers = screen.getAllByRole("header").map((h) => h.props.children);
     expect(headers[0]).toBe("Today");
     expect(screen.getByText("14:59")).toBeTruthy();
+    fireEvent.press(screen.getByText("expense 1"));
+    expect(mockNavigate).toHaveBeenCalledWith("ManageExpense", {
+      expenseId: "e1",
+    });
+  });
+
+  it("renders month headers and short dates in cheap-render mode for a long year", () => {
+    const count = MAX_EXPENSES_RENDER + 10;
+    const expenses = Array.from({ length: count }, (_, i) =>
+      // newest first: one Expense a day going back from today
+      expenseOn(`e${i}`, `expense ${i}`, new Date(2026, 10, 27 - i, 12, 0)),
+    );
+
+    const screen = renderList(expenses, "year");
+
+    const headers = screen.getAllByRole("header").map((h) => h.props.children);
+    expect(headers[0]).toBe("This month");
+    expect(screen.queryByText("12:00")).toBeNull();
     fireEvent.press(screen.getByText("expense 1"));
     expect(mockNavigate).toHaveBeenCalledWith("ManageExpense", {
       expenseId: "e1",

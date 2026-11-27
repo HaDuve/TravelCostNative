@@ -5,8 +5,9 @@ import type { DateOrDateTime } from "./date";
 import type { ExpenseData } from "./expense";
 
 /**
- * One row of the Expense list: either a day header (a caption above a group
- * of Expenses) or an Expense.
+ * One row of the Expense list: either a header (a caption above a group of
+ * Expenses: a day, a time of day or a month, depending on the period) or an
+ * Expense.
  *
  * `underDayHeader` tells the row its date is already shown by the header above
  * it, so the row only needs to show the time.
@@ -20,9 +21,17 @@ export type ExpenseListEntry =
       underDayHeader: boolean;
     };
 
-/** Periods whose Expense list is split into day groups. */
+/** Periods whose Expense list is split into groups by day or time of day. */
 const PERIODS_WITH_DAY_HEADERS: ReadonlySet<string> = new Set([
+  RangeString.day,
   RangeString.week,
+  RangeString.month,
+]);
+
+/** Periods whose Expense list is split into groups by month. */
+const PERIODS_WITH_MONTH_HEADERS: ReadonlySet<string> = new Set([
+  RangeString.year,
+  RangeString.total,
 ]);
 
 function toLocalDateTime(date: DateOrDateTime | string): DateTime {
@@ -43,20 +52,133 @@ function dayLabel(day: DateTime, now: DateTime, locale: string): string {
 }
 
 /**
+ * Time-of-day groups of the day period, latest first. `fromHour` is the
+ * first hour of the group (inclusive); a group ends where the previous one
+ * in this list starts.
+ *
+ *   This evening     18:00 - 23:59
+ *   This afternoon   14:00 - 17:59
+ *   Midday           11:00 - 13:59
+ *   This morning     05:00 - 10:59
+ *   Last night       00:01 - 04:59
+ *
+ * Expenses from the last hour (up to now, but not exactly an hour ago) go
+ * under "Just now" instead, whatever their time of day.
+ */
+const TIME_OF_DAY_GROUPS: ReadonlyArray<{
+  fromHour: number;
+  labelKey: string;
+}> = [
+  { fromHour: 18, labelKey: "expenseListThisEvening" },
+  { fromHour: 14, labelKey: "expenseListThisAfternoon" },
+  { fromHour: 11, labelKey: "expenseListMidday" },
+  { fromHour: 5, labelKey: "expenseListThisMorning" },
+  { fromHour: 0, labelKey: "expenseListLastNight" },
+];
+
+const JUST_NOW_MINUTES = 60;
+
+/**
+ * A group of the Expense list. `timeOfDay` marks today's time-of-day groups
+ * in the day period; `noTimeOfDay` marks today's group of Expenses without a
+ * real time of day, which goes right after the time-of-day groups.
+ */
+type Section = {
+  key: string;
+  label: string;
+  timeOfDay?: boolean;
+  noTimeOfDay?: boolean;
+};
+
+function section(labelKey: string, locale: string): Section {
+  return { key: labelKey, label: i18n.t(labelKey, { locale }) };
+}
+
+/**
+ * True when the Expense has no real time of day: it sits exactly at
+ * midnight, or it is one day of a **Ranged expense**.
+ */
+function hasNoTimeOfDay(expense: ExpenseData, time: DateTime): boolean {
+  if (expense.rangeId) return true;
+  return time.hour === 0 && time.minute === 0;
+}
+
+function timeOfDaySection(
+  expense: ExpenseData,
+  time: DateTime,
+  now: DateTime,
+  locale: string,
+): Section {
+  if (hasNoTimeOfDay(expense, time)) {
+    return { ...section("today", locale), noTimeOfDay: true };
+  }
+  const minutesAgo = now.diff(time, "minutes").minutes;
+  if (minutesAgo >= 0 && minutesAgo < JUST_NOW_MINUTES) {
+    return { ...section("expenseListJustNow", locale), timeOfDay: true };
+  }
+  const group = TIME_OF_DAY_GROUPS.find(
+    ({ fromHour }) => time.hour >= fromHour,
+  );
+  return { ...section(group.labelKey, locale), timeOfDay: true };
+}
+
+function monthSection(date: DateTime, now: DateTime, locale: string): Section {
+  if (date.hasSame(now, "month"))
+    return section("expenseListThisMonth", locale);
+  return {
+    key: date.toFormat("yyyy-MM"),
+    label: date.setLocale(locale).toFormat("LLLL yyyy"),
+  };
+}
+
+function sectionFor(
+  expense: ExpenseData,
+  period: string,
+  now: DateTime,
+  locale: string,
+): Section {
+  const date = toLocalDateTime(expense.date);
+  if (PERIODS_WITH_MONTH_HEADERS.has(period))
+    return monthSection(date, now, locale);
+  const daySection = {
+    key: date.toISODate(),
+    label: dayLabel(date, now, locale),
+  };
+  if (period === RangeString.day) {
+    // a filtered list can hold other days; only today is split by time
+    if (!date.hasSame(now, "day")) return daySection;
+    return timeOfDaySection(expense, date, now, locale);
+  }
+  return daySection;
+}
+
+/**
  * Turns the Expenses shown for a period into the rows of the Expense list.
  *
- * In the week period every local day gets a header ("Today", "Yesterday",
- * "Monday 23.11", ...) above its Expenses. The Expenses keep their incoming
- * order (newest first); a header starts whenever the day changes. Other
- * periods get plain Expense rows.
+ * - day: today's Expenses in time-of-day groups (see `TIME_OF_DAY_GROUPS`),
+ *   with those that have no real time of day under a "Today" group at the
+ *   end. Expenses from other days (filtered lists) get a day group as in
+ *   the week period.
+ * - week and month: one group per local day ("Today", "Yesterday",
+ *   "Monday 23.11").
+ * - year and total: one group per month ("This month", "October 2026"),
+ *   with the month name from the locale.
+ *
+ * Under day and time-of-day headers a row only needs its time
+ * (`underDayHeader`); under month headers it keeps its short date.
+ *
+ * The Expenses keep their incoming order (newest first) inside a group, and
+ * groups are ordered by their first Expense. An unknown period gets plain
+ * Expense rows.
  */
 export function groupExpensesForList(
   expenses: ExpenseData[],
   period: RangeString | string,
   now: Date,
-  locale: string
+  locale: string,
 ): ExpenseListEntry[] {
-  if (!PERIODS_WITH_DAY_HEADERS.has(period)) {
+  const underDayHeader = PERIODS_WITH_DAY_HEADERS.has(period);
+  if (!underDayHeader && !PERIODS_WITH_MONTH_HEADERS.has(period)) {
     return expenses.map((expense) => ({
       kind: "expense",
       key: expense.id,
@@ -66,26 +188,48 @@ export function groupExpensesForList(
   }
 
   const nowDay = DateTime.fromJSDate(now);
-  const entries: ExpenseListEntry[] = [];
-  let currentDayKey: string | null = null;
-
+  const groups = new Map<string, { section: Section; rows: ExpenseData[] }>();
   for (const expense of expenses) {
-    const day = toLocalDateTime(expense.date);
-    const dayKey = day.toISODate();
-    if (dayKey !== currentDayKey) {
-      currentDayKey = dayKey;
+    const expenseSection = sectionFor(expense, period, nowDay, locale);
+    const group = groups.get(expenseSection.key);
+    if (group) group.rows.push(expense);
+    else
+      groups.set(expenseSection.key, {
+        section: expenseSection,
+        rows: [expense],
+      });
+  }
+
+  const ordered = [...groups.values()];
+  const noTimeIndex = ordered.findIndex((group) => group.section.noTimeOfDay);
+  if (noTimeIndex >= 0) {
+    const [noTimeGroup] = ordered.splice(noTimeIndex, 1);
+    const lastTimeOfDayIndex = ordered.reduce(
+      (last, group, index) => (group.section.timeOfDay ? index : last),
+      -1,
+    );
+    ordered.splice(
+      lastTimeOfDayIndex >= 0 ? lastTimeOfDayIndex + 1 : noTimeIndex,
+      0,
+      noTimeGroup,
+    );
+  }
+
+  const entries: ExpenseListEntry[] = [];
+  for (const { section: groupSection, rows } of ordered) {
+    entries.push({
+      kind: "dayHeader",
+      key: `dayHeader-${groupSection.key}`,
+      label: groupSection.label,
+    });
+    for (const expense of rows) {
       entries.push({
-        kind: "dayHeader",
-        key: `dayHeader-${dayKey}`,
-        label: dayLabel(day, nowDay, locale),
+        kind: "expense",
+        key: expense.id,
+        expense,
+        underDayHeader,
       });
     }
-    entries.push({
-      kind: "expense",
-      key: expense.id,
-      expense,
-      underDayHeader: true,
-    });
   }
   return entries;
 }
@@ -102,7 +246,7 @@ export type ExpenseListRowHeights = {
  */
 export function expenseListItemLayouts(
   entries: ExpenseListEntry[],
-  { expenseRowHeight, dayHeaderHeight }: ExpenseListRowHeights
+  { expenseRowHeight, dayHeaderHeight }: ExpenseListRowHeights,
 ): { length: number; offset: number }[] {
   let offset = 0;
   return entries.map((entry) => {

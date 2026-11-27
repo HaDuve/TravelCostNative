@@ -158,20 +158,15 @@ describe("groupExpensesForList (week period)", () => {
   });
 });
 
-describe("groupExpensesForList (other periods)", () => {
+describe("groupExpensesForList (no period)", () => {
   const now = at(2026, 11, 27, 15, 0);
   const expenses = [
     expenseOn("lunch", at(2026, 11, 27, 13, 0)),
     expenseOn("dinner", at(2026, 11, 26, 20, 0)),
   ];
 
-  it.each([
-    RangeString.day,
-    RangeString.month,
-    RangeString.year,
-    RangeString.total,
-  ])("%s lists plain Expense rows without headers", (period) => {
-    const entries = groupExpensesForList(expenses, period, now, "en");
+  it("lists plain Expense rows without headers before the period is known", () => {
+    const entries = groupExpensesForList(expenses, "", now, "en");
 
     expect(entries).toEqual([
       { kind: "expense", key: "lunch", expense: expenses[0], underDayHeader: false },
@@ -211,7 +206,8 @@ describe("expenseListItemLayouts", () => {
         expenseOn("lunch", at(2026, 11, 27, 13, 0)),
         expenseOn("dinner", at(2026, 11, 26, 20, 0)),
       ],
-      RangeString.month,
+      // no period yet (e.g. before the user's settings have loaded)
+      "",
       now,
       "en"
     );

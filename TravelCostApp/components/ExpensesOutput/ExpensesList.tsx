@@ -62,6 +62,7 @@ import {
 } from "../../util/expense-list-sections";
 import { UserContext } from "../../store/user-context";
 import { useSplitHistoryContext } from "../../hooks/useSplitHistoryContext";
+import { useRefreshOnReturn } from "../../hooks/useRefreshOnReturn";
 import * as Haptics from "expo-haptics";
 import { toShortFormat } from "../../util/date";
 import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
@@ -119,8 +120,11 @@ function ExpensesList({
 
   if (expenses?.length < 6) addShadowItemsToExpenses(expenses);
 
-  // Rows of the list: day headers (week period) and Expenses, followed by
-  // the blank shadow rows that pad short lists.
+  // Rows of the list: section headers (day, time of day or month, by period)
+  // and Expenses, followed by the blank shadow rows that pad short lists.
+  // Labels such as "Just now" are recomputed when the user comes back to the
+  // screen or the app.
+  const returnsToScreen = useRefreshOnReturn();
   const listEntries: ExpenseListEntry[] = useMemo(() => {
     const isShadow = (item) => item.id?.startsWith("shadow");
     const shadowEntries: ExpenseListEntry[] = expenses
@@ -140,7 +144,7 @@ function ExpensesList({
       ),
       ...shadowEntries,
     ];
-  }, [expenses, expenses?.length, periodName]);
+  }, [expenses, expenses?.length, periodName, returnsToScreen]);
   const listItemLayouts = useMemo(
     () =>
       expenseListItemLayouts(listEntries, {

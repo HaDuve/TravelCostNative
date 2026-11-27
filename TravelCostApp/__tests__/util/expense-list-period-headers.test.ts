@@ -1,0 +1,316 @@
+import { RangeString } from "../../store/expenses-context";
+import {
+  ExpenseListEntry,
+  groupExpensesForList,
+} from "../../util/expense-list-sections";
+import { makeExpense } from "../fixtures/expense";
+
+// Local wall-clock dates (jest pins TZ=Europe/Berlin), so day boundaries are
+// the user's local days.
+function at(
+  year: number,
+  month: number,
+  day: number,
+  hour = 12,
+  minute = 0,
+): Date {
+  return new Date(year, month - 1, day, hour, minute);
+}
+
+function expenseOn(id: string, date: Date, extra = {}) {
+  return makeExpense({ id, date, startDate: date, endDate: date, ...extra });
+}
+
+/** Compact view of the list: header labels and Expense ids, in order. */
+function outline(entries: ExpenseListEntry[]): string[] {
+  return entries.map((entry) =>
+    entry.kind === "dayHeader" ? `# ${entry.label}` : entry.expense.id,
+  );
+}
+
+describe("groupExpensesForList (day period)", () => {
+  it("splits today into time-of-day groups at fixed boundaries", () => {
+    // late in the day, so "Just now" only covers 22:59-23:59
+    const now = at(2026, 11, 27, 23, 59);
+    const expenses = [
+      expenseOn("22:00", at(2026, 11, 27, 22, 0)),
+      expenseOn("18:00", at(2026, 11, 27, 18, 0)),
+      expenseOn("17:59", at(2026, 11, 27, 17, 59)),
+      expenseOn("14:00", at(2026, 11, 27, 14, 0)),
+      expenseOn("13:59", at(2026, 11, 27, 13, 59)),
+      expenseOn("11:00", at(2026, 11, 27, 11, 0)),
+      expenseOn("10:59", at(2026, 11, 27, 10, 59)),
+      expenseOn("05:00", at(2026, 11, 27, 5, 0)),
+      expenseOn("04:59", at(2026, 11, 27, 4, 59)),
+      expenseOn("00:01", at(2026, 11, 27, 0, 1)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# This evening",
+      "22:00",
+      "18:00",
+      "# This afternoon",
+      "17:59",
+      "14:00",
+      "# Midday",
+      "13:59",
+      "11:00",
+      "# This morning",
+      "10:59",
+      "05:00",
+      "# Last night",
+      "04:59",
+      "00:01",
+    ]);
+  });
+
+  it("puts the last hour under Just now, ahead of the time-of-day groups", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("14:30", at(2026, 11, 27, 14, 30)),
+      expenseOn("14:01", at(2026, 11, 27, 14, 1)),
+      expenseOn("14:00", at(2026, 11, 27, 14, 0)),
+      expenseOn("09:00", at(2026, 11, 27, 9, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Just now",
+      "14:30",
+      "14:01",
+      "# This afternoon",
+      "14:00",
+      "# This morning",
+      "09:00",
+    ]);
+  });
+
+  it("puts Expenses with no real time of day (midnight, Ranged expense days) under one Today group after the timed ones", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("lunch", at(2026, 11, 27, 14, 30)),
+      expenseOn("hotel-day", at(2026, 11, 27, 10, 0), { rangeId: "r1" }),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("no-time", at(2026, 11, 27, 0, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# Just now",
+      "lunch",
+      "# This morning",
+      "coffee",
+      "# Today",
+      "hotel-day",
+      "no-time",
+    ]);
+  });
+
+  it("shows only the time on rows under time-of-day headers", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const entries = groupExpensesForList(
+      [expenseOn("coffee", at(2026, 11, 27, 9, 0))],
+      RangeString.day,
+      now,
+      "en",
+    );
+
+    expect(entries[1]).toMatchObject({ kind: "expense", underDayHeader: true });
+  });
+
+  it("gives Expenses from other days (e.g. a filtered list) their day label instead of a time of day", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("dinner", at(2026, 11, 26, 20, 0)),
+      expenseOn("taxi", at(2026, 11, 23, 8, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# This morning",
+      "coffee",
+      "# Yesterday",
+      "dinner",
+      "# Monday 23.11",
+      "taxi",
+    ]);
+  });
+
+  it("keeps today's no-time group with today's groups, above older days", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("hotel-day", at(2026, 11, 27, 10, 0), { rangeId: "r1" }),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("dinner", at(2026, 11, 26, 20, 0)),
+    ];
+
+    const entries = groupExpensesForList(expenses, RangeString.day, now, "en");
+
+    expect(outline(entries)).toEqual([
+      "# This morning",
+      "coffee",
+      "# Today",
+      "hotel-day",
+      "# Yesterday",
+      "dinner",
+    ]);
+  });
+});
+
+describe("groupExpensesForList (month period)", () => {
+  it("puts a day header with the week labels above each day, showing only the time on rows", () => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("lunch", at(2026, 11, 27, 13, 0)),
+      expenseOn("dinner", at(2026, 11, 26, 20, 0)),
+      expenseOn("taxi", at(2026, 11, 3, 8, 0)),
+      expenseOn("bus", at(2026, 11, 1, 8, 0)),
+    ];
+
+    const entries = groupExpensesForList(
+      expenses,
+      RangeString.month,
+      now,
+      "en",
+    );
+
+    expect(outline(entries)).toEqual([
+      "# Today",
+      "lunch",
+      "# Yesterday",
+      "dinner",
+      "# Tuesday 03.11",
+      "taxi",
+      "# Sunday 01.11",
+      "bus",
+    ]);
+    const rows = entries.filter((entry) => entry.kind === "expense");
+    expect(
+      rows.map((row) => row.kind === "expense" && row.underDayHeader),
+    ).toEqual([true, true, true, true]);
+  });
+
+  it("calls the last day of the previous month Yesterday on the 1st", () => {
+    const now = at(2026, 12, 1, 10, 0);
+    const expenses = [
+      expenseOn("breakfast", at(2026, 12, 1, 8, 0)),
+      expenseOn("dinner", at(2026, 11, 30, 20, 0)),
+    ];
+
+    const entries = groupExpensesForList(
+      expenses,
+      RangeString.month,
+      now,
+      "en",
+    );
+
+    expect(outline(entries)).toEqual([
+      "# Today",
+      "breakfast",
+      "# Yesterday",
+      "dinner",
+    ]);
+  });
+});
+
+describe.each([RangeString.year, RangeString.total])(
+  "groupExpensesForList (%s period)",
+  (period) => {
+    it("puts a month header above each month, calling the current month This month, and keeps the short date on rows", () => {
+      const now = at(2026, 11, 27, 15, 0);
+      const expenses = [
+        expenseOn("lunch", at(2026, 11, 27, 13, 0)),
+        expenseOn("hostel", at(2026, 11, 1, 0, 0)),
+        expenseOn("flight", at(2026, 10, 31, 23, 59)),
+        expenseOn("visa", at(2026, 2, 14, 9, 0)),
+      ];
+
+      const entries = groupExpensesForList(expenses, period, now, "en");
+
+      expect(outline(entries)).toEqual([
+        "# This month",
+        "lunch",
+        "hostel",
+        "# October 2026",
+        "flight",
+        "# February 2026",
+        "visa",
+      ]);
+      const rows = entries.filter((entry) => entry.kind === "expense");
+      expect(
+        rows.map((row) => row.kind === "expense" && row.underDayHeader),
+      ).toEqual([false, false, false, false]);
+    });
+
+    it("keeps the year apart across a year change", () => {
+      const now = at(2027, 1, 5, 12, 0);
+      const expenses = [
+        expenseOn("snacks", at(2027, 1, 2, 10, 0)),
+        expenseOn("party", at(2026, 12, 31, 22, 0)),
+        expenseOn("old-january", at(2026, 1, 20, 10, 0)),
+      ];
+
+      const entries = groupExpensesForList(expenses, period, now, "en");
+
+      expect(outline(entries)).toEqual([
+        "# This month",
+        "snacks",
+        "# December 2026",
+        "party",
+        "# January 2026",
+        "old-january",
+      ]);
+    });
+
+    it.each([
+      ["de", ["# Dieser Monat", "# Oktober 2026"]],
+      ["fr", ["# Ce mois-ci", "# octobre 2026"]],
+      ["ru", ["# Этот месяц", "# октябрь 2026"]],
+    ])("takes month names from the locale (%s)", (locale, headers) => {
+      const now = at(2026, 11, 27, 15, 0);
+      const expenses = [
+        expenseOn("lunch", at(2026, 11, 27, 13, 0)),
+        expenseOn("flight", at(2026, 10, 31, 20, 0)),
+      ];
+
+      const entries = groupExpensesForList(expenses, period, now, locale);
+
+      expect(outline(entries).filter((line) => line.startsWith("#"))).toEqual(
+        headers,
+      );
+    });
+  },
+);
+
+describe("groupExpensesForList (localized time-of-day headers)", () => {
+  it.each([
+    ["de", ["# Gerade eben", "# Mittags", "# Heute Morgen", "# Heute"]],
+    ["fr", ["# À l'instant", "# Midi", "# Ce matin", "# Aujourd'hui"]],
+    ["ru", ["# Только что", "# В обед", "# Сегодня утром", "# Сегодня"]],
+  ])("localizes the day period in %s", (locale, headers) => {
+    const now = at(2026, 11, 27, 15, 0);
+    const expenses = [
+      expenseOn("snack", at(2026, 11, 27, 14, 30)),
+      expenseOn("lunch", at(2026, 11, 27, 12, 0)),
+      expenseOn("coffee", at(2026, 11, 27, 9, 0)),
+      expenseOn("no-time", at(2026, 11, 27, 0, 0)),
+    ];
+
+    const entries = groupExpensesForList(
+      expenses,
+      RangeString.day,
+      now,
+      locale,
+    );
+
+    expect(outline(entries).filter((line) => line.startsWith("#"))).toEqual(
+      headers,
+    );
+  });
+});

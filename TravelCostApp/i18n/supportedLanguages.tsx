@@ -78,6 +78,7 @@ const en = {
   expenseListThisAfternoon: "This afternoon",
   expenseListThisEvening: "This evening",
   expenseListLastNight: "Last night",
+  expenseListMultiDay: "Multi-day expenses",
   expenseListThisMonth: "This month",
 
   // last periodname
@@ -798,6 +799,7 @@ const de = {
   expenseListThisAfternoon: "Heute Nachmittag",
   expenseListThisEvening: "Heute Abend",
   expenseListLastNight: "Letzte Nacht",
+  expenseListMultiDay: "Mehrtägige Ausgaben",
   expenseListThisMonth: "Dieser Monat",
 
   // last periodname
@@ -1556,6 +1558,7 @@ const fr = {
   expenseListThisAfternoon: "Cet après-midi",
   expenseListThisEvening: "Ce soir",
   expenseListLastNight: "Cette nuit",
+  expenseListMultiDay: "Dépenses sur plusieurs jours",
   expenseListThisMonth: "Ce mois-ci",
 
   // last periodname
@@ -2312,6 +2315,7 @@ const ru = {
   expenseListThisAfternoon: "Сегодня днём",
   expenseListThisEvening: "Сегодня вечером",
   expenseListLastNight: "Прошлой ночью",
+  expenseListMultiDay: "Многодневные расходы",
   expenseListThisMonth: "Этот месяц",
 
   // last periodname

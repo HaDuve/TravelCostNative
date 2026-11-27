@@ -90,7 +90,7 @@ describe("groupExpensesForList (day period)", () => {
     ]);
   });
 
-  it("puts Expenses with no real time of day (midnight, Ranged expense days) under one Today group after the timed ones", () => {
+  it("puts midnight Expenses under Today and Ranged expense days under Multi-day expenses, after the timed ones", () => {
     const now = at(2026, 11, 27, 15, 0);
     const expenses = [
       expenseOn("lunch", at(2026, 11, 27, 14, 30)),
@@ -107,8 +107,9 @@ describe("groupExpensesForList (day period)", () => {
       "# This morning",
       "coffee",
       "# Today",
-      "hotel-day",
       "no-time",
+      "# Multi-day expenses",
+      "hotel-day",
     ]);
   });
 
@@ -176,7 +177,7 @@ describe("groupExpensesForList (day period)", () => {
     expect(outline(entries)).toEqual([
       "# This morning",
       "coffee",
-      "# Today",
+      "# Multi-day expenses",
       "hotel-day",
       "# Yesterday",
       "dinner",

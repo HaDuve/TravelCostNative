@@ -51,6 +51,21 @@ export function formatExpenseTimeOfDay(
   return toLocalDateTime(expense.date).toFormat("HH:mm");
 }
 
+/**
+ * Date range of a Ranged expense day, e.g. "20.11 – 03.12", or with the years
+ * when it crosses a year boundary: "28.12.26 – 04.01.27". Empty for an
+ * Expense that is not part of a Ranged expense.
+ */
+export function formatRangedExpenseDateRange(
+  expense: Pick<ExpenseData, "rangeId" | "startDate" | "endDate">,
+): string {
+  if (!expense.rangeId) return "";
+  const start = toLocalDateTime(expense.startDate);
+  const end = toLocalDateTime(expense.endDate);
+  const format = start.year === end.year ? "dd.MM" : "dd.MM.yy";
+  return `${start.toFormat(format)} – ${end.toFormat(format)}`;
+}
+
 function dayLabel(day: DateTime, now: DateTime, locale: string): string {
   if (day.hasSame(now, "day")) return i18n.t("today", { locale });
   if (day.hasSame(now.minus({ days: 1 }), "day"))
@@ -115,14 +130,15 @@ function newestFirst(expenses: ExpenseData[]): DatedExpense[] {
       expense,
       time,
       day: time.startOf("day").toMillis(),
-      noTimeOfDay: hasNoTimeOfDay(expense, time),
+      // timed, then midnight, then Ranged expense days
+      noTimeOfDay: expense.rangeId ? 2 : hasNoTimeOfDay(expense, time) ? 1 : 0,
       millis: time.toMillis(),
     };
   });
   keyed.sort(
     (a, b) =>
       b.day - a.day ||
-      Number(a.noTimeOfDay) - Number(b.noTimeOfDay) ||
+      a.noTimeOfDay - b.noTimeOfDay ||
       b.millis - a.millis,
   );
   return keyed.map(({ expense, time }) => ({ expense, time }));
@@ -133,6 +149,7 @@ function timeOfDayLabelKey(
   { expense, time }: DatedExpense,
   now: DateTime,
 ): string {
+  if (expense.rangeId) return "expenseListMultiDay";
   if (hasNoTimeOfDay(expense, time)) return "today";
   const minutesAgo = now.diff(time, "minutes").minutes;
   // negative when dated later than now: still "Just now", so it does not

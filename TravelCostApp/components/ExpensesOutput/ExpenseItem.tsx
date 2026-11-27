@@ -20,7 +20,10 @@ import React from "react";
 
 import { i18n } from "../../i18n/i18n";
 import { DateTime } from "luxon";
-import { formatExpenseTimeOfDay } from "../../util/expense-list-sections";
+import {
+  formatExpenseTimeOfDay,
+  formatRangedExpenseDateRange,
+} from "../../util/expense-list-sections";
 import { UserContext } from "../../store/user-context";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
@@ -64,6 +67,8 @@ function ExpenseItem(props): JSX.Element {
     iconName,
     isSpecialExpense,
     rangeId,
+    startDate,
+    endDate,
   }: ExpenseData = props;
   let { date } = props;
   const navigation = useNavigation();
@@ -288,15 +293,22 @@ function ExpenseItem(props): JSX.Element {
   const configureDateString = useCallback(() => {
     dateString.current = date ? date : "no date";
     const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
-    // a day header above the row already names the day
-    if (underDayHeader) {
+    if (rangeId) {
+      // a Ranged expense day shows its range where the time would go
+      dateString.current = formatRangedExpenseDateRange({
+        rangeId,
+        startDate,
+        endDate,
+      });
+    } else if (underDayHeader) {
+      // a day header above the row already names the day
       dateString.current = formatExpenseTimeOfDay({ date, rangeId });
     } else if (isToday(new Date(date)) && !rangeId) {
       // a Ranged expense day only carries the time the Ranged expense was
       // created at, so it keeps its short date below
       dateString.current = `${todayString()}${hourAndMinuteString}`;
     } else dateString.current = toShortFormat(date);
-  }, [date, rangeId, todayString, underDayHeader]);
+  }, [date, rangeId, startDate, endDate, todayString, underDayHeader]);
   configureDateString();
 
   const layout = useLayoutProfile();

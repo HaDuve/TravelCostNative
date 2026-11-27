@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { RangeString } from "../../store/expenses-context";
 import {
   ExpenseListEntry,
@@ -422,6 +423,35 @@ describe("groupExpensesForList (order)", () => {
       "september",
     ]);
   });
+});
+
+describe("groupExpensesForList (cost)", () => {
+  it.each([
+    [RangeString.week, "weekday"],
+    [RangeString.year, "month"],
+  ])(
+    "names the %s header (%s name) once per group, not once per Expense",
+    (period) => {
+      const now = at(2026, 11, 27, 15, 0);
+      // two older groups (no Today / This month), three Expenses each
+      const expenses = [
+        expenseOn("a1", at(2026, 10, 23, 9, 0)),
+        expenseOn("a2", at(2026, 10, 23, 10, 0)),
+        expenseOn("a3", at(2026, 10, 23, 11, 0)),
+        expenseOn("b1", at(2026, 9, 14, 9, 0)),
+        expenseOn("b2", at(2026, 9, 14, 10, 0)),
+        expenseOn("b3", at(2026, 9, 14, 11, 0)),
+      ];
+      const localeNames = jest.spyOn(DateTime.prototype, "toLocaleString");
+      try {
+        groupExpensesForList(expenses, period, now, "en");
+
+        expect(localeNames).toHaveBeenCalledTimes(2);
+      } finally {
+        localeNames.mockRestore();
+      }
+    },
+  );
 });
 
 describe("formatExpenseTimeOfDay", () => {

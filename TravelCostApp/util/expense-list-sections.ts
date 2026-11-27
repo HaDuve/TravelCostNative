@@ -89,13 +89,6 @@ const TIME_OF_DAY_GROUPS: ReadonlyArray<{
 
 const JUST_NOW_MINUTES = 60;
 
-/** A group of the Expense list: its key and the caption of its header. */
-type Section = { key: string; label: string };
-
-function section(labelKey: string, locale: string): Section {
-  return { key: labelKey, label: i18n.t(labelKey, { locale }) };
-}
-
 /**
  * True when the Expense has no real time of day: it sits exactly at
  * midnight, or it is one day of a **Ranged expense**.
@@ -105,17 +98,22 @@ function hasNoTimeOfDay(expense: ExpenseData, time: DateTime): boolean {
   return time.hour === 0 && time.minute === 0;
 }
 
+/** An Expense with its local date, computed once by `newestFirst`. */
+type DatedExpense = { expense: ExpenseData; time: DateTime };
+
 /**
  * Newest day first. Inside a day, Expenses with a real time of day come
  * first, newest first, and those without one (midnight, Ranged expense days)
  * follow: a Ranged expense day carries the time it was created at, which can
- * be later than anything else that day, or even later than now.
+ * be later than anything else that day, or even later than now. Returns a
+ * sorted copy, each Expense with its local date.
  */
-function newestFirst(expenses: ExpenseData[]): ExpenseData[] {
+function newestFirst(expenses: ExpenseData[]): DatedExpense[] {
   const keyed = expenses.map((expense) => {
     const time = toLocalDateTime(expense.date);
     return {
       expense,
+      time,
       day: time.startOf("day").toMillis(),
       noTimeOfDay: hasNoTimeOfDay(expense, time),
       millis: time.toMillis(),
@@ -127,57 +125,60 @@ function newestFirst(expenses: ExpenseData[]): ExpenseData[] {
       Number(a.noTimeOfDay) - Number(b.noTimeOfDay) ||
       b.millis - a.millis,
   );
-  return keyed.map(({ expense }) => expense);
+  return keyed.map(({ expense, time }) => ({ expense, time }));
 }
 
-function timeOfDaySection(
-  expense: ExpenseData,
-  time: DateTime,
+/** i18n key of the time-of-day group of an Expense dated today. */
+function timeOfDayLabelKey(
+  { expense, time }: DatedExpense,
   now: DateTime,
-  locale: string,
-): Section {
-  if (hasNoTimeOfDay(expense, time)) return section("today", locale);
+): string {
+  if (hasNoTimeOfDay(expense, time)) return "today";
   const minutesAgo = now.diff(time, "minutes").minutes;
   // negative when dated later than now: still "Just now", so it does not
   // land in a group above it
-  if (minutesAgo < JUST_NOW_MINUTES) {
-    return section("expenseListJustNow", locale);
+  if (minutesAgo < JUST_NOW_MINUTES) return "expenseListJustNow";
+  return TIME_OF_DAY_GROUPS.find(({ fromHour }) => time.hour >= fromHour)
+    .labelKey;
+}
+
+const THIS_MONTH_KEY = "expenseListThisMonth";
+
+/**
+ * Key of the group an Expense belongs to. Cheap, since it runs for every
+ * Expense; the caption is built once per group by `groupLabel`.
+ */
+function groupKey(row: DatedExpense, period: string, now: DateTime): string {
+  const { time } = row;
+  if (PERIODS_WITH_MONTH_HEADERS.has(period)) {
+    return time.hasSame(now, "month")
+      ? THIS_MONTH_KEY
+      : time.toFormat("yyyy-MM");
   }
-  const group = TIME_OF_DAY_GROUPS.find(
-    ({ fromHour }) => time.hour >= fromHour,
-  );
-  return section(group.labelKey, locale);
+  // a filtered list can hold other days; only today is split by time
+  if (period === RangeString.day && time.hasSame(now, "day")) {
+    return timeOfDayLabelKey(row, now);
+  }
+  return time.toISODate();
 }
 
-function monthSection(date: DateTime, now: DateTime, locale: string): Section {
-  if (date.hasSame(now, "month"))
-    return section("expenseListThisMonth", locale);
-  return {
-    key: date.toFormat("yyyy-MM"),
-    // toLocaleString, not toFormat("LLLL"): see dayLabel (Hermes prints "null").
-    label: `${date.setLocale(locale).toLocaleString({ month: "long" })} ${date.year}`,
-  };
-}
-
-function sectionFor(
-  expense: ExpenseData,
+/** Caption of a group, from its key and the date of its first Expense. */
+function groupLabel(
+  key: string,
+  first: DateTime,
   period: string,
   now: DateTime,
   locale: string,
-): Section {
-  const date = toLocalDateTime(expense.date);
-  if (PERIODS_WITH_MONTH_HEADERS.has(period))
-    return monthSection(date, now, locale);
-  const daySection = {
-    key: date.toISODate(),
-    label: dayLabel(date, now, locale),
-  };
-  if (period === RangeString.day) {
-    // a filtered list can hold other days; only today is split by time
-    if (!date.hasSame(now, "day")) return daySection;
-    return timeOfDaySection(expense, date, now, locale);
+): string {
+  if (PERIODS_WITH_MONTH_HEADERS.has(period)) {
+    if (key === THIS_MONTH_KEY) return i18n.t(THIS_MONTH_KEY, { locale });
+    // toLocaleString, not toFormat("LLLL"): see dayLabel (Hermes prints "null").
+    return `${first.setLocale(locale).toLocaleString({ month: "long" })} ${first.year}`;
   }
-  return daySection;
+  if (period === RangeString.day && first.hasSame(now, "day")) {
+    return i18n.t(key, { locale });
+  }
+  return dayLabel(first, now, locale);
 }
 
 /**
@@ -209,7 +210,7 @@ export function groupExpensesForList(
   const expenses = newestFirst(unsortedExpenses);
   const underDayHeader = PERIODS_WITH_DAY_HEADERS.has(period);
   if (!underDayHeader && !PERIODS_WITH_MONTH_HEADERS.has(period)) {
-    return expenses.map((expense) => ({
+    return expenses.map(({ expense }) => ({
       kind: "expense",
       key: expense.id,
       expense,
@@ -218,29 +219,25 @@ export function groupExpensesForList(
   }
 
   const nowDay = DateTime.fromJSDate(now);
-  const groups = new Map<string, { section: Section; rows: ExpenseData[] }>();
-  for (const expense of expenses) {
-    const expenseSection = sectionFor(expense, period, nowDay, locale);
-    const group = groups.get(expenseSection.key);
-    if (group) group.rows.push(expense);
-    else
-      groups.set(expenseSection.key, {
-        section: expenseSection,
-        rows: [expense],
-      });
+  const groups = new Map<string, DatedExpense[]>();
+  for (const row of expenses) {
+    const key = groupKey(row, period, nowDay);
+    const rows = groups.get(key);
+    if (rows) rows.push(row);
+    else groups.set(key, [row]);
   }
 
   // Groups come in the order of their first Expense. The newest-first sort
   // already puts today's "Today" group (no time of day) after its
   // time-of-day groups.
   const entries: ExpenseListEntry[] = [];
-  for (const { section: groupSection, rows } of groups.values()) {
+  for (const [key, rows] of groups) {
     entries.push({
       kind: "dayHeader",
-      key: `dayHeader-${groupSection.key}`,
-      label: groupSection.label,
+      key: `dayHeader-${key}`,
+      label: groupLabel(key, rows[0].time, period, nowDay, locale),
     });
-    for (const expense of rows) {
+    for (const { expense } of rows) {
       entries.push({
         kind: "expense",
         key: expense.id,

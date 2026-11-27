@@ -202,9 +202,9 @@ describe("groupExpensesForList (month period)", () => {
     );
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "lunch",
-      "# Yesterday",
+      "# Thursday 26.11",
       "dinner",
       "# Tuesday 03.11",
       "taxi",
@@ -232,9 +232,9 @@ describe("groupExpensesForList (month period)", () => {
     );
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Tuesday 01.12",
       "breakfast",
-      "# Yesterday",
+      "# Monday 30.11",
       "dinner",
     ]);
   });
@@ -243,7 +243,7 @@ describe("groupExpensesForList (month period)", () => {
 describe.each([RangeString.year, RangeString.total])(
   "groupExpensesForList (%s period)",
   (period) => {
-    it("puts a month header above each month, calling the current month This month, and keeps the short date on rows", () => {
+    it("puts a month header above each month, naming the month and year, and keeps the short date on rows", () => {
       const now = at(2026, 11, 27, 15, 0);
       const expenses = [
         expenseOn("lunch", at(2026, 11, 27, 13, 0)),
@@ -255,7 +255,7 @@ describe.each([RangeString.year, RangeString.total])(
       const entries = groupExpensesForList(expenses, period, now, "en");
 
       expect(outline(entries)).toEqual([
-        "# This month",
+        "# November 2026",
         "lunch",
         "hostel",
         "# October 2026",
@@ -280,7 +280,7 @@ describe.each([RangeString.year, RangeString.total])(
       const entries = groupExpensesForList(expenses, period, now, "en");
 
       expect(outline(entries)).toEqual([
-        "# This month",
+        "# January 2027",
         "snacks",
         "# December 2026",
         "party",
@@ -290,9 +290,9 @@ describe.each([RangeString.year, RangeString.total])(
     });
 
     it.each([
-      ["de", ["# Dieser Monat", "# Oktober 2026"]],
-      ["fr", ["# Ce mois-ci", "# octobre 2026"]],
-      ["ru", ["# Этот месяц", "# октябрь 2026"]],
+      ["de", ["# November 2026", "# Oktober 2026"]],
+      ["fr", ["# novembre 2026", "# octobre 2026"]],
+      ["ru", ["# ноябрь 2026", "# октябрь 2026"]],
     ])("takes month names from the locale (%s)", (locale, headers) => {
       const now = at(2026, 11, 27, 15, 0);
       const expenses = [
@@ -351,10 +351,10 @@ describe("groupExpensesForList (order)", () => {
     const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "lunch",
       "coffee",
-      "# Yesterday",
+      "# Thursday 26.11",
       "snack",
       "dinner",
       "# Monday 23.11",
@@ -393,11 +393,11 @@ describe("groupExpensesForList (order)", () => {
     const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "lunch",
       "coffee",
       "hotel-today",
-      "# Yesterday",
+      "# Thursday 26.11",
       "dinner",
       "hotel-yesterday",
     ]);
@@ -414,7 +414,7 @@ describe("groupExpensesForList (order)", () => {
     const entries = groupExpensesForList(expenses, RangeString.year, now, "en");
 
     expect(outline(entries)).toEqual([
-      "# This month",
+      "# November 2026",
       "late-nov",
       "early-nov",
       "# October 2026",

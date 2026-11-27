@@ -95,11 +95,28 @@ describe("ExpensesList day headers", () => {
     expenseOn("e-taxi", "taxi", at(11, 23, 8, 40)),
   ];
 
-  it("announces Today, Yesterday and weekday captions as headers in the week period", () => {
+  it("announces weekday and date captions as headers in the week period", () => {
     const screen = renderList(weekExpenses(), "week");
 
     const headers = screen.getAllByRole("header").map((h) => h.props.children);
-    expect(headers).toEqual(["Today", "Yesterday", "Monday 23.11"]);
+    expect(headers).toEqual([
+      "Friday 27.11",
+      "Thursday 26.11",
+      "Monday 23.11",
+    ]);
+  });
+
+  it("includes the period spend of the day in the header's accessible label", () => {
+    const screen = renderList(weekExpenses(), "week");
+
+    const labels = screen
+      .getAllByRole("header")
+      .map((h) => h.props.accessibilityLabel);
+    expect(labels).toEqual([
+      "Friday 27.11, €100",
+      "Thursday 26.11, €100",
+      "Monday 23.11, €100",
+    ]);
   });
 
   it("shows only the time on rows under a day header", () => {
@@ -182,7 +199,11 @@ describe("ExpensesList day headers", () => {
     const screen = renderList(weekExpenses(), "month");
 
     const headers = screen.getAllByRole("header").map((h) => h.props.children);
-    expect(headers).toEqual(["Today", "Yesterday", "Monday 23.11"]);
+    expect(headers).toEqual([
+      "Friday 27.11",
+      "Thursday 26.11",
+      "Monday 23.11",
+    ]);
     expect(screen.getByText("20:15")).toBeTruthy();
   });
 
@@ -197,7 +218,7 @@ describe("ExpensesList day headers", () => {
       const headers = screen
         .getAllByRole("header")
         .map((h) => h.props.children);
-      expect(headers).toEqual(["This month", "October 2026"]);
+      expect(headers).toEqual(["November 2026", "October 2026"]);
       expect(screen.queryByText("20:15")).toBeNull();
       expect(screen.getAllByText(/Nov/).length).toBeGreaterThan(0);
     },
@@ -282,7 +303,7 @@ describe("ExpensesList day headers", () => {
     const screen = renderList(expenses, "week");
 
     const headers = screen.getAllByRole("header").map((h) => h.props.children);
-    expect(headers[0]).toBe("Today");
+    expect(headers[0]).toBe("Friday 27.11");
     expect(screen.getByText("14:59")).toBeTruthy();
     fireEvent.press(screen.getByText("expense 1"));
     expect(mockNavigate).toHaveBeenCalledWith("ManageExpense", {
@@ -300,7 +321,7 @@ describe("ExpensesList day headers", () => {
     const screen = renderList(expenses, "year");
 
     const headers = screen.getAllByRole("header").map((h) => h.props.children);
-    expect(headers[0]).toBe("This month");
+    expect(headers[0]).toBe("November 2026");
     expect(screen.queryByText("12:00")).toBeNull();
     fireEvent.press(screen.getByText("expense 1"));
     expect(mockNavigate).toHaveBeenCalledWith("ManageExpense", {

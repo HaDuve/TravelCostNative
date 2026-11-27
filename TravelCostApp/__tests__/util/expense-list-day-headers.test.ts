@@ -44,10 +44,10 @@ describe("groupExpensesForList (week period)", () => {
     const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "lunch",
       "coffee",
-      "# Yesterday",
+      "# Thursday 26.11",
       "dinner",
       "# Monday 23.11",
       "taxi",
@@ -69,9 +69,9 @@ describe("groupExpensesForList (week period)", () => {
     );
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "early",
-      "# Yesterday",
+      "# Thursday 26.11",
       "late",
     ]);
   });
@@ -90,7 +90,7 @@ describe("groupExpensesForList (week period)", () => {
       "museum",
       "# Saturday 28.11",
       "hostel",
-      "# Today",
+      "# Friday 27.11",
       "lunch",
     ]);
   });
@@ -116,9 +116,9 @@ describe("groupExpensesForList (week period)", () => {
     );
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Wednesday 02.12",
       "wed",
-      "# Yesterday",
+      "# Tuesday 01.12",
       "tue",
       "# Monday 30.11",
       "mon",
@@ -126,9 +126,9 @@ describe("groupExpensesForList (week period)", () => {
   });
 
   it.each([
-    ["de", ["# Heute", "# Gestern", "# Montag 23.11"]],
-    ["fr", ["# Aujourd'hui", "# Hier", "# lundi 23.11"]],
-    ["ru", ["# Сегодня", "# Вчера", "# понедельник 23.11"]],
+    ["de", ["# Freitag 27.11", "# Donnerstag 26.11", "# Montag 23.11"]],
+    ["fr", ["# vendredi 27.11", "# jeudi 26.11", "# lundi 23.11"]],
+    ["ru", ["# пятница 27.11", "# четверг 26.11", "# понедельник 23.11"]],
   ])("localizes header labels in %s", (locale, headers) => {
     const expenses = [
       expenseOn("lunch", at(2026, 11, 27, 13, 0)),
@@ -162,10 +162,10 @@ describe("groupExpensesForList (week period)", () => {
     const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
 
     expect(outline(entries)).toEqual([
-      "# Today",
+      "# Friday 27.11",
       "lunch",
       "coffee",
-      "# Yesterday",
+      "# Thursday 26.11",
       "dinner",
       "# Tuesday 24.11",
       "backdated",
@@ -183,7 +183,7 @@ describe("groupExpensesForList (week period)", () => {
 
     const entries = groupExpensesForList(expenses, RangeString.week, now, "en");
 
-    expect(outline(entries)).toEqual(["# Today", "first", "second"]);
+    expect(outline(entries)).toEqual(["# Friday 27.11", "first", "second"]);
   });
 
   it("does not reorder the caller's array", () => {

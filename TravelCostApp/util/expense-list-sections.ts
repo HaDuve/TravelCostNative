@@ -88,17 +88,8 @@ const TIME_OF_DAY_GROUPS: ReadonlyArray<{
 
 const JUST_NOW_MINUTES = 60;
 
-/**
- * A group of the Expense list. `timeOfDay` marks today's time-of-day groups
- * in the day period; `noTimeOfDay` marks today's group of Expenses without a
- * real time of day, which goes right after the time-of-day groups.
- */
-type Section = {
-  key: string;
-  label: string;
-  timeOfDay?: boolean;
-  noTimeOfDay?: boolean;
-};
+/** A group of the Expense list: its key and the caption of its header. */
+type Section = { key: string; label: string };
 
 function section(labelKey: string, locale: string): Section {
   return { key: labelKey, label: i18n.t(labelKey, { locale }) };
@@ -144,17 +135,15 @@ function timeOfDaySection(
   now: DateTime,
   locale: string,
 ): Section {
-  if (hasNoTimeOfDay(expense, time)) {
-    return { ...section("today", locale), noTimeOfDay: true };
-  }
+  if (hasNoTimeOfDay(expense, time)) return section("today", locale);
   const minutesAgo = now.diff(time, "minutes").minutes;
   if (minutesAgo >= 0 && minutesAgo < JUST_NOW_MINUTES) {
-    return { ...section("expenseListJustNow", locale), timeOfDay: true };
+    return section("expenseListJustNow", locale);
   }
   const group = TIME_OF_DAY_GROUPS.find(
     ({ fromHour }) => time.hour >= fromHour,
   );
-  return { ...section(group.labelKey, locale), timeOfDay: true };
+  return section(group.labelKey, locale);
 }
 
 function monthSection(date: DateTime, now: DateTime, locale: string): Section {
@@ -238,23 +227,11 @@ export function groupExpensesForList(
       });
   }
 
-  const ordered = [...groups.values()];
-  const noTimeIndex = ordered.findIndex((group) => group.section.noTimeOfDay);
-  if (noTimeIndex >= 0) {
-    const [noTimeGroup] = ordered.splice(noTimeIndex, 1);
-    const lastTimeOfDayIndex = ordered.reduce(
-      (last, group, index) => (group.section.timeOfDay ? index : last),
-      -1,
-    );
-    ordered.splice(
-      lastTimeOfDayIndex >= 0 ? lastTimeOfDayIndex + 1 : noTimeIndex,
-      0,
-      noTimeGroup,
-    );
-  }
-
+  // Groups come in the order of their first Expense. The newest-first sort
+  // already puts today's "Today" group (no time of day) after its
+  // time-of-day groups.
   const entries: ExpenseListEntry[] = [];
-  for (const { section: groupSection, rows } of ordered) {
+  for (const { section: groupSection, rows } of groups.values()) {
     entries.push({
       kind: "dayHeader",
       key: `dayHeader-${groupSection.key}`,

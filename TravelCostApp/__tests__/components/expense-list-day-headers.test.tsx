@@ -135,27 +135,34 @@ describe("ExpensesList day headers", () => {
     });
   });
 
-  it("long-press selects the pressed Expense, not a neighbour", () => {
-    const screen = renderList(weekExpenses(), "week");
+  it.each(["week", "day", "month", "year"])(
+    "long-press selects the pressed Expense, not a neighbour, in the %s period",
+    (periodName) => {
+      const screen = renderList(weekExpenses(), periodName);
+      expect(screen.getAllByRole("header").length).toBeGreaterThan(0);
 
-    fireEvent(screen.getByText("sushi"), "longPress");
+      fireEvent(screen.getByText("sushi"), "longPress");
 
-    expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(1);
-    expect(screen.getAllByTestId("icon-ellipse-outline")).toHaveLength(2);
-  });
+      expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(1);
+      expect(screen.getAllByTestId("icon-ellipse-outline")).toHaveLength(2);
+    },
+  );
 
-  it("select-all selects every Expense and no header", () => {
-    const screen = renderList(weekExpenses(), "week");
-    fireEvent(screen.getByText("sushi"), "longPress");
+  it.each(["week", "day", "month", "year"])(
+    "select-all selects every Expense and no header in the %s period",
+    (periodName) => {
+      const screen = renderList(weekExpenses(), periodName);
+      fireEvent(screen.getByText("sushi"), "longPress");
 
-    fireEvent.press(screen.getByTestId("icon-checkmark-done-outline"));
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
+      fireEvent.press(screen.getByTestId("icon-checkmark-done-outline"));
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
 
-    expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(3);
-    expect(screen.queryAllByTestId("icon-ellipse-outline")).toHaveLength(0);
-  });
+      expect(screen.getAllByTestId("icon-checkmark-circle")).toHaveLength(3);
+      expect(screen.queryAllByTestId("icon-ellipse-outline")).toHaveLength(0);
+    },
+  );
 
   it("splits today into time-of-day headers in the day period, rows showing only the time", () => {
     const screen = renderList(
